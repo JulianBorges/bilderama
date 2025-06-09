@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { ChevronUpIcon, FileIcon, SparklesIcon } from 'lucide-react'
 import { GeneratedFile, AIResponse } from '@/lib/ai'
+import { useProjectStore } from '@/store/project-store'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -182,12 +183,19 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     setActiveSuggestions([])
 
     try {
+      const { pagePlan } = useProjectStore.getState();
+
+      const requestBody = {
+        userInput: content,
+        currentPagePlan: pagePlan,
+      };
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userInput: content }),
+        body: JSON.stringify(requestBody),
       })
 
       const result: AIResponse = await response.json()

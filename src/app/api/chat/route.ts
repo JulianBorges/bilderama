@@ -2,17 +2,34 @@ import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { config } from '@/lib/config'
 import { processUserInput } from '@/lib/ai'
 import { NextResponse } from 'next/server'
+import { getEditedPagePlan } from '@/lib/services/conversationalEditorService'
+import { PagePlan } from '@/lib/schemas'
 
 export async function POST(req: Request) {
   try {
-    const { userInput } = await req.json()
+    const { userInput, currentPagePlan } = await req.json()
 
     if (!userInput) {
       return NextResponse.json({ error: 'userInput é obrigatório' }, { status: 400 });
     }
 
-    const aiResponse = await processUserInput(userInput as string)
+    // Se um plano de página atual for fornecido, entramos no modo de edição.
+    if (currentPagePlan) {
+      const newPlan = await getEditedPagePlan(userInput as string, currentPagePlan as PagePlan);
+      
+      // Criamos uma resposta no formato que o frontend espera.
+      const aiResponse = {
+        pagePlanJson: JSON.stringify(newPlan),
+        // A explicação e as sugestões podem ser genéricas no modo de edição por enquanto.
+        explanation: "Seu site foi atualizado com base na sua instrução.",
+        suggestions: ["O que mais gostaria de alterar?", "Peça para mudar o tema.", "Adicione uma nova seção."]
+      };
 
+      return NextResponse.json(aiResponse);
+    }
+
+    // Caso contrário, usamos o fluxo original de geração de um novo site.
+    const aiResponse = await processUserInput(userInput as string)
     return NextResponse.json(aiResponse)
 
   } catch (error: any) {
