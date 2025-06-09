@@ -44,7 +44,7 @@ export default function Home() {
       const rebuildHtml = async () => {
         setIsGenerating(true);
         try {
-          const response = await fetch('/api/build', {
+          const response = await fetch('/api/render', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pagePlan),

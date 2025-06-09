@@ -1,10 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.externals.push({
       'utf-8-validate': 'commonjs utf-8-validate',
       'bufferutil': 'commonjs bufferutil',
     })
+
+    config.module.rules.push({
+      test: /\.hbs$/,
+      type: 'asset/source',
+    })
+
+    // Suprime avisos específicos do Handlebars no lado do servidor
+    if (isServer) {
+      config.ignoreWarnings = [
+        {
+          module: /handlebars/,
+          message: /require.extensions/,
+        },
+      ];
+    }
+
     return config
   },
   images: {

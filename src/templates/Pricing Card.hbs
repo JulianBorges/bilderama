@@ -1,0 +1,24 @@
+<div class="rounded-2xl border {{#if featured}}border-indigo-500{{else}}border-gray-200{{/if}} bg-white p-8 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+  {{#if featured}}
+  <p class="absolute top-0 -translate-y-1/2 rounded-full bg-indigo-500 px-3 py-1 text-sm font-semibold text-white">Mais Popular</p>
+  {{/if}}
+  <h3 class="text-lg font-semibold text-gray-900 dark:text-white" data-bild-block-index="{{blockIndex}}" data-bild-prop="planName">{{planName}}</h3>
+  <p class="mt-2 text-sm text-gray-600 dark:text-gray-400" data-bild-block-index="{{blockIndex}}" data-bild-prop="planDescription">{{planDescription}}</p>
+  <div class="mt-4 flex items-baseline">
+    <span class="text-4xl font-bold text-gray-900 dark:text-white" data-bild-block-index="{{blockIndex}}" data-bild-prop="price">{{price}}</span>
+    <span class="ml-1 text-gray-600 dark:text-gray-400" data-bild-block-index="{{blockIndex}}" data-bild-prop="billingCycle">/{{billingCycle}}</span>
+  </div>
+  <ul class="mt-6 space-y-4">
+    {{#each features}}
+      <li class="flex items-center">
+        <svg class="h-5 w-5 {{#if this.included}}text-green-500{{else}}text-gray-400{{/if}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{#if this.included}}M5 13l4 4L19 7{{else}}M6 18L18 6M6 6l12 12{{/if}}" />
+        </svg>
+        <span class="ml-3 text-gray-600 dark:text-gray-400">{{this.name}}</span>
+      </li>
+    {{/each}}
+  </ul>
+  <button class="mt-8 w-full rounded-lg {{#if featured}}bg-indigo-600 text-white hover:bg-indigo-700{{else}}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600{{/if}} px-4 py-2 font-semibold" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaText">
+    {{ctaText}}
+  </button>
+</div> 

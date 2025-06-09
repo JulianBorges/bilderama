@@ -44,15 +44,37 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setSelectedElement: (element) => set({ selectedElement: element }),
   setIsEditMode: (isEditMode) => set({ isEditMode: !get().isEditMode }),
 
-  handleCodeGeneration: (response) => {
-    set({ generatedFiles: response.files, isGenerating: false });
-    if (response.pagePlanJson) {
-      try {
-        set({ pagePlan: JSON.parse(response.pagePlanJson) });
-      } catch (e) {
-        console.error("Erro ao fazer parse do PagePlan JSON na store:", e);
-        set({ pagePlan: null });
+  handleCodeGeneration: async (response) => {
+    if (!response.pagePlanJson) {
+      console.error("A resposta da IA não continha um pagePlanJson.");
+      set({ isGenerating: false, generatedFiles: response.files || [] });
+      return;
+    }
+
+    try {
+      const pagePlan: PagePlan = JSON.parse(response.pagePlanJson);
+      set({ pagePlan }); // Armazena o plano recebido
+
+      // Etapa 2: Chamar o renderizador determinístico com o plano.
+      const renderResponse = await fetch('/api/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pagePlan),
+      });
+
+      if (!renderResponse.ok) {
+        throw new Error('Falha ao renderizar a página a partir do plano.');
       }
+
+      const { files } = await renderResponse.json();
+      
+      // Etapa 3: Atualizar o estado com os arquivos renderizados.
+      set({ generatedFiles: files, isGenerating: false });
+
+    } catch (e) {
+      console.error("Erro no fluxo de geração e renderização:", e);
+      // Opcional: define um estado de erro para a UI
+      set({ isGenerating: false, pagePlan: null });
     }
   },
 

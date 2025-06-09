@@ -196,7 +196,7 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
         throw new Error((result as any).error || `Erro da API: ${response.statusText}`);
       }
       
-      if (!result.files || !result.explanation) {
+      if (!result.pagePlanJson || !result.explanation) {
         throw new Error('Resposta incompleta da API')
       }
 
