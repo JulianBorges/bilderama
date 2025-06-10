@@ -3,6 +3,7 @@ import { z } from 'zod';
 // Esquema para um único bloco de construção da página
 const blockSchema = z.object({
   name: z.string(),
+  layout: z.string().optional(),
   properties: z.record(z.any()),
 });
 

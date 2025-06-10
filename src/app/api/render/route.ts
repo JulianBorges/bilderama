@@ -20,14 +20,14 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('[API RENDER ERROR]', error);
 
-    // Se for um erro de validação do Zod, retorna um erro 400 detalhado.
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Estrutura do PagePlan inválida.', details: error.errors }, { status: 400 });
+    // Se for um erro de validação do Zod, retorna uma resposta mais específica
+    if (error instanceof Error && error.name === 'ZodError') {
+      return NextResponse.json({ error: 'Corpo da requisição inválido.', details: error }, { status: 400 });
     }
 
     // Para outros erros, retorna um erro 500 genérico.
     return NextResponse.json(
-      { error: error.message || 'Erro interno do servidor ao renderizar a página.' },
+      { error: 'Erro interno do servidor ao renderizar a página.' },
       { status: 500 }
     );
   }
