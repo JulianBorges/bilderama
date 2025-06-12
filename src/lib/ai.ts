@@ -2,6 +2,7 @@ import { config } from './config'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai-edge'
 import { pagePlanSchema, PagePlan } from './schemas'
 import { ARCHITECT_SYSTEM_PROMPT } from './prompts/architect'
+import { ZodError } from 'zod'
 
 export interface GeneratedFile {
   path: string
@@ -56,7 +57,7 @@ async function callOpenAI(messages: ChatCompletionRequestMessage[]): Promise<str
 }
 
 // Interpreta e estrutura o prompt em inglês
-async function structurePrompt(userInput: string): Promise<string> {
+async function structurePrompt(userInput: string, maxRetries = 3): Promise<string> {
   const messages: ChatCompletionRequestMessage[] = [
     {
       role: 'system',
@@ -64,21 +65,46 @@ async function structurePrompt(userInput: string): Promise<string> {
     },
     {
       role: 'user',
-      content: `REQUISIÇÃO DO USUÁRIO:\n${userInput}`,
+      content: `REQUISIÇÃO DO USUÁRIO:\\n${userInput}`,
     },
-  ]
+  ];
 
-  try {
-    const responseJson = await callOpenAI(messages);
-    // Validação robusta com Zod.
-    // Isso garante que a resposta da IA corresponda exatamente ao nosso esquema definido.
-    const validatedPlan = pagePlanSchema.parse(JSON.parse(responseJson));
-    return JSON.stringify(validatedPlan);
-  } catch (e) {
-    console.error("StructurePrompt não retornou um JSON válido ou compatível com o esquema:", e);
-    // Se for um erro de validação do Zod, o erro será bem detalhado.
-    throw new Error("O Arquiteto da IA falhou em gerar um plano JSON válido e compatível.");
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const responseJson = await callOpenAI(messages);
+      const validatedPlan = pagePlanSchema.parse(JSON.parse(responseJson));
+      return JSON.stringify(validatedPlan); // Sucesso!
+    } catch (e) {
+      console.warn(`Tentativa ${attempt} falhou.`, e);
+      if (e instanceof ZodError) {
+        if (attempt < maxRetries) {
+          // Adiciona uma mensagem de correção para a próxima tentativa
+          messages.push({
+            role: 'assistant',
+            // @ts-ignore
+            content: e.message,
+          });
+          messages.push({
+            role: 'user',
+            content: `A sua resposta anterior continha um JSON inválido. O erro de validação foi: ${JSON.stringify(e.errors)}. Por favor, corrija o JSON e tente novamente.`,
+          });
+        }
+      } else if (e instanceof SyntaxError) {
+         if (attempt < maxRetries) {
+            messages.push({
+              role: 'user',
+              content: `A sua resposta anterior não era um JSON válido. O erro foi: ${e.message}. Por favor, retorne APENAS um objeto JSON válido.`,
+            });
+         }
+      } else {
+        // Erro inesperado, não relacionado à validação, falha imediatamente.
+        throw e;
+      }
+    }
   }
+
+  // Se todas as tentativas falharem
+  throw new Error(`O Arquiteto da IA falhou em gerar um plano JSON válido após ${maxRetries} tentativas.`);
 }
 
 // Analisa o código e gera resumo e sugestões em português

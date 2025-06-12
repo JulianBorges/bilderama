@@ -7,15 +7,22 @@ const blockSchema = z.object({
   properties: z.record(z.any()),
 });
 
+// Esquema para um widget global, como um modal ou um chat flutuante
+const widgetSchema = z.object({
+  name: z.string().describe("O nome do widget, correspondendo ao nome do arquivo de template .hbs."),
+  properties: z.record(z.any()).describe("As propriedades para preencher o template Handlebars do widget."),
+});
+
 // Esquema principal que define a estrutura de todo o plano da página
 export const pagePlanSchema = z.object({
   pageTitle: z.string().describe("O título da página para a tag <title> e SEO."),
   pageDescription: z.string().describe("A meta descrição da página para SEO."),
   theme: z.object({
-    colorPalette: z.enum(['blue', 'green', 'purple', 'orange', 'grayscale']),
+    themeName: z.enum(['moderno_azul', 'calor_tropical']),
     font: z.enum(['inter', 'roboto', 'lato']),
   }),
   blocks: z.array(blockSchema).describe("Um array de blocos que compõem a estrutura da página."),
+  widgets: z.array(widgetSchema).optional().describe("Um array de widgets globais a serem injetados na página, como modais ou pop-ups."),
 });
 
 // Inferimos o tipo TypeScript diretamente do esquema Zod.

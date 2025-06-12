@@ -1,0 +1,13 @@
+<div class="bg-gray-100 dark:bg-gray-900 py-12">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{title}}</h2>
+      <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">{{subtitle}}</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {{#each items}}
+        {{> CardMenuItem .}}
+      {{/each}}
+    </div>
+  </div>
+</div> 

@@ -8,33 +8,51 @@ interface PartialDefinition {
     layout: string;
 }
 
-// Mapeamento de paletas de cores para classes do Tailwind.
-const colorPaletteMap: Record<string, Record<string, string>> = {
-    blue: {
-        'bg-indigo-600': 'bg-blue-600', 'text-indigo-600': 'text-blue-600',
-        'border-indigo-500': 'border-blue-500', 'bg-indigo-500': 'bg-blue-500',
-        'bg-indigo-50': 'bg-blue-50',
-    },
-    green: {
-        'bg-indigo-600': 'bg-green-600', 'text-indigo-600': 'text-green-600',
-        'border-indigo-500': 'border-green-500', 'bg-indigo-500': 'bg-green-500',
-        'bg-indigo-50': 'bg-green-50',
-    },
-    purple: {
-        'bg-indigo-600': 'bg-purple-600', 'text-indigo-600': 'text-purple-600',
-        'border-indigo-500': 'border-purple-500', 'bg-indigo-500': 'bg-purple-500',
-        'bg-indigo-50': 'bg-purple-50',
-    },
-    orange: {
-        'bg-indigo-600': 'bg-orange-600', 'text-indigo-600': 'text-orange-600',
-        'border-indigo-500': 'border-orange-500', 'bg-indigo-500': 'bg-orange-500',
-        'bg-indigo-50': 'bg-orange-50',
-    },
-    grayscale: {
-        'bg-indigo-600': 'bg-gray-600', 'text-indigo-600': 'text-gray-600',
-        'border-indigo-500': 'border-gray-500', 'bg-indigo-500': 'bg-gray-500',
-        'bg-indigo-50': 'bg-gray-50',
-    }
+const themeVariablesMap: Record<string, Record<string, string>> = {
+  moderno_azul: {
+    '--background': '240 10% 3.9%',
+    '--foreground': '0 0% 98%',
+    '--card': '240 10% 3.9%',
+    '--card-foreground': '0 0% 98%',
+    '--popover': '240 10% 3.9%',
+    '--popover-foreground': '0 0% 98%',
+    '--primary': '217.2 91.2% 59.8%',
+    '--primary-foreground': '210 40% 98%',
+    '--secondary': '240 4.8% 95.9%',
+    '--secondary-foreground': '240 5.9% 10%',
+    '--muted': '240 4.8% 95.9%',
+    '--muted-foreground': '240 3.8% 46.1%',
+    '--accent': '240 4.8% 95.9%',
+    '--accent-foreground': '240 5.9% 10%',
+    '--destructive': '0 84.2% 60.2%',
+    '--destructive-foreground': '0 0% 98%',
+    '--border': '240 5.9% 90%',
+    '--input': '240 5.9% 90%',
+    '--ring': '217.2 91.2% 59.8%',
+    '--radius': '0.5rem',
+  },
+  calor_tropical: {
+    '--background': '20 14.3% 4.1%',
+    '--foreground': '0 0% 95%',
+    '--card': '24 9.8% 10%',
+    '--card-foreground': '0 0% 95%',
+    '--popover': '20 14.3% 4.1%',
+    '--popover-foreground': '0 0% 95%',
+    '--primary': '47.9 95.8% 53.1%',
+    '--primary-foreground': '26 83.3% 14.1%',
+    '--secondary': '12 6.5% 15.1%',
+    '--secondary-foreground': '0 0% 98%',
+    '--muted': '12 6.5% 15.1%',
+    '--muted-foreground': '0 0% 63.9%',
+    '--accent': '12 6.5% 15.1%',
+    '--accent-foreground': '0 0% 98%',
+    '--destructive': '0 72.2% 50.6%',
+    '--destructive-foreground': '0 0% 98%',
+    '--border': '12 6.5% 15.1%',
+    '--input': '12 6.5% 15.1%',
+    '--ring': '47.9 95.8% 53.1%',
+    '--radius': '0.8rem',
+  },
 };
 
 let arePartialsRegistered = false;
@@ -55,16 +73,6 @@ function registerPartials(partials: PartialDefinition[], templates: Record<strin
     });
 
     arePartialsRegistered = true;
-}
-
-// Função auxiliar para aplicar o tema de cores ao HTML gerado.
-function applyTheme(html: string, palette: string): string {
-    const themeColors = colorPaletteMap[palette] || colorPaletteMap.blue;
-    let themedHtml = html;
-    for (const [original, replacement] of Object.entries(themeColors)) {
-        themedHtml = themedHtml.replace(new RegExp(original, 'g'), replacement);
-    }
-    return themedHtml;
 }
 
 /**
@@ -94,7 +102,30 @@ export async function renderPage(pagePlan: PagePlan): Promise<GeneratedFile[]> {
         return blockTemplate(context);
     }).join('\n');
     
-    const themedBodyContent = applyTheme(bodyContent, pagePlan.theme.colorPalette);
+    // Gera a tag de estilo com as variáveis CSS do tema
+    const themeName = pagePlan.theme.themeName || 'moderno_azul';
+    const variables = themeVariablesMap[themeName];
+    const cssVariables = Object.entries(variables)
+      .map(([key, value]) => `${key}: ${value};`)
+      .join('\n');
+    const themeStyleTag = `<style>:root {\\n${cssVariables}\\n}</style>`;
+
+    // Processa e injeta os widgets, se existirem.
+    let widgetsHtml = '';
+    if (pagePlan.widgets && pagePlan.widgets.length > 0) {
+      widgetsHtml = pagePlan.widgets.map(widget => {
+        const templatePath = `${widget.name}/default.hbs`;
+        const templateString = templates[templatePath];
+
+        if (!templateString) {
+          console.warn(`Template não encontrado para o widget: ${widget.name} em ${templatePath}`);
+          return `<!-- Template para widget ${widget.name} não encontrado -->`;
+        }
+
+        const widgetTemplate = Handlebars.compile(templateString, { noEscape: true });
+        return widgetTemplate(widget.properties);
+      }).join('\\n');
+    }
 
     // Monta o documento HTML final.
     const fullHtml = `
@@ -106,9 +137,11 @@ export async function renderPage(pagePlan: PagePlan): Promise<GeneratedFile[]> {
     <title>${pagePlan.pageTitle}</title>
     <meta name="description" content="${pagePlan.pageDescription}">
     <script src="https://cdn.tailwindcss.com"></script>
+    ${themeStyleTag}
 </head>
 <body>
-${themedBodyContent}
+${bodyContent}
+${widgetsHtml}
 </body>
 </html>`;
 
