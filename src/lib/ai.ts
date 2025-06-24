@@ -56,6 +56,14 @@ async function callOpenAI(messages: ChatCompletionRequestMessage[]): Promise<str
   }
 }
 
+// Função para limpar a string JSON
+function cleanJsonString(jsonString: string): string {
+  return jsonString
+    .replace(/^```json\s*/, '') // Remove ```json no início
+    .replace(/\s*```$/, '')     // Remove ``` no final
+    .trim();                    // Remove espaços extras
+}
+
 // Interpreta e estrutura o prompt em inglês
 async function structurePrompt(userInput: string, maxRetries = 3): Promise<string> {
   const messages: ChatCompletionRequestMessage[] = [
@@ -72,7 +80,8 @@ async function structurePrompt(userInput: string, maxRetries = 3): Promise<strin
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const responseJson = await callOpenAI(messages);
-      const validatedPlan = pagePlanSchema.parse(JSON.parse(responseJson));
+      const cleanedJson = cleanJsonString(responseJson);
+      const validatedPlan = pagePlanSchema.parse(JSON.parse(cleanedJson));
       return JSON.stringify(validatedPlan); // Sucesso!
     } catch (e) {
       console.warn(`Tentativa ${attempt} falhou.`, e);

@@ -37,10 +37,9 @@ A arquitetura do Bilderama é seu maior diferencial, garantindo velocidade e con
 
 ## Roteiro Estratégico: O Caminho para o Mercado
 
-Com a fundação técnica estável, nosso foco se volta para a experiência do usuário e a criação de um produto com apelo comercial, guiado pela filosofia de ser um "copiloto assistido por IA".
+### Visão de Longo Prazo
 
-### Fase 1: O MVP Comercial e a Experiência "Premium" (Foco Imediato)
-
+#### Fase 1: O MVP Comercial e a Experiência "Premium"
 *O objetivo desta fase é fazer com que o Bilderama gere sites visualmente ricos e variados, e que a experiência de usar a ferramenta seja elegante e impressionante.*
 
 1.  **Enriquecimento da Biblioteca de Componentes (Prioridade Máxima):** Adicionar novos blocos de construção, aprimorar os existentes e adicionar outros elementos modernos para aumentar a variedade e a qualidade dos sites gerados.
@@ -49,20 +48,44 @@ Com a fundação técnica estável, nosso foco se volta para a experiência do u
 4.  **Refinamento da Experiência "Copiloto":** Melhorar a comunicação da IA, para que ela descreva as ações que realizou e ofereça sugestões mais contextuais.
 5.  **Renderização Progressiva (UX):** Implementar o efeito visual de "live coding" ou de construção bloco a bloco para reforçar o "fator wow" e a sensação de que a IA está trabalhando para o usuário.
 
-### Fase 2: Expansão da Plataforma e Persistência (Médio Prazo)
-
+#### Fase 2: Expansão da Plataforma e Persistência
 *Com a experiência de criação no ponto, agora expandimos o escopo do que o Bilderama pode fazer e garantimos que o trabalho do usuário seja permanente.*
 
 1.  **Persistência em Banco de Dados:** Implementar um backend com autenticação de usuários e banco de dados (ex: Supabase) para permitir o salvamento de múltiplos projetos e o versionamento de alterações.
 2.  **Suporte a Múltiplas Páginas:** Permitir a criação de sites completos (Home, Sobre, Contato, etc.) com navegação interligada.
 3.  **Ampliação dos Tipos de Geração:** Com a base de componentes e o suporte a múltiplas páginas, oferecer a criação de Blogs, Dashboards e sites de E-commerce simples.
 
-### Fase 3: Monetização e Ecossistema (Longo Prazo)
-
+#### Fase 3: Monetização e Ecossistema
 *Com uma plataforma robusta, focamos em monetizar e nos conectar ao ecossistema mais amplo.*
 
 1.  **Sistema de Deploy e Domínios:** Implementar a publicação com 1 clique em subdomínios `*.bilderama.com` (gratuito) e a conexão de domínios próprios (planos pagos).
 2.  **Integração com Ecossistema DEV:** Explorar funcionalidades "Pro" como o suporte a LLMs locais (Ollama) e a exportação de projetos para o GitHub.
+
+---
+
+### Plano de Ação Imediato (Prioridades Atuais)
+
+Para executar a visão acima, nosso roadmap tático atual está organizado da seguinte forma:
+
+#### 1. Prioridade Máxima: Persistência de Projetos
+* **Missão:** Transformar o Bilderama de uma demonstração tecnológica em uma ferramenta de trabalho real.
+* **Tarefas:** Implementar autenticação de usuários e um banco de dados para salvar, carregar e gerenciar múltiplos projetos.
+
+#### 2. Prioridade Alta: Integração Profunda com Tailwind CSS
+* **Missão:** Elevar a qualidade e o profissionalismo do código gerado.
+* **Tarefas:** Refatorar o sistema para usar o Tailwind CSS em tempo de build, eliminando a dependência do CDN e permitindo otimizações e uso de funcionalidades avançadas.
+
+#### 3. Prioridade Média: Aumentar o Arsenal Criativo da IA
+* **Missão:** Enriquecer a biblioteca para que a IA possa criar sites mais ricos e variados.
+* **Tarefas:** Expansão do catálogo de componentes (FAQ, Contato, Galeria) e implementação de layouts alternativos para os componentes existentes.
+
+#### 4. Prioridade Média-Baixa: Aprimorar a Inteligência e a Interação
+* **Missão:** Tornar a IA mais autônoma e a experiência de uso mais fluida.
+* **Tarefas:** Dinamização do `ARCHITECT_SYSTEM_PROMPT` e implementação de sugestões de acompanhamento no chat.
+
+#### 5. Prioridade Futura: Funcionalidades de Grande Escala
+* **Missão:** Expandir o escopo do que o Bilderama pode criar.
+* **Tarefas:** Adicionar suporte a múltiplas páginas e animações.
 
 ## Como Executar o Projeto
 

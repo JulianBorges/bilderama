@@ -2,58 +2,60 @@ import Handlebars from 'handlebars';
 import { PagePlan } from './schemas';
 import { GeneratedFile } from './ai';
 import { loadTemplates } from '@/templates';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+const themeVariablesMap = {
+  moderno_azul: {
+    '--background': '0 0% 100%',
+    '--foreground': '222.2 84% 4.9%',
+    '--card': '0 0% 100%',
+    '--card-foreground': '222.2 84% 4.9%',
+    '--popover': '0 0% 100%',
+    '--popover-foreground': '222.2 84% 4.9%',
+    '--primary': '221.2 83.2% 53.3%',
+    '--primary-foreground': '210 40% 98%',
+    '--secondary': '210 40% 96.1%',
+    '--secondary-foreground': '222.2 47.4% 11.2%',
+    '--muted': '210 40% 96.1%',
+    '--muted-foreground': '215.4 16.3% 46.9%',
+    '--accent': '210 40% 96.1%',
+    '--accent-foreground': '222.2 47.4% 11.2%',
+    '--destructive': '0 84.2% 60.2%',
+    '--destructive-foreground': '210 40% 98%',
+    '--border': '214.3 31.8% 91.4%',
+    '--input': '214.3 31.8% 91.4%',
+    '--ring': '221.2 83.2% 53.3%',
+    '--radius': '0.5rem',
+  },
+  calor_tropical: {
+    '--background': '20 14.3% 4.1%',
+    '--foreground': '60 9.1% 97.8%',
+    '--card': '20 14.3% 4.1%',
+    '--card-foreground': '60 9.1% 97.8%',
+    '--popover': '20 14.3% 4.1%',
+    '--popover-foreground': '60 9.1% 97.8%',
+    '--primary': '20.5 90.2% 48.2%',
+    '--primary-foreground': '60 9.1% 97.8%',
+    '--secondary': '12 6.5% 15.1%',
+    '--secondary-foreground': '60 9.1% 97.8%',
+    '--muted': '12 6.5% 15.1%',
+    '--muted-foreground': '24 5.4% 63.9%',
+    '--accent': '12 6.5% 15.1%',
+    '--accent-foreground': '60 9.1% 97.8%',
+    '--destructive': '0 72.2% 50.6%',
+    '--destructive-foreground': '60 9.1% 97.8%',
+    '--border': '12 6.5% 15.1%',
+    '--input': '12 6.5% 15.1%',
+    '--ring': '20.5 90.2% 48.2%',
+    '--radius': '0.5rem',
+  }
+};
 
 interface PartialDefinition {
     name: string;
     layout: string;
 }
-
-const themeVariablesMap: Record<string, Record<string, string>> = {
-  moderno_azul: {
-    '--background': '240 10% 3.9%',
-    '--foreground': '0 0% 98%',
-    '--card': '240 10% 3.9%',
-    '--card-foreground': '0 0% 98%',
-    '--popover': '240 10% 3.9%',
-    '--popover-foreground': '0 0% 98%',
-    '--primary': '217.2 91.2% 59.8%',
-    '--primary-foreground': '210 40% 98%',
-    '--secondary': '240 4.8% 95.9%',
-    '--secondary-foreground': '240 5.9% 10%',
-    '--muted': '240 4.8% 95.9%',
-    '--muted-foreground': '240 3.8% 46.1%',
-    '--accent': '240 4.8% 95.9%',
-    '--accent-foreground': '240 5.9% 10%',
-    '--destructive': '0 84.2% 60.2%',
-    '--destructive-foreground': '0 0% 98%',
-    '--border': '240 5.9% 90%',
-    '--input': '240 5.9% 90%',
-    '--ring': '217.2 91.2% 59.8%',
-    '--radius': '0.5rem',
-  },
-  calor_tropical: {
-    '--background': '20 14.3% 4.1%',
-    '--foreground': '0 0% 95%',
-    '--card': '24 9.8% 10%',
-    '--card-foreground': '0 0% 95%',
-    '--popover': '20 14.3% 4.1%',
-    '--popover-foreground': '0 0% 95%',
-    '--primary': '47.9 95.8% 53.1%',
-    '--primary-foreground': '26 83.3% 14.1%',
-    '--secondary': '12 6.5% 15.1%',
-    '--secondary-foreground': '0 0% 98%',
-    '--muted': '12 6.5% 15.1%',
-    '--muted-foreground': '0 0% 63.9%',
-    '--accent': '12 6.5% 15.1%',
-    '--accent-foreground': '0 0% 98%',
-    '--destructive': '0 72.2% 50.6%',
-    '--destructive-foreground': '0 0% 98%',
-    '--border': '12 6.5% 15.1%',
-    '--input': '12 6.5% 15.1%',
-    '--ring': '47.9 95.8% 53.1%',
-    '--radius': '0.8rem',
-  },
-};
 
 let arePartialsRegistered = false;
 
@@ -75,15 +77,34 @@ function registerPartials(partials: PartialDefinition[], templates: Record<strin
     arePartialsRegistered = true;
 }
 
+async function getBuiltCss(): Promise<string> {
+    try {
+        const cssDir = path.join(process.cwd(), '.next', 'static', 'css');
+        const files = await fs.readdir(cssDir);
+        const cssFile = files.find(file => file.endsWith('.css'));
+        if (!cssFile) {
+            console.warn('Nenhum arquivo CSS de build encontrado.');
+            return '';
+        }
+        const cssPath = path.join(cssDir, cssFile);
+        const cssContent = await fs.readFile(cssPath, 'utf-8');
+        return cssContent;
+    } catch (error) {
+        console.error('Falha ao ler o CSS de build:', error);
+        // Retorna string vazia para não quebrar a renderização da página
+        return '';
+    }
+}
+
 /**
  * Renderiza uma página completa a partir de um PagePlan usando templates Handlebars.
  * @param pagePlan O plano da página validado.
+ * @param cssContent O conteúdo CSS compilado do build.
  * @returns Uma Promise que resolve para um array de arquivos gerados.
  */
-export async function renderPage(pagePlan: PagePlan): Promise<GeneratedFile[]> {
+export async function renderPage(pagePlan: PagePlan, cssContent: string): Promise<GeneratedFile[]> {
     const { templates, partials } = await loadTemplates();
     
-    // Garante que os parciais sejam registrados antes de qualquer renderização.
     registerPartials(partials, templates);
 
     const bodyContent = pagePlan.blocks.map((block, index) => {
@@ -100,17 +121,26 @@ export async function renderPage(pagePlan: PagePlan): Promise<GeneratedFile[]> {
         const context = { ...block.properties, blockIndex: index };
         
         return blockTemplate(context);
-    }).join('\n');
+    }).join('');
     
-    // Gera a tag de estilo com as variáveis CSS do tema
-    const themeName = pagePlan.theme.themeName || 'moderno_azul';
-    const variables = themeVariablesMap[themeName];
-    const cssVariables = Object.entries(variables)
-      .map(([key, value]) => `${key}: ${value};`)
-      .join('\n');
-    const themeStyleTag = `<style>:root {\\n${cssVariables}\\n}</style>`;
+    // Gera as variáveis CSS do tema
+    const themeVariables = themeVariablesMap[pagePlan.theme.themeName];
+    const themeCss = Object.entries(themeVariables)
+        .map(([key, value]) => `${key}: ${value};`)
+        .join('\n    ');
+    
+    const themeStyleTag = pagePlan.theme.themeName === 'calor_tropical'
+        ? `<style>\n  .dark {\n    ${themeCss}\n  }\n</style>`
+        : `<style>\n  :root {\n    ${themeCss}\n  }\n</style>`;
 
-    // Processa e injeta os widgets, se existirem.
+    // Gera a tag de estilo com o CSS compilado
+    let compiledCssTag = '';
+    if (cssContent && cssContent.trim().length > 0) {
+      compiledCssTag = `<style>${cssContent}</style>`;
+    } else {
+      compiledCssTag = `<style>body:before{display:block;white-space:pre;content:'[AVISO] CSS de build não encontrado. Rode "next build" para gerar o CSS.';color:red;background:#fff;padding:2rem;}</style>`;
+    }
+
     let widgetsHtml = '';
     if (pagePlan.widgets && pagePlan.widgets.length > 0) {
       widgetsHtml = pagePlan.widgets.map(widget => {
@@ -124,20 +154,19 @@ export async function renderPage(pagePlan: PagePlan): Promise<GeneratedFile[]> {
 
         const widgetTemplate = Handlebars.compile(templateString, { noEscape: true });
         return widgetTemplate(widget.properties);
-      }).join('\\n');
+      }).join('');
     }
 
-    // Monta o documento HTML final.
     const fullHtml = `
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="${pagePlan.theme.themeName === 'calor_tropical' ? 'dark' : ''}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${pagePlan.pageTitle}</title>
     <meta name="description" content="${pagePlan.pageDescription}">
-    <script src="https://cdn.tailwindcss.com"></script>
     ${themeStyleTag}
+    ${compiledCssTag}
 </head>
 <body>
 ${bodyContent}
