@@ -1,7 +1,14 @@
 import { config } from './config'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai-edge'
 import { pagePlanSchema, PagePlan } from './schemas'
-import { ARCHITECT_SYSTEM_PROMPT } from './prompts/architect'
+import { 
+  CREATIVE_ARCHITECT_SYSTEM_PROMPT, 
+  buildCreativePrompt, 
+  selectPersonalityForContext,
+  CreativeContext,
+  DESIGN_PERSONALITIES 
+} from './prompts/creative-architect'
+import { interpretBusinessContext } from './services/contextInterpreter'
 import { ZodError } from 'zod'
 
 export interface GeneratedFile {
@@ -16,6 +23,8 @@ export interface AIResponse {
   files: GeneratedFile[] | null
   explanation: string
   suggestions: string[]
+  designPersonality?: string
+  designRationale?: string
 }
 
 const openaiConfig = new Configuration({
@@ -64,25 +73,48 @@ function cleanJsonString(jsonString: string): string {
     .trim();                    // Remove espaços extras
 }
 
-// Interpreta e estrutura o prompt em inglês
-async function structurePrompt(userInput: string, maxRetries = 3): Promise<string> {
+// Nova função principal que usa o sistema criativo
+async function generateCreativePagePlan(userInput: string, maxRetries = 3): Promise<{
+  pagePlan: string;
+  designPersonality: string;
+  designRationale: string;
+}> {
+  // Etapa 1: Interpretar o contexto do negócio
+  console.log('Interpretando contexto do negócio...');
+  const { context, insights, recommendations } = await interpretBusinessContext(userInput);
+  
+  // Etapa 2: Selecionar personalidade de design apropriada
+  const selectedPersonality = selectPersonalityForContext(context);
+  const personality = DESIGN_PERSONALITIES[selectedPersonality];
+  
+  console.log(`Personalidade selecionada: ${personality.name}`);
+  
+  // Etapa 3: Construir prompt criativo personalizado
+  const creativePrompt = buildCreativePrompt(context, selectedPersonality);
+  
   const messages: ChatCompletionRequestMessage[] = [
     {
       role: 'system',
-      content: ARCHITECT_SYSTEM_PROMPT
+      content: creativePrompt
     },
     {
       role: 'user',
-      content: `REQUISIÇÃO DO USUÁRIO:\\n${userInput}`,
+      content: userInput,
     },
   ];
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      console.log(`Tentativa ${attempt} de geração criativa...`);
       const responseJson = await callOpenAI(messages);
       const cleanedJson = cleanJsonString(responseJson);
       const validatedPlan = pagePlanSchema.parse(JSON.parse(cleanedJson));
-      return JSON.stringify(validatedPlan); // Sucesso!
+      
+      return {
+        pagePlan: JSON.stringify(validatedPlan),
+        designPersonality: personality.name,
+        designRationale: `Abordagem ${personality.name}: ${personality.approach}. Focando em ${personality.strengths.join(', ')}.`
+      };
     } catch (e) {
       console.warn(`Tentativa ${attempt} falhou.`, e);
       if (e instanceof ZodError) {
@@ -95,14 +127,14 @@ async function structurePrompt(userInput: string, maxRetries = 3): Promise<strin
           });
           messages.push({
             role: 'user',
-            content: `A sua resposta anterior continha um JSON inválido. O erro de validação foi: ${JSON.stringify(e.errors)}. Por favor, corrija o JSON e tente novamente.`,
+            content: `A sua resposta anterior continha um JSON inválido. O erro de validação foi: ${JSON.stringify(e.errors)}. Por favor, corrija o JSON e tente novamente seguindo exatamente o novo schema com 'composition.sections'.`,
           });
         }
       } else if (e instanceof SyntaxError) {
          if (attempt < maxRetries) {
             messages.push({
               role: 'user',
-              content: `A sua resposta anterior não era um JSON válido. O erro foi: ${e.message}. Por favor, retorne APENAS um objeto JSON válido.`,
+              content: `A sua resposta anterior não era um JSON válido. O erro foi: ${e.message}. Por favor, retorne APENAS um objeto JSON válido seguindo o novo schema flexível.`,
             });
          }
       } else {
@@ -113,44 +145,135 @@ async function structurePrompt(userInput: string, maxRetries = 3): Promise<strin
   }
 
   // Se todas as tentativas falharem
-  throw new Error(`O Arquiteto da IA falhou em gerar um plano JSON válido após ${maxRetries} tentativas.`);
+  throw new Error(`O Arquiteto Criativo da IA falhou em gerar um plano JSON válido após ${maxRetries} tentativas.`);
+}
+
+// Fallback para o sistema original
+async function generateBasicPagePlan(userInput: string, maxRetries = 3): Promise<string> {
+  // Usa o prompt original como fallback
+  const BASIC_SYSTEM_PROMPT = `
+  Você é um arquiteto de interfaces web. Crie um PagePlan em JSON para: ${userInput}
+  
+  Use o novo schema com 'composition.sections' em vez de 'blocks' diretos.
+  
+  Exemplo de estrutura:
+  {
+    "pageTitle": "...",
+    "pageDescription": "...",
+    "pageType": "landing",
+    "targetAudience": "...",
+    "conversionGoal": "...",
+    "theme": { "themeName": "moderno_azul", "font": "inter" },
+    "composition": {
+      "type": "linear",
+      "sections": [
+        {
+          "id": "hero-section",
+          "name": "Hero Principal",
+          "layout": "grid",
+          "gridConfig": { "columns": 1 },
+          "blocks": [
+            {
+              "id": "hero-1",
+              "name": "HeroModerno",
+              "variant": "default",
+              "properties": { ... }
+            }
+          ]
+        }
+      ]
+    }
+  }
+  `;
+
+  const messages: ChatCompletionRequestMessage[] = [
+    {
+      role: 'system',
+      content: BASIC_SYSTEM_PROMPT
+    },
+    {
+      role: 'user',
+      content: userInput,
+    },
+  ];
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const responseJson = await callOpenAI(messages);
+      const cleanedJson = cleanJsonString(responseJson);
+      const validatedPlan = pagePlanSchema.parse(JSON.parse(cleanedJson));
+      return JSON.stringify(validatedPlan);
+    } catch (e) {
+      console.warn(`Fallback attempt ${attempt} failed.`, e);
+      if (attempt === maxRetries) {
+        throw e;
+      }
+    }
+  }
+
+  throw new Error('Fallback também falhou');
 }
 
 // Analisa o código e gera resumo e sugestões em português
-async function generateAnalysis(files: GeneratedFile[]): Promise<{ explanation: string; suggestions: string[] }> {
-  // A análise agora pode ser mais simples ou focada em outras coisas,
-  // já que a geração de código é previsível.
-  // Por enquanto, vamos retornar valores mockados.
-  const analysisPrompt = `Baseado nos seguintes arquivos, gere uma breve explicação e 3 sugestões de melhoria: ${JSON.stringify(files)}`;
+async function generateAnalysis(files: GeneratedFile[], personality?: string): Promise<{ explanation: string; suggestions: string[] }> {
+  if (personality) {
+    const selectedPersonality = Object.values(DESIGN_PERSONALITIES).find(p => p.name === personality);
+    if (selectedPersonality) {
+      return {
+        explanation: `Seu site foi criado seguindo a abordagem ${personality}. ${selectedPersonality.approach}`,
+        suggestions: [
+          `Como ${personality.split(' - ')[0]}, recomendo focar em ${selectedPersonality.strengths[0].toLowerCase()}`,
+          "Experimente ajustar as cores ou fontes para refinar a personalidade da marca",
+          "Considere adicionar mais elementos que reforcem seus objetivos de conversão"
+        ]
+      };
+    }
+  }
   
-  // Esta parte pode ser expandida no futuro.
-  // const response = await callOpenAI([...]); 
-  
-    return {
-    explanation: "Seu site foi gerado com sucesso usando um plano de construção estruturado e um motor de renderização determinístico.",
-    suggestions: ["Experimente pedir uma paleta de cores diferente.", "Adicione uma seção de depoimentos de clientes.", "Peça para incluir uma galeria de imagens."]
+  return {
+    explanation: "Seu site foi gerado com sucesso usando um sistema de design inteligente e adaptativo.",
+    suggestions: ["Experimente pedir mudanças específicas", "Teste diferentes personalidades de design", "Adicione mais detalhes sobre seu negócio para resultados mais personalizados"]
   }
 }
 
 /**
- * Orquestra o fluxo principal:
- * 1. Pega o input do usuário e gera um PagePlan estruturado via IA.
- * 2. (Etapa removida) Não gera mais código diretamente aqui.
- * 3. Analisa o resultado para fornecer feedback.
- * Retorna o PagePlan e a análise.
+ * Orquestra o novo fluxo criativo:
+ * 1. Interpreta contexto do negócio
+ * 2. Seleciona personalidade de design apropriada  
+ * 3. Gera PagePlan criativo e flexível
+ * 4. Fornece explicação personalizada
  */
 export async function processUserInput(userInput: string): Promise<AIResponse> {
-  const pagePlanJson = await structurePrompt(userInput)
-  
-  // A análise agora é mockada, pois não temos mais os arquivos gerados pela IA aqui.
-  // O ideal seria que a análise acontecesse no frontend após a renderização.
-  // Por simplicidade, vamos manter um mock aqui.
-  const analysis = await generateAnalysis([]);
+  try {
+    // Tenta usar o sistema criativo primeiro
+    const { pagePlan, designPersonality, designRationale } = await generateCreativePagePlan(userInput);
+    const analysis = await generateAnalysis([], designPersonality);
 
-  return {
-    pagePlanJson,
-    files: null, // O frontend irá gerar os arquivos com o PagePlan
-    explanation: analysis.explanation,
-    suggestions: analysis.suggestions,
+    return {
+      pagePlanJson: pagePlan,
+      files: null, 
+      explanation: `${analysis.explanation}\n\n${designRationale}`,
+      suggestions: analysis.suggestions,
+      designPersonality,
+      designRationale
+    };
+  } catch (error) {
+    console.error('Sistema criativo falhou, usando fallback:', error);
+    
+    try {
+      // Fallback para sistema básico
+      const pagePlanJson = await generateBasicPagePlan(userInput);
+      const analysis = await generateAnalysis([]);
+
+      return {
+        pagePlanJson,
+        files: null,
+        explanation: analysis.explanation,
+        suggestions: analysis.suggestions,
+      };
+    } catch (fallbackError) {
+      console.error('Fallback também falhou:', fallbackError);
+      throw new Error('Não foi possível gerar o site. Tente ser mais específico sobre seu negócio.');
+    }
   }
 }

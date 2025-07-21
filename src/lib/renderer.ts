@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars';
-import { PagePlan } from './schemas';
+import { PagePlan, Section, Block } from './schemas';
 import { GeneratedFile } from './ai';
 import { loadTemplates } from '@/templates';
 import fs from 'node:fs/promises';
@@ -322,6 +322,147 @@ async function getBuiltCss(): Promise<string> {
     }
 }
 
+function renderBlock(block: Block, templates: Record<string, string>, blockIndex: number): string {
+    const variant = block.variant || 'default';
+    const templatePath = `${block.name}/${variant}.hbs`;
+    const templateString = templates[templatePath];
+
+    if (!templateString) {
+        console.warn(`Template não encontrado para o bloco: ${block.name} com variant: ${variant} em ${templatePath}`);
+        return `<!-- Template para ${block.name} (${variant}) não encontrado -->`;
+    }
+    
+    const blockTemplate = Handlebars.compile(templateString, { noEscape: true });
+    
+    // Merge das propriedades com metadados do bloco
+    const context = { 
+        ...block.properties, 
+        blockIndex,
+        blockId: block.id 
+    };
+    
+    let renderedContent = blockTemplate(context);
+    
+    // Aplica styling customizado se presente
+    if (block.styling?.customCSS) {
+        renderedContent = `
+            <style>
+                #${block.id} { ${block.styling.customCSS} }
+            </style>
+            ${renderedContent}
+        `;
+    }
+    
+    return renderedContent;
+}
+
+function renderSection(section: Section, templates: Record<string, string>): string {
+    const { layout, gridConfig, blocks, styling } = section;
+    
+    // Renderiza todos os blocos da seção
+    const renderedBlocks = blocks.map((block, index) => {
+        const blockHtml = renderBlock(block, templates, index);
+        
+        // Se o bloco tem posicionamento específico, envolve em container
+        if (block.position) {
+            const gridPosition = generateGridPositionCSS(block.position);
+            return `<div class="section-block" style="${gridPosition}">${blockHtml}</div>`;
+        }
+        
+        return blockHtml;
+    });
+    
+    // Gera CSS do layout da seção
+    const layoutCSS = generateSectionLayoutCSS(layout, gridConfig);
+    const stylingSS = styling ? generateSectionStylingCSS(styling) : '';
+    
+    return `
+        <section id="${section.id}" class="section-container ${layout}-layout" style="${layoutCSS}${stylingSS}">
+            ${renderedBlocks.join('')}
+        </section>
+    `;
+}
+
+function generateGridPositionCSS(position: any): string {
+    const { desktop, tablet, mobile } = position;
+    let css = '';
+    
+    if (desktop) {
+        css += `
+            grid-row: ${desktop.row} / span ${desktop.rowSpan || 1};
+            grid-column: ${desktop.column} / span ${desktop.columnSpan || 1};
+        `;
+    }
+    
+    // Adiciona responsividade se tablet/mobile definidos
+    if (tablet || mobile) {
+        css += `
+            @media (max-width: 1024px) {
+                ${tablet ? `
+                    grid-row: ${tablet.row} / span ${tablet.rowSpan || 1};
+                    grid-column: ${tablet.column} / span ${tablet.columnSpan || 1};
+                ` : ''}
+            }
+            @media (max-width: 768px) {
+                ${mobile ? `
+                    grid-row: ${mobile.row} / span ${mobile.rowSpan || 1};
+                    grid-column: ${mobile.column} / span ${mobile.columnSpan || 1};
+                    order: ${mobile.order || 'unset'};
+                ` : ''}
+            }
+        `;
+    }
+    
+    return css;
+}
+
+function generateSectionLayoutCSS(layout: string, gridConfig?: any): string {
+    switch (layout) {
+        case 'grid':
+            return gridConfig ? `
+                display: grid;
+                grid-template-columns: repeat(${gridConfig.columns}, 1fr);
+                ${gridConfig.rows ? `grid-template-rows: repeat(${gridConfig.rows}, 1fr);` : ''}
+                gap: ${gridConfig.gap || '1rem'};
+            ` : 'display: grid; gap: 1rem;';
+            
+        case 'flexbox':
+            return 'display: flex; flex-wrap: wrap; gap: 1rem;';
+            
+        case 'masonry':
+            return `
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1rem;
+                align-items: start;
+            `;
+            
+        case 'carousel':
+            return `
+                display: flex;
+                overflow-x: auto;
+                gap: 1rem;
+                scroll-snap-type: x mandatory;
+            `;
+            
+        default:
+            return 'display: block;';
+    }
+}
+
+function generateSectionStylingCSS(styling: any): string {
+    let css = '';
+    
+    if (styling.background) {
+        css += `background: ${styling.background};`;
+    }
+    if (styling.minHeight) {
+        css += `min-height: ${styling.minHeight};`;
+    }
+    
+    return css;
+}
+
 /**
  * Renderiza uma página completa a partir de um PagePlan usando templates Handlebars.
  * @param pagePlan O plano da página validado.
@@ -333,24 +474,32 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     
     registerPartials(partials, templates);
 
-    const bodyContent = pagePlan.blocks.map((block, index) => {
-        const templatePath = `${block.name}/${block.layout || 'default'}.hbs`;
-        const templateString = templates[templatePath];
-
-        if (!templateString) {
-            console.warn(`Template não encontrado para o bloco: ${block.name} com layout: ${block.layout || 'default'}`);
-            return `<!-- Template para ${block.name} (${block.layout || 'default'}) não encontrado em ${templatePath} -->`;
-        }
-        
-        const blockTemplate = Handlebars.compile(templateString, { noEscape: true });
-        
-        const context = { ...block.properties, blockIndex: index };
-        
-        return blockTemplate(context);
-    }).join('');
+    let bodyContent = '';
+    
+    // Renderiza usando nova estrutura de composition se disponível
+    if (pagePlan.composition?.sections) {
+        bodyContent = pagePlan.composition.sections
+            .map(section => renderSection(section, templates))
+            .join('');
+    } 
+    // Fallback para estrutura antiga (blocks)
+    else if (pagePlan.blocks) {
+        bodyContent = pagePlan.blocks.map((block, index) => {
+            return renderBlock(block, templates, index);
+        }).join('');
+    }
     
     // Gera as variáveis CSS do tema
     const themeVariables = themeVariablesMap[pagePlan.theme.themeName] || themeVariablesMap.moderno_azul;
+    
+    // Aplica customizações de paleta se presentes
+    if (pagePlan.theme.customPalette) {
+        const customPalette = pagePlan.theme.customPalette;
+        if (customPalette.primary) themeVariables['--primary'] = customPalette.primary;
+        if (customPalette.secondary) themeVariables['--secondary'] = customPalette.secondary;
+        if (customPalette.accent) themeVariables['--accent'] = customPalette.accent;
+    }
+    
     const themeCss = Object.entries(themeVariables)
         .map(([key, value]) => `${key}: ${value};`)
         .join('\n    ');
@@ -404,6 +553,15 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     const fontLink = fontLinks[pagePlan.theme.font] || fontLinks.inter;
     const fontFamilyCSS = `<style>body { font-family: '${pagePlan.theme.font.charAt(0).toUpperCase() + pagePlan.theme.font.slice(1)}', sans-serif; }</style>`;
 
+    // SEO enhancements
+    const seoTags = pagePlan.seo ? `
+        ${pagePlan.seo.keywords ? `<meta name="keywords" content="${pagePlan.seo.keywords.join(', ')}">` : ''}
+        ${pagePlan.seo.ogImage ? `<meta property="og:image" content="${pagePlan.seo.ogImage}">` : ''}
+        <meta property="og:title" content="${pagePlan.pageTitle}">
+        <meta property="og:description" content="${pagePlan.pageDescription}">
+        ${pagePlan.seo.structuredData ? `<script type="application/ld+json">${JSON.stringify(pagePlan.seo.structuredData)}</script>` : ''}
+    ` : '';
+
     const fullHtml = `
 <!DOCTYPE html>
 <html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}">
@@ -412,14 +570,17 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${pagePlan.pageTitle}</title>
     <meta name="description" content="${pagePlan.pageDescription}">
+    ${seoTags}
     ${fontLink}
     ${themeStyleTag}
     ${fontFamilyCSS}
     ${compiledCssTag}
+    ${pagePlan.customCode?.head || ''}
 </head>
 <body>
 ${bodyContent}
 ${widgetsHtml}
+${pagePlan.customCode?.body || ''}
 </body>
 </html>`;
 
@@ -427,6 +588,6 @@ ${widgetsHtml}
     path: 'index.html',
         content: fullHtml,
         type: 'page',
-        description: 'Página principal construída via renderizador determinístico.'
+        description: 'Página principal construída via renderizador determinístico flexível.'
     }];
 } 
