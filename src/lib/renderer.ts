@@ -49,7 +49,233 @@ const themeVariablesMap = {
     '--input': '12 6.5% 15.1%',
     '--ring': '20.5 90.2% 48.2%',
     '--radius': '0.5rem',
+  },
+  tech_neon: {
+    '--background': '230 15% 3%',
+    '--foreground': '180 100% 85%',
+    '--primary': '190 100% 50%',
+    '--primary-foreground': '230 15% 3%',
+    '--secondary': '270 100% 60%',
+    '--accent': '300 100% 70%',
+    '--neon-blue': '190 100% 50%',
+    '--neon-purple': '270 100% 60%',
+    '--neon-pink': '300 100% 70%',
+    '--glow': '0 0 20px currentColor',
+    '--radius': '0.25rem',
+  },
+  luxury_gold: {
+    '--background': '45 20% 8%',
+    '--foreground': '45 10% 95%',
+    '--primary': '45 90% 60%',
+    '--primary-foreground': '45 20% 8%',
+    '--secondary': '45 20% 15%',
+    '--accent': '45 100% 75%',
+    '--gold': '45 90% 60%',
+    '--gold-light': '45 100% 75%',
+    '--gold-dark': '45 80% 45%',
+    '--luxury-shadow': '0 10px 40px rgba(255, 215, 0, 0.3)',
+    '--radius': '0.75rem',
+  },
+  nature_green: {
+    '--background': '140 20% 5%',
+    '--foreground': '140 10% 95%',
+    '--primary': '140 70% 45%',
+    '--primary-foreground': '140 20% 5%',
+    '--secondary': '140 30% 15%',
+    '--accent': '120 60% 60%',
+    '--nature-green': '140 70% 45%',
+    '--forest-dark': '140 80% 25%',
+    '--leaf-light': '120 60% 60%',
+    '--organic-shadow': '0 8px 32px rgba(34, 197, 94, 0.2)',
+    '--radius': '1rem',
+  },
+  glassmorphism: {
+    '--background': '210 40% 2%',
+    '--foreground': '210 40% 98%',
+    '--primary': '200 100% 50%',
+    '--glass-bg': 'rgba(255, 255, 255, 0.1)',
+    '--glass-border': 'rgba(255, 255, 255, 0.2)',
+    '--backdrop-blur': 'blur(10px)',
+    '--glass-shadow': '0 8px 32px rgba(0, 0, 0, 0.3)',
+    '--radius': '1.5rem',
+  },
+  cyberpunk: {
+    '--background': '0 0% 0%',
+    '--foreground': '180 100% 90%',
+    '--primary': '340 100% 50%',
+    '--secondary': '60 100% 50%',
+    '--accent': '180 100% 50%',
+    '--cyber-pink': '340 100% 50%',
+    '--cyber-yellow': '60 100% 50%',
+    '--cyber-cyan': '180 100% 50%',
+    '--glitch-shadow': '2px 2px 0 #ff00ff, -2px -2px 0 #00ffff',
+    '--radius': '0rem',
   }
+};
+
+// Sistema de efeitos CSS
+const effectsCSS = {
+  glassmorphism: `
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+  `,
+  parallax: `
+    .parallax-container {
+      overflow-x: hidden;
+      overflow-y: auto;
+      perspective: 1px;
+      height: 100vh;
+    }
+    .parallax-element {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      transform: translateZ(-1px) scale(2);
+    }
+  `,
+  particles: `
+    .particles-bg {
+      position: relative;
+      overflow: hidden;
+    }
+    .particles-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent);
+      background-size: 100px 80px, 120px 100px, 80px 60px;
+      animation: particles 20s linear infinite;
+    }
+    @keyframes particles {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-100px, -80px); }
+    }
+  `,
+  gradients: `
+    .gradient-bg {
+      background: linear-gradient(-45deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  `,
+  shadows: `
+    .shadow-glow {
+      box-shadow: 
+        0 0 20px rgba(var(--primary), 0.3),
+        0 0 40px rgba(var(--primary), 0.2),
+        0 0 60px rgba(var(--primary), 0.1);
+    }
+    .shadow-elevation {
+      box-shadow: 
+        0 2px 4px rgba(0,0,0,0.1),
+        0 8px 16px rgba(0,0,0,0.1),
+        0 16px 32px rgba(0,0,0,0.1);
+    }
+  `,
+  '3d': `
+    .transform-3d {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .card-3d {
+      transition: transform 0.3s ease;
+    }
+    .card-3d:hover {
+      transform: rotateY(10deg) rotateX(5deg) translateZ(20px);
+    }
+  `
+};
+
+// Sistema de animações
+const animationsCSS = {
+  subtle: `
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    .slide-up { animation: slideUp 0.8s ease-out; }
+    .scale-in { animation: scaleIn 0.5s ease-out; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  `,
+  moderate: `
+    .bounce-in { animation: bounceIn 0.8s ease-out; }
+    .slide-in-left { animation: slideInLeft 0.7s ease-out; }
+    .slide-in-right { animation: slideInRight 0.7s ease-out; }
+    .rotate-in { animation: rotateIn 0.6s ease-out; }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes slideInLeft {
+      from { transform: translateX(-100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes rotateIn {
+      from { transform: rotate(-10deg) scale(0.8); opacity: 0; }
+      to { transform: rotate(0) scale(1); opacity: 1; }
+    }
+  `,
+  dynamic: `
+    .flip-in { animation: flipIn 1s ease-out; }
+    .zoom-bounce { animation: zoomBounce 1.2s ease-out; }
+    .shake-in { animation: shakeIn 0.8s ease-out; }
+    .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+    
+    @keyframes flipIn {
+      0% { transform: perspective(400px) rotateY(90deg); opacity: 0; }
+      40% { transform: perspective(400px) rotateY(-10deg); }
+      70% { transform: perspective(400px) rotateY(10deg); }
+      100% { transform: perspective(400px) rotateY(0deg); opacity: 1; }
+    }
+    @keyframes zoomBounce {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes shakeIn {
+      0% { transform: translateX(-100px); opacity: 0; }
+      60% { transform: translateX(10px); }
+      80% { transform: translateX(-5px); }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 5px rgba(var(--primary), 0.5); }
+      50% { box-shadow: 0 0 20px rgba(var(--primary), 0.8), 0 0 30px rgba(var(--primary), 0.6); }
+    }
+  `
 };
 
 interface PartialDefinition {
@@ -124,14 +350,22 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     }).join('');
     
     // Gera as variáveis CSS do tema
-    const themeVariables = themeVariablesMap[pagePlan.theme.themeName];
+    const themeVariables = themeVariablesMap[pagePlan.theme.themeName] || themeVariablesMap.moderno_azul;
     const themeCss = Object.entries(themeVariables)
         .map(([key, value]) => `${key}: ${value};`)
         .join('\n    ');
     
-    const themeStyleTag = pagePlan.theme.themeName === 'calor_tropical'
-        ? `<style>\n  .dark {\n    ${themeCss}\n  }\n</style>`
-        : `<style>\n  :root {\n    ${themeCss}\n  }\n</style>`;
+    // Gera CSS de efeitos baseado no tema
+    const effectsCss = pagePlan.theme.effects?.map(effect => effectsCSS[effect] || '').join('\n') || '';
+    
+    // Gera CSS de animações baseado no nível escolhido
+    const animationsCss = pagePlan.theme.animations ? animationsCSS[pagePlan.theme.animations] || '' : '';
+    
+    const isDarkTheme = ['calor_tropical', 'tech_neon', 'luxury_gold', 'nature_green', 'glassmorphism', 'cyberpunk'].includes(pagePlan.theme.themeName);
+    
+    const themeStyleTag = isDarkTheme
+        ? `<style>\n  .dark {\n    ${themeCss}\n  }\n  ${effectsCss}\n  ${animationsCss}\n</style>`
+        : `<style>\n  :root {\n    ${themeCss}\n  }\n  ${effectsCss}\n  ${animationsCss}\n</style>`;
 
     // Gera a tag de estilo com o CSS compilado
     let compiledCssTag = '';
@@ -157,15 +391,30 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
       }).join('');
     }
 
+    // Adiciona Google Fonts baseado na fonte escolhida
+    const fontLinks = {
+      inter: '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">',
+      roboto: '<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">',
+      lato: '<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">',
+      playfair: '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">',
+      montserrat: '<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">',
+      poppins: '<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">'
+    };
+
+    const fontLink = fontLinks[pagePlan.theme.font] || fontLinks.inter;
+    const fontFamilyCSS = `<style>body { font-family: '${pagePlan.theme.font.charAt(0).toUpperCase() + pagePlan.theme.font.slice(1)}', sans-serif; }</style>`;
+
     const fullHtml = `
 <!DOCTYPE html>
-<html lang="pt-BR" class="${pagePlan.theme.themeName === 'calor_tropical' ? 'dark' : ''}">
+<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${pagePlan.pageTitle}</title>
     <meta name="description" content="${pagePlan.pageDescription}">
+    ${fontLink}
     ${themeStyleTag}
+    ${fontFamilyCSS}
     ${compiledCssTag}
 </head>
 <body>
