@@ -90,22 +90,53 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       return;
     }
 
-    const newPagePlan = {
-      ...pagePlan,
-      blocks: pagePlan.blocks.map((block, index) => {
-        if (index === blockIndex) {
-          return {
-            ...block,
-            properties: {
-              ...block.properties,
-              [propKey]: newContent
-            }
-          };
+    // Atualiza blocks (sistema antigo)
+    if (pagePlan.blocks) {
+      const newPagePlan = {
+        ...pagePlan,
+        blocks: pagePlan.blocks.map((block, index) => {
+          if (index === blockIndex) {
+            return {
+              ...block,
+              properties: {
+                ...block.properties,
+                [propKey]: newContent
+              }
+            };
+          }
+          return block;
+        })
+      };
+      set({ pagePlan: newPagePlan });
+      return;
+    }
+
+    // Atualiza composition.sections (sistema novo)
+    if (pagePlan.composition?.sections) {
+      let updatedBlockIndex = 0;
+      const newPagePlan = {
+        ...pagePlan,
+        composition: {
+          ...pagePlan.composition,
+          sections: pagePlan.composition.sections.map(section => ({
+            ...section,
+            blocks: section.blocks.map((block, index) => {
+              if (updatedBlockIndex === blockIndex) {
+                return {
+                  ...block,
+                  properties: {
+                    ...block.properties,
+                    [propKey]: newContent
+                  }
+                };
+              }
+              updatedBlockIndex++;
+              return block;
+            })
+          }))
         }
-        return block;
-      })
-    };
-    
-    set({ pagePlan: newPagePlan });
+      };
+      set({ pagePlan: newPagePlan });
+    }
   },
 })); 

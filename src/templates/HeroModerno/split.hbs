@@ -1,0 +1,133 @@
+<section class="relative min-h-screen w-full overflow-hidden bg-background">
+  <div class="container mx-auto grid lg:grid-cols-2 min-h-screen">
+    <!-- Content Side -->
+    <div class="flex flex-col justify-center px-4 lg:px-8 py-16 lg:py-0 order-2 lg:order-1">
+      <div class="max-w-xl slide-in-left">
+        <!-- Badge/Tag -->
+        {{#if badge}}
+        <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary mb-6">
+          {{badge}}
+        </div>
+        {{/if}}
+        
+        <h1 class="text-4xl lg:text-6xl font-bold tracking-tight text-foreground mb-6 leading-tight" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+          {{title}}
+        </h1>
+        
+        <p class="text-lg lg:text-xl text-muted-foreground mb-8 leading-relaxed" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+          {{subtitle}}
+        </p>
+        
+        <!-- Features List -->
+        {{#if features}}
+        <ul class="space-y-3 mb-8">
+          {{#each features}}
+          <li class="flex items-center text-muted-foreground">
+            <svg class="w-5 h-5 text-primary mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{this}}
+          </li>
+          {{/each}}
+        </ul>
+        {{/if}}
+        
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button class="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-primary-foreground bg-primary rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaPrimary">
+            {{ctaPrimary}}
+            {{#if ctaPrimaryIcon}}
+            <svg class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="{{ctaPrimaryIcon}}"/>
+            </svg>
+            {{/if}}
+          </button>
+          
+          {{#if ctaSecondary}}
+          <button class="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-foreground border-2 border-border rounded-lg transition-all duration-300 hover:bg-muted" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaSecondary">
+            {{ctaSecondary}}
+          </button>
+          {{/if}}
+        </div>
+        
+        <!-- Social Proof -->
+        {{#if socialProof}}
+        <div class="mt-8 pt-8 border-t border-border">
+          <p class="text-sm text-muted-foreground mb-4">{{socialProof.text}}</p>
+          {{#if socialProof.logos}}
+          <div class="flex items-center space-x-6 opacity-70">
+            {{#each socialProof.logos}}
+            <img src="{{this.src}}" alt="{{this.alt}}" class="h-8 grayscale hover:grayscale-0 transition-all duration-300">
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    
+    <!-- Visual Side -->
+    <div class="relative flex items-center justify-center order-1 lg:order-2 p-4 lg:p-8">
+      <div class="relative w-full max-w-lg scale-in">
+        <!-- Main Image/Graphic -->
+        {{#if image}}
+        <img src="{{image}}" alt="{{title}}" class="w-full h-auto rounded-2xl shadow-2xl">
+        {{/if}}
+        
+        {{#if videoUrl}}
+        <video 
+          autoplay 
+          muted 
+          loop 
+          playsinline
+          class="w-full h-auto rounded-2xl shadow-2xl"
+          poster="{{posterImage}}"
+        >
+          <source src="{{videoUrl}}" type="video/mp4">
+        </video>
+        {{/if}}
+        
+        <!-- Floating Elements -->
+        {{#if floatingElements}}
+        {{#each floatingElements}}
+        <div class="absolute {{this.position}} bg-white rounded-xl shadow-lg p-4 border animate-float" style="animation-delay: {{this.delay}}ms;">
+          {{#if this.icon}}
+          <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
+            <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
+              <path d="{{this.icon}}"/>
+            </svg>
+          </div>
+          {{/if}}
+          <p class="text-sm font-semibold text-gray-900">{{this.text}}</p>
+          {{#if this.subtext}}
+          <p class="text-xs text-gray-500">{{this.subtext}}</p>
+          {{/if}}
+        </div>
+        {{/each}}
+        {{/if}}
+        
+        <!-- Decorative Elements -->
+        <div class="absolute -top-4 -left-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl animate-pulse"></div>
+        <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl animate-pulse" style="animation-delay: 1000ms;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <div class="w-6 h-10 border-2 border-foreground/30 rounded-full flex justify-center">
+      <div class="w-1 h-3 bg-foreground/50 rounded-full mt-2 animate-pulse"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+</style>

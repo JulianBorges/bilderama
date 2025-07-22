@@ -1,0 +1,46 @@
+<section class="relative h-screen w-full overflow-hidden">
+  <!-- Background Video -->
+  <div class="absolute inset-0 z-0">
+    <video 
+      autoplay 
+      muted 
+      loop 
+      playsinline
+      class="h-full w-full object-cover"
+      poster="{{posterImage}}"
+    >
+      <source src="{{videoUrl}}" type="video/mp4">
+      <!-- Fallback background -->
+      <div class="h-full w-full bg-gradient-to-br from-primary via-secondary to-accent"></div>
+    </video>
+    <!-- Dark overlay -->
+    <div class="absolute inset-0 bg-black/40"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 container mx-auto flex h-full flex-col items-center justify-center px-4 text-center">
+    <div class="fade-in">
+      <h1 class="mb-6 text-6xl font-bold tracking-tight text-white md:text-8xl drop-shadow-2xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+        {{title}}
+      </h1>
+      <p class="mb-8 max-w-3xl text-xl text-white/90 drop-shadow-lg slide-up" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+        {{subtitle}}
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center scale-in">
+        <button class="glass-effect rounded-full px-8 py-4 font-semibold text-white transition-all duration-300 hover:scale-105 shadow-glow" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaPrimary">
+          {{ctaPrimary}}
+        </button>
+        <button class="border-2 border-white rounded-full px-8 py-4 font-semibold text-white transition-all duration-300 hover:bg-white hover:text-black" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaSecondary">
+          {{ctaSecondary}}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <div class="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+      <div class="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
+    </div>
+  </div>
+</section>

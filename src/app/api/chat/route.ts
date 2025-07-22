@@ -1,6 +1,7 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { config } from '@/lib/config'
 import { processUserInput } from '@/lib/ai'
+import { mockProcessUserInput } from '@/lib/ai-mock'
 import { NextResponse } from 'next/server'
 import { getEditedPagePlan } from '@/lib/services/conversationalEditorService'
 import { PagePlan } from '@/lib/schemas'
@@ -29,7 +30,16 @@ export async function POST(req: Request) {
     }
 
     // Caso contrário, usamos o fluxo original de geração de um novo site.
-    const aiResponse = await processUserInput(userInput as string)
+    let aiResponse;
+    
+    // Verifica se a chave da API está configurada para usar mock em desenvolvimento
+    if (!config.openaiApiKey) {
+      console.log('Usando mock - OpenAI API Key não configurada');
+      aiResponse = await mockProcessUserInput(userInput as string);
+    } else {
+      aiResponse = await processUserInput(userInput as string);
+    }
+    
     return NextResponse.json(aiResponse)
 
   } catch (error: any) {
