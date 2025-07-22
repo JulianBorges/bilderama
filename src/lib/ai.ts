@@ -243,6 +243,13 @@ async function generateAnalysis(files: GeneratedFile[], personality?: string): P
  * 4. Fornece explicação personalizada
  */
 export async function processUserInput(userInput: string): Promise<AIResponse> {
+  // Valida se a API key está configurada
+  try {
+    config.validateApiKey();
+  } catch (error: any) {
+    throw new Error(`Configuração inválida: ${error.message}. Por favor, configure a OPENAI_API_KEY no arquivo .env`);
+  }
+
   try {
     // Tenta usar o sistema criativo primeiro
     const { pagePlan, designPersonality, designRationale } = await generateCreativePagePlan(userInput);
@@ -259,6 +266,11 @@ export async function processUserInput(userInput: string): Promise<AIResponse> {
   } catch (error) {
     console.error('Sistema criativo falhou, usando fallback:', error);
     
+    // Se o erro for de configuração, propaga imediatamente
+    if (error instanceof Error && error.message.includes('Configuração inválida')) {
+      throw error;
+    }
+    
     try {
       // Fallback para sistema básico
       const pagePlanJson = await generateBasicPagePlan(userInput);
@@ -272,6 +284,12 @@ export async function processUserInput(userInput: string): Promise<AIResponse> {
       };
     } catch (fallbackError) {
       console.error('Fallback também falhou:', fallbackError);
+      
+      // Se o erro for de configuração, retorna mensagem específica
+      if (fallbackError instanceof Error && (fallbackError.message.includes('Configuração inválida') || fallbackError.message.includes('OPENAI_API_KEY'))) {
+        throw new Error('A chave da API OpenAI não está configurada. Por favor, adicione uma chave válida no arquivo .env');
+      }
+      
       throw new Error('Não foi possível gerar o site. Tente ser mais específico sobre seu negócio.');
     }
   }
