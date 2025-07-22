@@ -68,7 +68,14 @@ const CONTENT_PROMPTS = {
            * Número (realista mas impressionante)
            * Sufixo (%, +, k, mil, etc.)
            * Label/descrição curta (máximo 25 caracteres)
-           * Descrição detalhada (máximo 50 caracteres)`
+           * Descrição detalhada (máximo 50 caracteres)`,
+
+  about: `Crie uma seção "sobre" envolvente para um negócio de {{businessType}}.
+         Deve incluir:
+         - Título da seção (máximo 50 caracteres)
+         - Subtítulo (máximo 100 caracteres)
+         - Descrição da empresa/história (máximo 300 caracteres)
+         - 3 valores principais da empresa`
 };
 
 export async function generateContent(request: ContentGenerationRequest): Promise<GeneratedContent> {

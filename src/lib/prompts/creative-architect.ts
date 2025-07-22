@@ -171,10 +171,10 @@ Seção 3 (flexbox): Testimonials exclusivos + CTA sutil
 **FORMATO DE RESPOSTA**
 
 Retorne um JSON seguindo o novo schema de PagePlan com:
-1. `pageType`: Tipo específico da página
-2. `targetAudience`: Público detalhado
-3. `conversionGoal`: Objetivo específico
-4. `composition`: Estrutura de seções flexível
+1. pageType: Tipo específico da página
+2. targetAudience: Público detalhado
+3. conversionGoal: Objetivo específico
+4. composition: Estrutura de seções flexível
 5. Cada seção com layout apropriado e componentes posicionados
 
 **SEJA CRIATIVO E ÚNICO!**

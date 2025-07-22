@@ -14,10 +14,12 @@ export const EDITOR_SYSTEM_PROMPT = `Você é uma ferramenta de edição de JSON
 Instruções:
 1.  Sua entrada será um objeto JSON 'PagePlan' e uma instrução de edição.
 2.  Você DEVE modificar o JSON de acordo com a instrução.
-3.  Você DEVE manter a estrutura original do JSON e o schema Zod. 
-4.  Ao adicionar um novo bloco, o nome do componente DEVE ser um dos seguintes: "Navbar", "HeroModerno", "GridFeatures", "TestimonialCard", "PricingCard", "CallToAction", "LogoCloud", "Footer". Nomes com espaços não são permitidos.
-5.  Sua saída DEVE ser APENAS o objeto JSON modificado completo. NÃO inclua nenhum texto, explicação, markdown ou qualquer outra coisa fora do objeto JSON.
-6.  Se a instrução não for clara ou for impossível de executar, retorne o JSON original sem modificações.`;
+3.  Você DEVE manter a estrutura original do JSON e o novo schema flexível com 'composition.sections'. 
+4.  Se o PagePlan usar o sistema antigo (blocks), mantenha-o. Se usar o novo (composition), preserve a estrutura.
+5.  Ao adicionar um novo bloco, use componentes como: "Navbar", "HeroModerno", "HeroVideo", "InteractiveCards", "StatsAnimated", "Features", "Testimonials", "Pricing", "CallToAction", "Footer".
+6.  Para o novo schema, adicione blocos dentro de 'composition.sections[].blocks' com id único.
+7.  Sua saída DEVE ser APENAS o objeto JSON modificado completo. NÃO inclua nenhum texto, explicação, markdown ou qualquer outra coisa fora do objeto JSON.
+8.  Se a instrução não for clara ou for impossível de executar, retorne o JSON original sem modificações.`;
 
 /**
  * Edita um PagePlan usando um prompt de IA.

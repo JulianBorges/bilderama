@@ -110,6 +110,85 @@ const themeVariablesMap = {
     '--cyber-cyan': '180 100% 50%',
     '--glitch-shadow': '2px 2px 0 #ff00ff, -2px -2px 0 #00ffff',
     '--radius': '0rem',
+  },
+  sunset_gradient: {
+    '--background': '25 95% 95%',
+    '--foreground': '15 15% 15%',
+    '--primary': '20 90% 60%',
+    '--primary-foreground': '0 0% 100%',
+    '--secondary': '35 85% 70%',
+    '--secondary-foreground': '15 15% 15%',
+    '--accent': '45 95% 65%',
+    '--accent-foreground': '15 15% 15%',
+    '--muted': '25 20% 90%',
+    '--muted-foreground': '15 15% 40%',
+    '--border': '25 30% 85%',
+    '--input': '25 30% 85%',
+    '--ring': '20 90% 60%',
+    '--radius': '0.75rem',
+  },
+  dark_premium: {
+    '--background': '220 15% 6%',
+    '--foreground': '220 10% 95%',
+    '--primary': '220 100% 60%',
+    '--primary-foreground': '220 15% 6%',
+    '--secondary': '220 20% 15%',
+    '--secondary-foreground': '220 10% 95%',
+    '--accent': '200 80% 60%',
+    '--accent-foreground': '220 15% 6%',
+    '--muted': '220 20% 12%',
+    '--muted-foreground': '220 10% 60%',
+    '--border': '220 20% 20%',
+    '--input': '220 20% 20%',
+    '--ring': '220 100% 60%',
+    '--radius': '0.5rem',
+  },
+  minimalist_mono: {
+    '--background': '0 0% 98%',
+    '--foreground': '0 0% 10%',
+    '--primary': '0 0% 20%',
+    '--primary-foreground': '0 0% 98%',
+    '--secondary': '0 0% 90%',
+    '--secondary-foreground': '0 0% 20%',
+    '--accent': '0 0% 15%',
+    '--accent-foreground': '0 0% 98%',
+    '--muted': '0 0% 95%',
+    '--muted-foreground': '0 0% 40%',
+    '--border': '0 0% 85%',
+    '--input': '0 0% 85%',
+    '--ring': '0 0% 20%',
+    '--radius': '0.25rem',
+  },
+  retro_wave: {
+    '--background': '270 100% 5%',
+    '--foreground': '300 100% 95%',
+    '--primary': '300 100% 60%',
+    '--primary-foreground': '270 100% 5%',
+    '--secondary': '330 100% 50%',
+    '--secondary-foreground': '270 100% 5%',
+    '--accent': '180 100% 50%',
+    '--accent-foreground': '270 100% 5%',
+    '--neon-pink': '300 100% 60%',
+    '--neon-cyan': '180 100% 50%',
+    '--neon-purple': '270 100% 70%',
+    '--retro-glow': '0 0 30px currentColor',
+    '--radius': '0.5rem',
+  },
+  corporate_elite: {
+    '--background': '210 20% 98%',
+    '--foreground': '210 20% 8%',
+    '--primary': '210 100% 40%',
+    '--primary-foreground': '0 0% 100%',
+    '--secondary': '210 20% 92%',
+    '--secondary-foreground': '210 20% 15%',
+    '--accent': '200 80% 45%',
+    '--accent-foreground': '0 0% 100%',
+    '--muted': '210 20% 95%',
+    '--muted-foreground': '210 20% 45%',
+    '--border': '210 20% 88%',
+    '--input': '210 20% 88%',
+    '--ring': '210 100% 40%',
+    '--radius': '0.375rem',
   }
 };
 
@@ -205,6 +284,7 @@ const effectsCSS = {
 
 // Sistema de animações
 const animationsCSS = {
+  none: '',
   subtle: `
     .fade-in { animation: fadeIn 0.6s ease-out; }
     .slide-up { animation: slideUp 0.8s ease-out; }
@@ -495,9 +575,15 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     // Aplica customizações de paleta se presentes
     if (pagePlan.theme.customPalette) {
         const customPalette = pagePlan.theme.customPalette;
-        if (customPalette.primary) themeVariables['--primary'] = customPalette.primary;
-        if (customPalette.secondary) themeVariables['--secondary'] = customPalette.secondary;
-        if (customPalette.accent) themeVariables['--accent'] = customPalette.accent;
+        if (customPalette.primary && '--primary' in themeVariables) {
+            (themeVariables as any)['--primary'] = customPalette.primary;
+        }
+        if (customPalette.secondary && '--secondary' in themeVariables) {
+            (themeVariables as any)['--secondary'] = customPalette.secondary;
+        }
+        if (customPalette.accent && '--accent' in themeVariables) {
+            (themeVariables as any)['--accent'] = customPalette.accent;
+        }
     }
     
     const themeCss = Object.entries(themeVariables)
@@ -510,7 +596,7 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     // Gera CSS de animações baseado no nível escolhido
     const animationsCss = pagePlan.theme.animations ? animationsCSS[pagePlan.theme.animations] || '' : '';
     
-    const isDarkTheme = ['calor_tropical', 'tech_neon', 'luxury_gold', 'nature_green', 'glassmorphism', 'cyberpunk'].includes(pagePlan.theme.themeName);
+    const isDarkTheme = ['calor_tropical', 'tech_neon', 'luxury_gold', 'nature_green', 'glassmorphism', 'cyberpunk', 'dark_premium', 'retro_wave'].includes(pagePlan.theme.themeName);
     
     const themeStyleTag = isDarkTheme
         ? `<style>\n  .dark {\n    ${themeCss}\n  }\n  ${effectsCss}\n  ${animationsCss}\n</style>`

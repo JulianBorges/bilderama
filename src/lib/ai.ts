@@ -2,7 +2,6 @@ import { config } from './config'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai-edge'
 import { pagePlanSchema, PagePlan } from './schemas'
 import { 
-  CREATIVE_ARCHITECT_SYSTEM_PROMPT, 
   buildCreativePrompt, 
   selectPersonalityForContext,
   CreativeContext,
