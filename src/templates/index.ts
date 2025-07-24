@@ -53,6 +53,9 @@ export const partials: PartialDefinition[] = [
     { name: 'TestimonialCard', layout: 'default' },
     { name: 'PricingCard', layout: 'default' },
     { name: 'CardMenuItem', layout: 'default' },
+    { name: 'StatCard', layout: 'default' },
+    { name: 'TeamMemberCard', layout: 'default' },
+    { name: 'BlogCard', layout: 'default' },
     // Adicione outros parciais aqui conforme necessário
 ];
 
@@ -105,6 +108,9 @@ export async function loadTemplates(): Promise<TemplateCatalog> {
         { name: 'TestimonialCard', layout: 'default' },
         { name: 'PricingCard', layout: 'default' },
         { name: 'CardMenuItem', layout: 'default' },
+        { name: 'StatCard', layout: 'default' },
+        { name: 'TeamMemberCard', layout: 'default' },
+        { name: 'BlogCard', layout: 'default' },
     ];
 
     cache = { templates, partials };

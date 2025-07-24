@@ -1,13 +1,13 @@
-<section class="bg-white py-16 dark:bg-gray-950">
+<section class="bg-muted/30 py-16">
   <div class="container mx-auto px-4">
-    <h2 class="text-center text-lg font-semibold text-gray-600 dark:text-gray-400" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+    <h2 class="text-center text-lg font-semibold text-muted-foreground" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
       {{title}}
     </h2>
     <div class="mt-8 grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-6">
       {{#each logos}}
       <div class="col-span-1 flex justify-center">
         <img
-          class="h-12 w-auto object-contain"
+          class="h-12 w-auto object-contain opacity-70 transition-opacity duration-300 hover:opacity-100 filter grayscale hover:grayscale-0"
           src="{{this.src}}"
           alt="{{this.alt}}"
         />

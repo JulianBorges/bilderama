@@ -1,0 +1,28 @@
+<div class="group relative rounded-xl bg-card border border-border/50 p-6 text-center transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
+  <!-- Icon -->
+  <div class="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+    <svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{iconSvgPath}}" />
+    </svg>
+  </div>
+  
+  <!-- Number -->
+  <div class="mb-2 text-3xl font-bold text-foreground transition-colors duration-200 group-hover:text-primary">
+    {{value}}
+  </div>
+  
+  <!-- Label -->
+  <div class="text-sm font-medium text-muted-foreground">
+    {{label}}
+  </div>
+  
+  <!-- Optional description -->
+  {{#if description}}
+    <div class="mt-2 text-xs text-muted-foreground">
+      {{description}}
+    </div>
+  {{/if}}
+  
+  <!-- Gradient background -->
+  <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"></div>
+</div> 

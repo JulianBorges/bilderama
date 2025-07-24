@@ -18,7 +18,7 @@ export const pagePlanSchema = z.object({
   pageTitle: z.string().describe("O título da página para a tag <title> e SEO."),
   pageDescription: z.string().describe("A meta descrição da página para SEO."),
   theme: z.object({
-    themeName: z.enum(['moderno_azul', 'calor_tropical']),
+    themeName: z.enum(['moderno_azul', 'calor_tropical', 'saas_premium', 'corporativo_elegante', 'ecommerce_luxo']),
     font: z.enum(['inter', 'roboto', 'lato']),
   }),
   blocks: z.array(blockSchema).describe("Um array de blocos que compõem a estrutura da página."),

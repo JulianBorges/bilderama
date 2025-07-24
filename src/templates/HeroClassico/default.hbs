@@ -1,0 +1,59 @@
+<section class="relative bg-background text-foreground py-24 sm:py-32 lg:py-40">
+  <!-- Pattern background -->
+  <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+  
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- Content Column -->
+      <div class="order-2 lg:order-1 space-y-8">
+        <div class="space-y-6">
+          <h1 class="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+            {{title}}
+          </h1>
+          <p class="text-xl text-muted-foreground leading-relaxed" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+            {{subtitle}}
+          </p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="{{ctaHref}}" class="group inline-flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary/90 hover:scale-105" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaText">
+            {{ctaText}}
+            <svg class="ml-2 h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+        </div>
+        
+        <!-- Stats or social proof -->
+        <div class="flex items-center gap-8 pt-8 border-t border-border">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-foreground">10k+</div>
+            <div class="text-sm text-muted-foreground">Clientes</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-foreground">99%</div>
+            <div class="text-sm text-muted-foreground">Satisfação</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-foreground">24/7</div>
+            <div class="text-sm text-muted-foreground">Suporte</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Image Column -->
+      <div class="order-1 lg:order-2">
+        <div class="relative">
+          <div class="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 p-8">
+            <div class="w-full h-full rounded-xl bg-card shadow-2xl flex items-center justify-center">
+              <div class="text-6xl">🚀</div>
+            </div>
+          </div>
+          <!-- Floating elements -->
+          <div class="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-xl"></div>
+          <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-secondary/10 rounded-full blur-xl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> 

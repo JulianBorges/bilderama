@@ -49,6 +49,72 @@ const themeVariablesMap = {
     '--input': '12 6.5% 15.1%',
     '--ring': '20.5 90.2% 48.2%',
     '--radius': '0.5rem',
+  },
+  saas_premium: {
+    '--background': '240 10% 3.9%',
+    '--foreground': '0 0% 98%',
+    '--card': '240 10% 3.9%',
+    '--card-foreground': '0 0% 98%',
+    '--popover': '240 10% 3.9%',
+    '--popover-foreground': '0 0% 98%',
+    '--primary': '263 70% 50.4%',
+    '--primary-foreground': '210 20% 98%',
+    '--secondary': '240 3.7% 15.9%',
+    '--secondary-foreground': '0 0% 98%',
+    '--muted': '240 3.7% 15.9%',
+    '--muted-foreground': '240 5% 64.9%',
+    '--accent': '240 3.7% 15.9%',
+    '--accent-foreground': '0 0% 98%',
+    '--destructive': '0 62.8% 30.6%',
+    '--destructive-foreground': '0 0% 98%',
+    '--border': '240 3.7% 15.9%',
+    '--input': '240 3.7% 15.9%',
+    '--ring': '263 70% 50.4%',
+    '--radius': '0.5rem',
+  },
+  corporativo_elegante: {
+    '--background': '0 0% 100%',
+    '--foreground': '0 0% 3.9%',
+    '--card': '0 0% 100%',
+    '--card-foreground': '0 0% 3.9%',
+    '--popover': '0 0% 100%',
+    '--popover-foreground': '0 0% 3.9%',
+    '--primary': '142.1 76.2% 36.3%',
+    '--primary-foreground': '355.7 100% 97.3%',
+    '--secondary': '210 40% 96.1%',
+    '--secondary-foreground': '222.2 47.4% 11.2%',
+    '--muted': '210 40% 96.1%',
+    '--muted-foreground': '215.4 16.3% 46.9%',
+    '--accent': '210 40% 96.1%',
+    '--accent-foreground': '222.2 47.4% 11.2%',
+    '--destructive': '0 84.2% 60.2%',
+    '--destructive-foreground': '210 40% 98%',
+    '--border': '214.3 31.8% 91.4%',
+    '--input': '214.3 31.8% 91.4%',
+    '--ring': '142.1 76.2% 36.3%',
+    '--radius': '0.5rem',
+  },
+  ecommerce_luxo: {
+    '--background': '60 9.1% 97.8%',
+    '--foreground': '24 9.8% 10%',
+    '--card': '0 0% 100%',
+    '--card-foreground': '24 9.8% 10%',
+    '--popover': '0 0% 100%',
+    '--popover-foreground': '24 9.8% 10%',
+    '--primary': '24 100% 50%',
+    '--primary-foreground': '60 9.1% 97.8%',
+    '--secondary': '60 4.8% 95.9%',
+    '--secondary-foreground': '24 9.8% 10%',
+    '--muted': '60 4.8% 95.9%',
+    '--muted-foreground': '25 5.3% 44.7%',
+    '--accent': '60 4.8% 95.9%',
+    '--accent-foreground': '24 9.8% 10%',
+    '--destructive': '0 84.2% 60.2%',
+    '--destructive-foreground': '60 9.1% 97.8%',
+    '--border': '20 5.9% 90%',
+    '--input': '20 5.9% 90%',
+    '--ring': '24 100% 50%',
+    '--radius': '0.5rem',
   }
 };
 
@@ -125,11 +191,18 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     
     // Gera as variáveis CSS do tema
     const themeVariables = themeVariablesMap[pagePlan.theme.themeName];
-    const themeCss = Object.entries(themeVariables)
+    if (!themeVariables) {
+        console.warn(`Tema "${pagePlan.theme.themeName}" não encontrado. Usando tema padrão.`);
+    }
+    
+    const currentThemeVars = themeVariables || themeVariablesMap.moderno_azul;
+    const themeCss = Object.entries(currentThemeVars)
         .map(([key, value]) => `${key}: ${value};`)
         .join('\n    ');
     
-    const themeStyleTag = pagePlan.theme.themeName === 'calor_tropical'
+    // Verifica se é um tema escuro
+    const isDarkTheme = ['calor_tropical', 'saas_premium'].includes(pagePlan.theme.themeName);
+    const themeStyleTag = isDarkTheme
         ? `<style>\n  .dark {\n    ${themeCss}\n  }\n</style>`
         : `<style>\n  :root {\n    ${themeCss}\n  }\n</style>`;
 
@@ -157,14 +230,25 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
       }).join('');
     }
 
+    // Add font families CSS
+    const fontFamily = pagePlan.theme.font || 'inter';
+    const fontCssMap = {
+      'inter': '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Inter", sans-serif; }',
+      'roboto': '@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"); body { font-family: "Roboto", sans-serif; }',
+      'lato': '@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"); body { font-family: "Lato", sans-serif; }'
+    };
+
+    const fontCss = fontCssMap[fontFamily] || fontCssMap.inter;
+
     const fullHtml = `
 <!DOCTYPE html>
-<html lang="pt-BR" class="${pagePlan.theme.themeName === 'calor_tropical' ? 'dark' : ''}">
+<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${pagePlan.pageTitle}</title>
     <meta name="description" content="${pagePlan.pageDescription}">
+    <style>${fontCss}</style>
     ${themeStyleTag}
     ${compiledCssTag}
 </head>

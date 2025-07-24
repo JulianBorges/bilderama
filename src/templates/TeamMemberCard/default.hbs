@@ -1,0 +1,46 @@
+<div class="group relative rounded-xl bg-card border border-border/50 p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+  <!-- Profile Image -->
+  <div class="relative mx-auto mb-4 h-24 w-24">
+    <div class="h-full w-full overflow-hidden rounded-full ring-4 ring-border transition-all duration-300 group-hover:ring-primary/50">
+      <img
+        src="{{avatarUrl}}"
+        alt="{{name}}"
+        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+      />
+    </div>
+    <div class="absolute -bottom-2 -right-2 h-6 w-6 rounded-full bg-primary border-2 border-card flex items-center justify-center">
+      <svg class="h-3 w-3 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+      </svg>
+    </div>
+  </div>
+  
+  <!-- Name and Role -->
+  <div class="space-y-2">
+    <h3 class="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-200">
+      {{name}}
+    </h3>
+    <p class="text-sm font-medium text-primary">
+      {{role}}
+    </p>
+    <p class="text-sm text-muted-foreground leading-relaxed">
+      {{bio}}
+    </p>
+  </div>
+  
+  <!-- Social Links -->
+  {{#if socialLinks}}
+    <div class="mt-4 flex justify-center gap-3">
+      {{#each socialLinks}}
+        <a href="{{this.url}}" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:scale-110">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="{{this.iconPath}}" />
+          </svg>
+        </a>
+      {{/each}}
+    </div>
+  {{/if}}
+  
+  <!-- Gradient background -->
+  <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"></div>
+</div> 

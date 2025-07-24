@@ -1,0 +1,62 @@
+<article class="group relative rounded-xl bg-card border border-border/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+  <!-- Featured Image -->
+  <div class="relative overflow-hidden">
+    <img
+      src="{{imageUrl}}"
+      alt="{{title}}"
+      class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+    
+    <!-- Category Badge -->
+    <div class="absolute top-4 left-4">
+      <span class="inline-flex items-center rounded-full bg-primary/90 px-3 py-1 text-xs font-medium text-primary-foreground backdrop-blur-sm">
+        {{category}}
+      </span>
+    </div>
+  </div>
+  
+  <!-- Content -->
+  <div class="p-6 space-y-4">
+    <!-- Meta Info -->
+    <div class="flex items-center gap-4 text-sm text-muted-foreground">
+      <time datetime="{{publishedAt}}">{{publishedDate}}</time>
+      <span>•</span>
+      <span>{{readTime}} min de leitura</span>
+    </div>
+    
+    <!-- Title -->
+    <h3 class="text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">
+      {{title}}
+    </h3>
+    
+    <!-- Excerpt -->
+    <p class="text-muted-foreground leading-relaxed line-clamp-3">
+      {{excerpt}}
+    </p>
+    
+    <!-- Author Info -->
+    <div class="flex items-center gap-3 pt-4 border-t border-border">
+      <div class="h-8 w-8 overflow-hidden rounded-full">
+        <img
+          src="{{author.avatarUrl}}"
+          alt="{{author.name}}"
+          class="h-full w-full object-cover"
+        />
+      </div>
+      <div class="flex-1">
+        <div class="text-sm font-medium text-foreground">{{author.name}}</div>
+      </div>
+      
+      <!-- Read More Arrow -->
+      <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+        <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Gradient background -->
+  <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"></div>
+</article> 

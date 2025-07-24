@@ -1,13 +1,16 @@
-<div class="group rounded-lg border bg-card p-6 shadow-sm transition duration-200 hover:shadow-lg text-card-foreground">
-  <div class="mb-4 inline-flex rounded-lg bg-primary/10 p-3">
+<div class="group relative rounded-xl border bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-card-foreground">
+  <div class="mb-4 inline-flex rounded-xl bg-primary/10 p-3 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
     <svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{iconSvgPath}}" />
     </svg>
   </div>
-  <h3 class="mb-2 text-xl font-semibold text-foreground" data-bild-block-index="{{../blockIndex}}" data-bild-prop="title">
+  <h3 class="mb-3 text-xl font-semibold text-foreground transition-colors duration-200 group-hover:text-primary" data-bild-block-index="{{../blockIndex}}" data-bild-prop="title">
     {{title}}
   </h3>
-  <p class="text-muted-foreground" data-bild-block-index="{{../blockIndex}}" data-bild-prop="description">
+  <p class="text-muted-foreground leading-relaxed" data-bild-block-index="{{../blockIndex}}" data-bild-prop="description">
     {{description}}
   </p>
+  
+  <!-- Elemento decorativo -->
+  <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"></div>
 </div> 

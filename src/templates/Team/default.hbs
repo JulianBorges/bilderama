@@ -1,0 +1,14 @@
+<section class="bg-background py-16 sm:py-20">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">{{title}}</h2>
+      <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">{{subtitle}}</p>
+    </div>
+    
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {{#each members}}
+        {{> TeamMemberCard}}
+      {{/each}}
+    </div>
+  </div>
+</section> 
