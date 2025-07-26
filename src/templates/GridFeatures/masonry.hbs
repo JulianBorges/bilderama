@@ -1,0 +1,38 @@
+<section class="py-16 bg-background text-foreground">
+  <div class="container mx-auto px-4">
+    <div class="text-center space-y-4 mb-12">
+      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+        {{title}}
+      </h2>
+      <p class="mx-auto max-w-2xl text-lg text-muted-foreground" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+        {{subtitle}}
+      </p>
+    </div>
+    
+    <div class="columns-1 md:columns-2 lg:columns-3 gap-6">
+      {{#each featureCards}}
+      <div class="break-inside-avoid mb-6">
+        <div class="bg-card text-card-foreground p-6 rounded-lg border transition-all duration-300 hover:shadow-lg">
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0">
+              <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <svg class="h-6 w-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="{{iconSvgPath}}" />
+                </svg>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-semibold mb-2" data-bild-block-index="{{../blockIndex}}" data-bild-feature-index="{{@index}}" data-bild-prop="title">
+                {{title}}
+              </h3>
+              <p class="text-muted-foreground text-sm leading-relaxed" data-bild-block-index="{{../blockIndex}}" data-bild-feature-index="{{@index}}" data-bild-prop="description">
+                {{description}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section> 

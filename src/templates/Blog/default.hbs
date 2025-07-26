@@ -1,4 +1,4 @@
-<section class="bg-muted/20 py-16 sm:py-20">
+<section class="bg-muted/20 {{designTokens designTokens}}">
   <div class="container mx-auto px-4">
     <div class="text-center mb-16">
       <h2 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">{{title}}</h2>
@@ -12,13 +12,15 @@
     </div>
     
     <!-- View All Button -->
+    {{#if viewAllText}}
     <div class="mt-12 text-center">
-      <a href="#" class="inline-flex items-center justify-center rounded-lg border border-border bg-background px-6 py-3 font-medium text-foreground transition-all duration-200 hover:bg-accent hover:border-primary">
-        Ver todos os artigos
+      <a href="{{viewAllHref}}" class="inline-flex items-center justify-center rounded-lg border border-border bg-background px-6 py-3 font-medium text-foreground transition-all duration-200 hover:bg-accent hover:border-primary" data-bild-block-index="{{blockIndex}}" data-bild-prop="viewAllText">
+        {{viewAllText}}
         <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
       </a>
     </div>
+    {{/if}}
   </div>
 </section> 

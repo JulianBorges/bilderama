@@ -58,10 +58,83 @@ async function callOpenAI(messages: ChatCompletionRequestMessage[]): Promise<str
 
 // Função para limpar a string JSON
 function cleanJsonString(jsonString: string): string {
-  return jsonString
+  let cleaned = jsonString
     .replace(/^```json\s*/, '') // Remove ```json no início
     .replace(/\s*```$/, '')     // Remove ``` no final
     .trim();                    // Remove espaços extras
+  
+  // Remove texto explicativo antes do JSON
+  const jsonStartIndex = cleaned.indexOf('{');
+  if (jsonStartIndex > 0) {
+    cleaned = cleaned.substring(jsonStartIndex);
+  }
+  
+  // Remove texto após o JSON
+  const jsonEndIndex = cleaned.lastIndexOf('}');
+  if (jsonEndIndex !== -1 && jsonEndIndex < cleaned.length - 1) {
+    cleaned = cleaned.substring(0, jsonEndIndex + 1);
+  }
+  
+  return cleaned;
+}
+
+// Função para limpar valores inválidos de design tokens
+function cleanInvalidDesignTokens(pagePlan: any): void {
+  // Valores inválidos que devem ser removidos
+  const invalidValues = ['default', 'null', '', null, undefined];
+  
+  // Para borderRadius e shadowIntensity, 'none' é válido mas deve ser tratado com cuidado
+  const noneAllowedFields = ['borderRadius', 'shadowIntensity', 'animation'];
+  
+  // Limpa design tokens nos blocos
+  if (pagePlan.blocks && Array.isArray(pagePlan.blocks)) {
+    pagePlan.blocks.forEach((block: any) => {
+      if (block.designTokens && typeof block.designTokens === 'object') {
+        Object.keys(block.designTokens).forEach(key => {
+          const value = block.designTokens[key];
+          
+          // Remove valores sempre inválidos
+          if (invalidValues.includes(value)) {
+            delete block.designTokens[key];
+          }
+          // Remove 'none' apenas para campos onde não é apropriado
+          else if (value === 'none' && !noneAllowedFields.includes(key)) {
+            delete block.designTokens[key];
+          }
+        });
+        
+        // Remove o objeto designTokens se estiver vazio
+        if (Object.keys(block.designTokens).length === 0) {
+          delete block.designTokens;
+        }
+      }
+    });
+  }
+  
+  // Limpa design tokens nos widgets
+  if (pagePlan.widgets && Array.isArray(pagePlan.widgets)) {
+    pagePlan.widgets.forEach((widget: any) => {
+      if (widget.designTokens && typeof widget.designTokens === 'object') {
+        Object.keys(widget.designTokens).forEach(key => {
+          const value = widget.designTokens[key];
+          
+          // Remove valores sempre inválidos
+          if (invalidValues.includes(value)) {
+            delete widget.designTokens[key];
+          }
+          // Remove 'none' apenas para campos onde não é apropriado
+          else if (value === 'none' && !noneAllowedFields.includes(key)) {
+            delete widget.designTokens[key];
+          }
+        });
+        
+        // Remove o objeto designTokens se estiver vazio
+        if (Object.keys(widget.designTokens).length === 0) {
+          delete widget.designTokens;
+        }
+      }
+    });
+  }
 }
 
 // Interpreta e estrutura o prompt em inglês
@@ -81,28 +154,48 @@ async function structurePrompt(userInput: string, maxRetries = 3): Promise<strin
     try {
       const responseJson = await callOpenAI(messages);
       const cleanedJson = cleanJsonString(responseJson);
-      const validatedPlan = pagePlanSchema.parse(JSON.parse(cleanedJson));
+      const parsedJson = JSON.parse(cleanedJson);
+      
+      // Camada de defesa: limpa valores inválidos antes da validação Zod
+      cleanInvalidDesignTokens(parsedJson);
+      
+      const validatedPlan = pagePlanSchema.parse(parsedJson);
       return JSON.stringify(validatedPlan); // Sucesso!
     } catch (e) {
       console.warn(`Tentativa ${attempt} falhou.`, e);
       if (e instanceof ZodError) {
         if (attempt < maxRetries) {
-          // Adiciona uma mensagem de correção para a próxima tentativa
-          messages.push({
-            role: 'assistant',
-            // @ts-ignore
-            content: e.message,
-          });
+          // Cria uma mensagem de erro mais específica
+          const errorMessages = e.errors.map(error => {
+            if (error.code === 'invalid_enum_value') {
+              return `Campo "${error.path.join('.')}" tem valor inválido "${error.received}". Valores permitidos: ${error.options.join(', ')}.`;
+            }
+            return `Campo "${error.path.join('.')}" está inválido: ${error.message}`;
+          }).join(' ');
+          
           messages.push({
             role: 'user',
-            content: `A sua resposta anterior continha um JSON inválido. O erro de validação foi: ${JSON.stringify(e.errors)}. Por favor, corrija o JSON e tente novamente.`,
+            content: `ERRO DE VALIDAÇÃO: ${errorMessages} 
+
+IMPORTANTE: 
+- Use APENAS os valores EXATOS listados para cada campo
+- Para themeName, use apenas: moderno_azul, calor_tropical, saas_premium, corporativo_elegante, ecommerce_luxo, startup_tech, wellness_natural, creative_agency, finance_trust, restaurant_warm
+- Para spacing, use apenas: compact, comfortable, spacious, extra-spacious
+- Retorne APENAS JSON válido, sem texto explicativo.`,
           });
         }
       } else if (e instanceof SyntaxError) {
          if (attempt < maxRetries) {
             messages.push({
               role: 'user',
-              content: `A sua resposta anterior não era um JSON válido. O erro foi: ${e.message}. Por favor, retorne APENAS um objeto JSON válido.`,
+              content: `ERRO DE SINTAXE JSON: ${e.message}
+
+INSTRUÇÕES CRÍTICAS:
+- Retorne APENAS um objeto JSON válido
+- NÃO adicione texto explicativo como "Aqui está" ou comentários
+- Use aspas duplas para todas as strings
+- NÃO use vírgulas após o último elemento
+- Comece diretamente com { e termine com }`,
             });
          }
       } else {

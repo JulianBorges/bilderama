@@ -34,6 +34,10 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
     const htmlFile = findHtmlFile(path)
     if (!htmlFile) return ''
 
+    // Extrai o CSS injetado do arquivo HTML gerado
+    const cssMatch = htmlFile.content.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+    const extractedCss = cssMatch ? cssMatch.join('\n') : '';
+
     // Limpar o conteúdo HTML de links para CSS e JS locais
     let processedHtmlContent = htmlFile.content;
     // Remove qualquer link para o CDN do Tailwind, para evitar conflitos
@@ -42,8 +46,9 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
     processedHtmlContent = processedHtmlContent.replace(/<link\s+[^>]*?href\s*=\s*(["'])(?!http)([^\s>"']+?\.css)\1[^>]*?>/gi, '');
     // Remove <script src="script.js"></script> ou similares (case-insensitive, pode ter outros atributos)
     processedHtmlContent = processedHtmlContent.replace(/<script\s+[^>]*?src\s*=\s*(["'])(?!http)([^\s>"']+?\.js)\1[^>]*?>\s*<\/script>/gi, '');
+    // Remove tags <style> existentes para evitar duplicação
+    processedHtmlContent = processedHtmlContent.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
 
-    const cssContent = cssFiles.map(f => f.content).join('\n')
     const jsContent = `
       const IS_EDIT_MODE = ${editMode};
       let selectedElement = null;
@@ -129,7 +134,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <script src="https://cdn.tailwindcss.com"></script>
+          ${extractedCss}
           <style>
             /* Reset básico e garantia de altura total */
             html, body {
@@ -138,8 +143,8 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
               height: 100%;
               min-height: 100vh;
             }
-            /* Estilos gerados */
-            ${cssContent}
+            /* Estilos adicionais de arquivos CSS */
+            ${cssFiles.map(f => f.content).join('\n')}
           </style>
         </head>
         <body>

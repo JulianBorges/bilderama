@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:css": "node scripts/build-template-css.js",
+    "build:all": "npm run build:css && npm run build"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",

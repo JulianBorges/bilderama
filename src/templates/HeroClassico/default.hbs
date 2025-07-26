@@ -25,20 +25,16 @@
         </div>
         
         <!-- Stats or social proof -->
+        {{#if stats}}
         <div class="flex items-center gap-8 pt-8 border-t border-border">
+          {{#each stats}}
           <div class="text-center">
-            <div class="text-2xl font-bold text-foreground">10k+</div>
-            <div class="text-sm text-muted-foreground">Clientes</div>
+            <div class="text-2xl font-bold text-foreground">{{this.value}}</div>
+            <div class="text-sm text-muted-foreground">{{this.label}}</div>
           </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-foreground">99%</div>
-            <div class="text-sm text-muted-foreground">Satisfação</div>
-          </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-foreground">24/7</div>
-            <div class="text-sm text-muted-foreground">Suporte</div>
-          </div>
+          {{/each}}
         </div>
+        {{/if}}
       </div>
       
       <!-- Image Column -->

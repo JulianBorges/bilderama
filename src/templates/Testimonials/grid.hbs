@@ -1,0 +1,45 @@
+<section class="py-16 bg-muted/30 text-foreground {{designTokens designTokens}}">
+  <div class="container mx-auto px-4">
+    <div class="text-center space-y-4 mb-16">
+      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl {{themePersonality theme}}" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+        {{title}}
+      </h2>
+      <p class="mx-auto max-w-2xl text-lg text-muted-foreground" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+        {{subtitle}}
+      </p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {{#each items}}
+      <div class="bg-card text-card-foreground p-8 rounded-xl border shadow-sm hover:shadow-md transition-all duration-300">
+        <div class="space-y-6">
+          <!-- Quote -->
+          <div class="relative">
+            <svg class="absolute -top-2 -left-2 h-8 w-8 text-primary/20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6.5 10c.223-2.25 1.221-4.154 2.991-5.739C10.263 3.676 11.6 3 13.035 3v2c-.54 0-1.08.36-1.622.943C10.793 6.568 10.325 7.398 10.075 8.5H14v9.5H6.5V10zM2.5 10c.223-2.25 1.221-4.154 2.991-5.739C6.263 3.676 7.6 3 9.035 3v2c-.54 0-1.08.36-1.622.943C6.793 6.568 6.325 7.398 6.075 8.5H10v9.5H2.5V10z"/>
+            </svg>
+            <blockquote class="text-foreground leading-relaxed pl-6" data-bild-block-index="{{../blockIndex}}" data-bild-testimonial-index="{{@index}}" data-bild-prop="quote">
+              "{{quote}}"
+            </blockquote>
+          </div>
+          
+          <!-- Author -->
+          <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+              <img class="h-12 w-12 rounded-full object-cover ring-2 ring-primary/10" src="{{avatarUrl}}" alt="{{authorName}}" loading="lazy">
+            </div>
+            <div>
+              <p class="font-semibold text-foreground" data-bild-block-index="{{../blockIndex}}" data-bild-testimonial-index="{{@index}}" data-bild-prop="authorName">
+                {{authorName}}
+              </p>
+              <p class="text-sm text-muted-foreground" data-bild-block-index="{{../blockIndex}}" data-bild-testimonial-index="{{@index}}" data-bild-prop="authorRole">
+                {{authorRole}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section> 
