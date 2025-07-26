@@ -13,6 +13,15 @@ interface PartialDefinition {
 
 let arePartialsRegistered = false;
 
+// Tenta carregar CSS pré-gerado de design tokens para evitar gerar em tempo de execução
+let prebuiltTokensCss: string | null = null;
+try {
+  const tokensPath = path.join(process.cwd(), 'src', 'lib', 'generated-theme.css');
+  prebuiltTokensCss = require('node:fs').readFileSync(tokensPath, 'utf8');
+} catch (_) {
+  prebuiltTokensCss = null;
+}
+
 // Helper para gerar classes CSS baseadas em design tokens
 function generateDesignTokenClasses(designTokens: any): string {
   if (!designTokens) return '';
@@ -224,7 +233,11 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     const defaultToDark = pagePlan.theme.personality === 'tech' || pagePlan.theme.personality === 'creative';
     const isDarkTheme = defaultToDark;
     
-    const themeStyleTag = `<style>
+    let themeStyleTag = '';
+    if (prebuiltTokensCss) {
+      themeStyleTag = `<style>${prebuiltTokensCss}</style>`;
+    } else {
+      themeStyleTag = `<style>
   :root {
     ${lightThemeCss}
   }
@@ -237,6 +250,7 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
   .ease-bounce { transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
   .ease-spring { transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 </style>`;
+    }
 
     // Gera a tag de estilo com o CSS compilado
     let compiledCssTag = '';
@@ -283,7 +297,7 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
 
     const fullHtml = `
 <!DOCTYPE html>
-<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}">
+<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}" data-theme="${pagePlan.theme.themeName}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
