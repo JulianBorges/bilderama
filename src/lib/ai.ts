@@ -3,6 +3,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai-e
 import { pagePlanSchema, PagePlan } from './schemas'
 import { ARCHITECT_SYSTEM_PROMPT } from './prompts/architect'
 import { ZodError } from 'zod'
+import { sleep } from './utils'
 
 export interface GeneratedFile {
   path: string
@@ -24,7 +25,7 @@ const openaiConfig = new Configuration({
 
 const openai = new OpenAIApi(openaiConfig)
 
-async function callOpenAI(messages: ChatCompletionRequestMessage[]): Promise<string> {
+async function callOpenAI(messages: ChatCompletionRequestMessage[], { maxRetries = 3, stream = false } = {}): Promise<string> {
   try {
     config.validateApiKey();
   } catch (error) {
@@ -33,23 +34,49 @@ async function callOpenAI(messages: ChatCompletionRequestMessage[]): Promise<str
   }
 
   try {
-    const response = await openai.createChatCompletion({
-      model: config.model,
-      messages,
-      stream: false
-    })
+    let attempt = 0
+    let lastError: any = null
+    while (attempt < maxRetries) {
+      try {
+        const response = await openai.createChatCompletion({
+          model: config.model,
+          messages,
+          stream
+        })
 
-    if (!response.ok) {
-      throw new Error('Erro na resposta da API da OpenAI')
+        if (!response.ok) {
+          throw new Error(`Erro na resposta da API da OpenAI. Status ${response.status}`)
+        }
+
+        if (stream) {
+          // Acumula streaming manualmente
+          const reader = response.body!.getReader()
+          const decoder = new TextDecoder()
+          let content = ''
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            content += decoder.decode(value, { stream: true })
+          }
+          return content
+        } else {
+          const data = await response.json()
+          if (!data.choices?.[0]?.message?.content) {
+            throw new Error('Resposta da API em formato inválido')
+          }
+          return data.choices[0].message.content
+        }
+      } catch (err: any) {
+        lastError = err
+        attempt++
+        if (attempt >= maxRetries) break
+        const delay = Math.pow(2, attempt) * 500 // 0.5s, 1s, 2s...
+        console.warn(`Retry OpenAI (${attempt}/${maxRetries}) em ${delay}ms. Motivo:`, err?.message || err)
+        await sleep(delay)
+      }
     }
 
-    const data = await response.json()
-    
-    if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Resposta da API em formato inválido')
-    }
-
-    return data.choices[0].message.content
+    throw lastError || new Error('Falha desconhecida ao chamar OpenAI')
   } catch (error) {
     console.error('Erro ao chamar a API da OpenAI:', error)
     throw new Error('Falha ao comunicar com a API da OpenAI')
