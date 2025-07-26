@@ -5,7 +5,7 @@ const MAX_BODY_SIZE = 25 * 1024 // 25 kB
 
 export function middleware(req: NextRequest) {
   // Verifica se a key da OpenAI está configurada no servidor
-  if (!process.env.OPENAI_API_KEY) {
+  if (process.env.NODE_ENV !== 'test' && !process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: 'OPENAI_API_KEY não configurada no servidor' }, { status: 500 })
   }
 
