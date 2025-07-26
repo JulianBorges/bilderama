@@ -4,7 +4,7 @@ vi.mock('next/server', () => {
   return {
     NextResponse: {
       json: (body: any, init: any) => ({ body, status: init?.status || 200 }),
-      next: () => ({ status: 200, next: true }),
+      next: () => ({ status: 200, next: true })
     }
   }
 })
