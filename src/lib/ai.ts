@@ -2,6 +2,7 @@ import { config } from './config'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai-edge'
 import { pagePlanSchema, PagePlan } from './schemas'
 import { ARCHITECT_SYSTEM_PROMPT } from './prompts/architect'
+import catalog from './catalog.json'
 import { ZodError } from 'zod'
 import { sleep } from './utils'
 
@@ -172,8 +173,12 @@ async function structurePrompt(userInput: string, maxRetries = 3): Promise<strin
       content: ARCHITECT_SYSTEM_PROMPT
     },
     {
+      role: 'system',
+      content: `BLOCOS DISPONÍVEIS: ${ (catalog as any).blocks.map((b:any)=>b.name).join(', ') }. WIDGETS: ${ (catalog as any).widgets.join(', ') }.`
+    },
+    {
       role: 'user',
-      content: `REQUISIÇÃO DO USUÁRIO:\\n${userInput}`,
+      content: `REQUISIÇÃO DO USUÁRIO:\n${userInput}`,
     },
   ];
 
