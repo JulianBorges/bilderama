@@ -46,8 +46,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
     processedHtmlContent = processedHtmlContent.replace(/<link\s+[^>]*?href\s*=\s*(["'])(?!http)([^\s>"']+?\.css)\1[^>]*?>/gi, '');
     // Remove <script src="script.js"></script> ou similares (case-insensitive, pode ter outros atributos)
     processedHtmlContent = processedHtmlContent.replace(/<script\s+[^>]*?src\s*=\s*(["'])(?!http)([^\s>"']+?\.js)\1[^>]*?>\s*<\/script>/gi, '');
-    // Remove tags <style> existentes para evitar duplicação
-    processedHtmlContent = processedHtmlContent.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+    // Mantemos as <style> originais para preservar variáveis CSS dos temas
 
     const jsContent = `
       const IS_EDIT_MODE = ${editMode};
