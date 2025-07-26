@@ -16,7 +16,8 @@ describe('middleware', () => {
     const bigBody = 'x'.repeat(26 * 1024)
     const req = new Request('http://localhost/api/chat', {
       method: 'POST',
-      body: bigBody
+      body: bigBody,
+      headers: { 'content-length': `${bigBody.length}` }
     }) as any
     const res: any = middleware(req)
     expect(res.status).toBe(413)
