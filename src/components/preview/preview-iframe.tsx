@@ -140,7 +140,6 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.5/dist/tailwind.min.css" rel="stylesheet">
           ${extractedCss}
           <style>
             /* Reset básico e garantia de altura total */
