@@ -32,6 +32,13 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
   // Gera o HTML completo com todos os recursos
   const generateFullHtml = (path: string, editMode: boolean) => {
     const htmlFile = findHtmlFile(path)
+    // Extrai data-theme do HTML gerado
+    let dataThemeAttr = 'moderno_azul'
+    const themeMatch = htmlFile?.content.match(/data-theme="([^"]+)"/)
+    if (themeMatch && themeMatch[1]) {
+      dataThemeAttr = themeMatch[1]
+    }
+
     if (!htmlFile) return ''
 
     // Extrai o CSS injetado do arquivo HTML gerado
@@ -129,7 +136,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
 
     return `
       <!DOCTYPE html>
-      <html>
+      <html data-theme="${dataThemeAttr}">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
