@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "ts-node --esm scripts/build-design-css.ts",
+    "prebuild": "node -r ts-node/register scripts/build-design-css.ts",
     "start": "next start",
     "lint": "next lint",
     "build:css": "node scripts/build-template-css.js",
