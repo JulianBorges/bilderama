@@ -38,7 +38,7 @@ export const pagePlanSchema = z.object({
   pageTitle: z.string().describe("O título da página para a tag <title> e SEO."),
   pageDescription: z.string().describe("A meta descrição da página para SEO."),
   theme: themeSchema,
-  blocks: z.array(blockSchema).describe("Um array de blocos que compõem a estrutura da página."),
+  blocks: z.array(blockSchema).min(1, { message: 'O site deve conter pelo menos um bloco.' }).describe("Um array de blocos que compõem a estrutura da página."),
   widgets: z.array(widgetSchema).optional().describe("Um array de widgets globais a serem injetados na página, como modais ou pop-ups."),
 });
 

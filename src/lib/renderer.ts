@@ -193,7 +193,11 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
 
     const bodyContent = pagePlan.blocks.map((block, index) => {
         const templatePath = `${block.name}/${block.layout || 'default'}.hbs`;
-        const templateString = templates[templatePath];
+        let templateString = templates[templatePath];
+        if (!templateString && block.layout && block.layout !== 'default') {
+            // tenta layout default
+            templateString = templates[`${block.name}/default.hbs`];
+        }
 
         if (!templateString) {
             console.warn(`Template não encontrado para o bloco: ${block.name} com layout: ${block.layout || 'default'}`);
