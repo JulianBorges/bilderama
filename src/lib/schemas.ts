@@ -33,6 +33,15 @@ const themeSchema = z.object({
   density: z.enum(['compact', 'comfortable', 'spacious']).optional(),
 });
 
+// Esquema para páginas adicionais (opcional)
+const pageRouteSchema = z.object({
+  path: z.string().min(1).describe('Caminho relativo sem domínio. Ex.: "/sobre" ou "precos"'),
+  pageTitle: z.string(),
+  pageDescription: z.string(),
+  blocks: z.array(blockSchema).min(1),
+  widgets: z.array(widgetSchema).optional(),
+});
+
 // Esquema principal que define a estrutura de todo o plano da página
 export const pagePlanSchema = z.object({
   pageTitle: z.string().describe("O título da página para a tag <title> e SEO."),
@@ -40,8 +49,10 @@ export const pagePlanSchema = z.object({
   theme: themeSchema,
   blocks: z.array(blockSchema).min(1, { message: 'O site deve conter pelo menos um bloco.' }).describe("Um array de blocos que compõem a estrutura da página."),
   widgets: z.array(widgetSchema).optional().describe("Um array de widgets globais a serem injetados na página, como modais ou pop-ups."),
+  pages: z.array(pageRouteSchema).optional().describe('Páginas adicionais além da página principal'),
 });
 
 // Inferimos o tipo TypeScript diretamente do esquema Zod.
 // Esta será a nossa "fonte da verdade" para a tipagem do PagePlan.
-export type PagePlan = z.infer<typeof pagePlanSchema>; 
+export type PagePlan = z.infer<typeof pagePlanSchema>;
+export type PageRoute = z.infer<typeof pageRouteSchema>; 

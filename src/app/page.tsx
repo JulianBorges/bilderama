@@ -8,10 +8,7 @@ import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { SplitPanel } from '@/components/ui/split-panel'
 import { Button } from '@/components/ui/button'
 import { CodeIcon, EyeOpenIcon, Pencil1Icon } from '@radix-ui/react-icons'
-import { DownloadIcon } from 'lucide-react'
 import { EditorPanel } from '@/components/editor/editor-panel'
-import JSZip from 'jszip'
-import { saveAs } from 'file-saver'
 import { useProjectStore } from '@/store/project-store'
 
 export default function Home() {
@@ -64,17 +61,6 @@ export default function Home() {
     }
   }, [pagePlan, setGeneratedFiles, setIsGenerating]);
   
-  const handleDownload = async () => {
-    if (generatedFiles.length === 0) return;
-
-    const zip = new JSZip();
-    generatedFiles.forEach(file => {
-      zip.file(file.path, file.content);
-    });
-
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'bilderama-site.zip');
-  }
 
   // Wrapper para a função de geração de código para resetar a flag
   const generationHandler = (response: any) => {
@@ -96,16 +82,6 @@ export default function Home() {
             <Pencil1Icon className="h-4 w-4" />
             {isEditMode ? 'Sair da Edição' : 'Editar Site'}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDownload}
-            disabled={generatedFiles.length === 0}
-            className="gap-2"
-          >
-            <DownloadIcon className="h-4 w-4" />
-            Download
-          </Button>
           <div className="flex items-center rounded-lg border bg-background p-1">
             <Button
               variant={activeView === 'preview' ? 'default' : 'ghost'}
@@ -126,6 +102,29 @@ export default function Home() {
               Código
             </Button>
           </div>
+          <Button
+            variant="default"
+            size="sm"
+            disabled={generatedFiles.length === 0}
+            onClick={async () => {
+              try {
+                const res = await fetch('/api/publish', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ files: generatedFiles })
+                })
+                const data = await res.json()
+                if (!res.ok) throw new Error(data?.error || 'Falha na publicação')
+                const url = `/p/${data.slug}`
+                window.open(url, '_blank')
+              } catch (err: any) {
+                alert(err.message || 'Erro ao publicar')
+              }
+            }}
+            className="gap-2"
+          >
+            Publicar
+          </Button>
           <ThemeToggle />
         </div>
       </header>

@@ -2,12 +2,12 @@
   <div class="container mx-auto px-4 py-8">
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <h3 class="text-lg font-bold text-foreground">{{companyName}}</h3>
-        <p class="mt-2 text-muted-foreground">{{companyDescription}}</p>
+        <h3 class="text-lg font-bold text-foreground" {{editableAttr prop="companyName"}}>{{companyName}}</h3>
+        <p class="mt-2 text-muted-foreground" {{editableAttr prop="companyDescription"}}>{{companyDescription}}</p>
       </div>
       {{#each linkSections}}
       <div>
-        <h4 class="font-semibold text-foreground">{{this.title}}</h4>
+                  <h4 class="font-semibold text-foreground" {{editableAttr prop="title"}}>{{this.title}}</h4>
         <ul class="mt-4 space-y-2">
           {{#each this.links}}
           <li><a href="#" class="text-muted-foreground hover:text-foreground">{{this}}</a></li>

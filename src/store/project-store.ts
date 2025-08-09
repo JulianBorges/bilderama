@@ -42,7 +42,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setActiveView: (view) => set({ activeView: view }),
   setSelectedElement: (element) => set({ selectedElement: element }),
-  setIsEditMode: (isEditMode) => set({ isEditMode: !get().isEditMode }),
+  setIsEditMode: (isEditMode) => set({ isEditMode }),
 
   handleCodeGeneration: async (response) => {
     if (!response.pagePlanJson) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { ChevronUpIcon, FileIcon, SparklesIcon } from 'lucide-react'
@@ -27,47 +27,35 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
   const [placeholderText, setPlaceholderText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [activeSuggestions, setActiveSuggestions] = useState<string[]>([])
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Placeholder animado dentro do input
+  // Auto-resize do textarea
   useEffect(() => {
-    if (isTyping) return // pausa a animação enquanto digita
-  
+    if (!textareaRef.current) return
+    textareaRef.current.style.height = '0px'
+    const scrollH = textareaRef.current.scrollHeight
+    textareaRef.current.style.height = Math.min(scrollH, 160) + 'px'
+  }, [input])
+
+  // Placeholder animado
+  useEffect(() => {
+    if (isTyping) return
     const phrases = [
-      "O que você quer construir hoje?",
-      "Um site?",
-      "Um app?",
-      "Que tal um jogo?",
-      "Seja o que for, nós construímos pra você.",
+      'O que você quer construir hoje?','Um site?','Um app?','Que tal um jogo?','Seja o que for, nós construímos pra você.'
     ]
-  
-    let currentPhrase = 0
-    let currentChar = 0
-    let typing = true
-    let timeoutId: NodeJS.Timeout
-  
+    let currentPhrase = 0, currentChar = 0, typing = true, timeoutId: NodeJS.Timeout
     const animate = () => {
       const text = phrases[currentPhrase]
       if (typing) {
         setPlaceholderText(text.slice(0, currentChar++))
-        if (currentChar > text.length) {
-          typing = false
-          timeoutId = setTimeout(animate, 1000)
-          return
-        }
+        if (currentChar > text.length) { typing = false; timeoutId = setTimeout(animate, 1000); return }
       } else {
         setPlaceholderText(text.slice(0, currentChar--))
-        if (currentChar === 0) {
-          typing = true
-          currentPhrase = (currentPhrase + 1) % phrases.length
-          timeoutId = setTimeout(animate, 500)
-          return
-        }
+        if (currentChar === 0) { typing = true; currentPhrase = (currentPhrase + 1) % phrases.length; timeoutId = setTimeout(animate, 500); return }
       }
       timeoutId = setTimeout(animate, typing ? 80 : 40)
     }
-  
     timeoutId = setTimeout(animate, 300)
-  
     return () => clearTimeout(timeoutId)
   }, [isTyping])
 
@@ -75,7 +63,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     if (message.role === 'user') {
       return <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
     }
-
     switch (message.type) {
       case 'prompt':
         return (
@@ -86,7 +73,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
             </pre>
           </div>
         )
-
       case 'files':
         return (
           <div className="space-y-2">
@@ -102,7 +88,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
             </div>
           </div>
         )
-
       case 'explanation':
         return (
           <div className="space-y-2">
@@ -110,7 +95,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
             <div className="text-sm">{message.content.replace('✨ ', '')}</div>
           </div>
         )
-
       case 'suggestions':
         return (
           <div className="space-y-2">
@@ -128,7 +112,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
             </div>
           </div>
         )
-
       case 'error':
         return (
           <div className="space-y-2">
@@ -136,7 +119,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
             <div className="text-sm text-destructive">{message.content}</div>
           </div>
         )
-
       default:
         return <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
     }
@@ -152,7 +134,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
 
   const renderSuggestions = () => {
     if (activeSuggestions.length === 0) return null
-
     return (
       <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="overflow-x-auto px-4 py-3 flex gap-2 no-scrollbar">
@@ -173,7 +154,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
 
   const handleSubmit = async (content: string) => {
     if (!content.trim() || isLoading) return
-
     const userMessage: ChatMessage = { role: 'user', content }
     setMessages((prev) => [...prev, userMessage])
     setInput('')
@@ -181,61 +161,19 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     setIsLoading(true)
     onGenerationStart()
     setActiveSuggestions([])
-
     try {
       const { pagePlan } = useProjectStore.getState();
-
-      const requestBody = {
-        userInput: content,
-        currentPagePlan: pagePlan,
-      };
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
+      const requestBody = { userInput: content, currentPagePlan: pagePlan }
+      const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) })
       const result: AIResponse = await response.json()
-
-      if (!response.ok) {
-        throw new Error((result as any).error || `Erro da API: ${response.statusText}`);
-      }
-      
-      if (!result.pagePlanJson || !result.explanation) {
-        throw new Error('Resposta incompleta da API')
-      }
-
+      if (!response.ok) throw new Error((result as any).error || `Erro da API: ${response.statusText}`)
+      if (!result.pagePlanJson || !result.explanation) throw new Error('Resposta incompleta da API')
       onCodeGeneration(result)
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: result.explanation,
-          type: 'explanation',
-        }
-      ])
-
-      if (result.suggestions && result.suggestions.length > 0) {
-        setActiveSuggestions(result.suggestions)
-      }
+      setMessages((prev) => [...prev, { role: 'assistant', content: result.explanation, type: 'explanation' }])
+      if (result.suggestions && result.suggestions.length > 0) setActiveSuggestions(result.suggestions)
     } catch (error) {
-      console.error('Erro detalhado:', error)
-      const errorMessage = error instanceof Error 
-        ? error.message
-        : 'Ocorreu um erro inesperado ao processar sua solicitação'
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: `Desculpe, mas encontrei um problema: ${errorMessage}. Por favor, tente novamente com um prompt diferente.`,
-          type: 'error'
-        },
-      ])
+      const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro inesperado ao processar sua solicitação'
+      setMessages((prev) => [...prev, { role: 'assistant', content: `Desculpe, mas encontrei um problema: ${errorMessage}. Por favor, tente novamente com um prompt diferente.`, type: 'error' }])
     } finally {
       setIsLoading(false)
     }
@@ -246,24 +184,19 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     handleSubmit(input)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      handleSubmit(input)
+    }
+  }
+
   return (
     <div className="flex flex-col h-[92vh] max-h-[92vh] bg-background">
-      {/* Área de mensagens */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, i) => (
-          <div
-            key={i}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : message.type === 'error'
-                  ? 'bg-destructive/10 border border-destructive/20'
-                  : 'bg-muted'
-              }`}
-            >
+          <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : message.type === 'error' ? 'bg-destructive/10 border border-destructive/20' : 'bg-muted'}`}>
               {message.role === 'user' ? (
                 <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
               ) : message.type === 'error' ? (
@@ -282,39 +215,23 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
         ))}
       </div>
 
-      {/* Área de sugestões */}
       {renderSuggestions()}
 
-      {/* Área de input */}
       <form onSubmit={handleFormSubmit} className="border-t px-6 pb-5 pt-3 bg-background">
-        <div className="flex flex-col justify-between h-12 min-h-[8rem] rounded-lg border border-border bg-muted/60 px-4 py-3 shadow-sm transition-all">
-          <input
-            type="text"
+        <div className="flex items-end gap-2 rounded-lg border border-border bg-muted/60 px-3 py-2 shadow-sm">
+          <textarea
+            ref={textareaRef}
             value={input}
-            onChange={(e) => {
-              setInput(e.target.value)
-              setIsTyping(true)
-            }}
+            onChange={(e) => { setInput(e.target.value); setIsTyping(true) }}
             onBlur={() => setIsTyping(false)}
+            onKeyDown={handleKeyDown}
             placeholder={placeholderText}
-            className="flex-1 bg-transparent px-0 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0"
+            className="flex-1 bg-transparent px-0 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 resize-none max-h-40"
             disabled={isLoading}
           />
-          <div className="mt-2 flex justify-end">
-            <Button
-              type="submit"
-              size="icon"
-              className="rounded-md shadow-sm h-9 w-9"
-              disabled={isLoading}
-              variant="default"
-            >
-              {isLoading ? (
-                <ReloadIcon className="h-4 w-4 animate-spin" />
-              ) : (
-                <ChevronUpIcon className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+          <Button type="submit" size="icon" className="rounded-md shadow-sm h-9 w-9" disabled={isLoading} variant="default">
+            {isLoading ? <ReloadIcon className="h-4 w-4 animate-spin" /> : <ChevronUpIcon className="h-4 w-4" />}
+          </Button>
         </div>
       </form>
     </div>

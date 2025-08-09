@@ -87,17 +87,15 @@ async function callOpenAI(messages: ChatCompletionRequestMessage[], { maxRetries
 // Função para limpar a string JSON
 function cleanJsonString(jsonString: string): string {
   let cleaned = jsonString
-    .replace(/^```json\s*/, '') // Remove ```json no início
-    .replace(/\s*```$/, '')     // Remove ``` no final
-    .trim();                    // Remove espaços extras
+    .replace(/^```json\s*/, '')
+    .replace(/\s*```$/, '')
+    .trim();
   
-  // Remove texto explicativo antes do JSON
   const jsonStartIndex = cleaned.indexOf('{');
   if (jsonStartIndex > 0) {
     cleaned = cleaned.substring(jsonStartIndex);
   }
   
-  // Remove texto após o JSON
   const jsonEndIndex = cleaned.lastIndexOf('}');
   if (jsonEndIndex !== -1 && jsonEndIndex < cleaned.length - 1) {
     cleaned = cleaned.substring(0, jsonEndIndex + 1);
@@ -108,30 +106,21 @@ function cleanJsonString(jsonString: string): string {
 
 // Função para limpar valores inválidos de design tokens
 function cleanInvalidDesignTokens(pagePlan: any): void {
-  // Valores inválidos que devem ser removidos
   const invalidValues = ['default', 'null', '', null, undefined];
-  
-  // Para borderRadius e shadowIntensity, 'none' é válido mas deve ser tratado com cuidado
   const noneAllowedFields = ['borderRadius', 'shadowIntensity', 'animation'];
   
-  // Limpa design tokens nos blocos
   if (pagePlan.blocks && Array.isArray(pagePlan.blocks)) {
     pagePlan.blocks.forEach((block: any) => {
       if (block.designTokens && typeof block.designTokens === 'object') {
         Object.keys(block.designTokens).forEach(key => {
           const value = block.designTokens[key];
-          
-          // Remove valores sempre inválidos
           if (invalidValues.includes(value)) {
             delete block.designTokens[key];
           }
-          // Remove 'none' apenas para campos onde não é apropriado
           else if (value === 'none' && !noneAllowedFields.includes(key)) {
             delete block.designTokens[key];
           }
         });
-        
-        // Remove o objeto designTokens se estiver vazio
         if (Object.keys(block.designTokens).length === 0) {
           delete block.designTokens;
         }
@@ -139,24 +128,18 @@ function cleanInvalidDesignTokens(pagePlan: any): void {
     });
   }
   
-  // Limpa design tokens nos widgets
   if (pagePlan.widgets && Array.isArray(pagePlan.widgets)) {
     pagePlan.widgets.forEach((widget: any) => {
       if (widget.designTokens && typeof widget.designTokens === 'object') {
         Object.keys(widget.designTokens).forEach(key => {
           const value = widget.designTokens[key];
-          
-          // Remove valores sempre inválidos
           if (invalidValues.includes(value)) {
             delete widget.designTokens[key];
           }
-          // Remove 'none' apenas para campos onde não é apropriado
           else if (value === 'none' && !noneAllowedFields.includes(key)) {
             delete widget.designTokens[key];
           }
         });
-        
-        // Remove o objeto designTokens se estiver vazio
         if (Object.keys(widget.designTokens).length === 0) {
           delete widget.designTokens;
         }
@@ -165,8 +148,27 @@ function cleanInvalidDesignTokens(pagePlan: any): void {
   }
 }
 
+function buildMultipageHint(userInput: string): string | null {
+  const lower = userInput.toLowerCase()
+  const wantsAbout = lower.includes('sobre') || lower.includes('about')
+  const wantsPricing = lower.includes('preço') || lower.includes('preços') || lower.includes('pricing')
+  const wantsContact = lower.includes('contato') || lower.includes('contact')
+  const wantsBlog = lower.includes('blog')
+
+  const pages: string[] = []
+  if (wantsAbout) pages.push('/sobre')
+  if (wantsPricing) pages.push('/precos')
+  if (wantsContact) pages.push('/contato')
+  if (wantsBlog) pages.push('/blog')
+
+  if (pages.length === 0) return null
+
+  return `GERAR MULTIPÁGINAS:\n- Incluir 'pages[]' com rotas: ${pages.join(', ')}.\n- Garantir que links internos como 'ctaHref' apontem para essas rotas.\n- Cada página deve ter ao menos 1 bloco.`
+}
+
 // Interpreta e estrutura o prompt em inglês
 async function structurePrompt(userInput: string, maxRetries = 3): Promise<string> {
+  const multipageHint = buildMultipageHint(userInput)
   const messages: ChatCompletionRequestMessage[] = [
     {
       role: 'system',
@@ -182,22 +184,24 @@ async function structurePrompt(userInput: string, maxRetries = 3): Promise<strin
     },
   ];
 
+  if (multipageHint) {
+    messages.push({ role: 'user', content: multipageHint })
+  }
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const responseJson = await callOpenAI(messages);
       const cleanedJson = cleanJsonString(responseJson);
       const parsedJson = JSON.parse(cleanedJson);
       
-      // Camada de defesa: limpa valores inválidos antes da validação Zod
       cleanInvalidDesignTokens(parsedJson);
       
       const validatedPlan = pagePlanSchema.parse(parsedJson);
-      return JSON.stringify(validatedPlan); // Sucesso!
+      return JSON.stringify(validatedPlan);
     } catch (e) {
       console.warn(`Tentativa ${attempt} falhou.`, e);
       if (e instanceof ZodError) {
         if (attempt < maxRetries) {
-          // Cria uma mensagem de erro mais específica
           const errorMessages = e.errors.map(error => {
             if (error.code === 'invalid_enum_value') {
               return `Campo "${error.path.join('.')}" tem valor inválido "${error.received}". Valores permitidos: ${error.options.join(', ')}.`;
@@ -231,50 +235,31 @@ INSTRUÇÕES CRÍTICAS:
             });
          }
       } else {
-        // Erro inesperado, não relacionado à validação, falha imediatamente.
         throw e;
       }
     }
   }
 
-  // Se todas as tentativas falharem
   throw new Error(`O Arquiteto da IA falhou em gerar um plano JSON válido após ${maxRetries} tentativas.`);
 }
 
 // Analisa o código e gera resumo e sugestões em português
 async function generateAnalysis(files: GeneratedFile[]): Promise<{ explanation: string; suggestions: string[] }> {
-  // A análise agora pode ser mais simples ou focada em outras coisas,
-  // já que a geração de código é previsível.
-  // Por enquanto, vamos retornar valores mockados.
   const analysisPrompt = `Baseado nos seguintes arquivos, gere uma breve explicação e 3 sugestões de melhoria: ${JSON.stringify(files)}`;
   
-  // Esta parte pode ser expandida no futuro.
-  // const response = await callOpenAI([...]); 
-  
-    return {
+  return {
     explanation: "Seu site foi gerado com sucesso usando um plano de construção estruturado e um motor de renderização determinístico.",
     suggestions: ["Experimente pedir uma paleta de cores diferente.", "Adicione uma seção de depoimentos de clientes.", "Peça para incluir uma galeria de imagens."]
   }
 }
 
-/**
- * Orquestra o fluxo principal:
- * 1. Pega o input do usuário e gera um PagePlan estruturado via IA.
- * 2. (Etapa removida) Não gera mais código diretamente aqui.
- * 3. Analisa o resultado para fornecer feedback.
- * Retorna o PagePlan e a análise.
- */
 export async function processUserInput(userInput: string): Promise<AIResponse> {
   const pagePlanJson = await structurePrompt(userInput)
-  
-  // A análise agora é mockada, pois não temos mais os arquivos gerados pela IA aqui.
-  // O ideal seria que a análise acontecesse no frontend após a renderização.
-  // Por simplicidade, vamos manter um mock aqui.
   const analysis = await generateAnalysis([]);
 
   return {
     pagePlanJson,
-    files: null, // O frontend irá gerar os arquivos com o PagePlan
+    files: null,
     explanation: analysis.explanation,
     suggestions: analysis.suggestions,
   }

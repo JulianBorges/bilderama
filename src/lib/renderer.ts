@@ -120,6 +120,46 @@ function registerDesignTokenHelper() {
     };
     return new Handlebars.SafeString(personalityClasses[theme.personality] || '');
   });
+
+  // Helper para injetar atributos de edição
+  Handlebars.registerHelper('editableAttr', function(this: any, options: any) {
+    const prop = options?.hash?.prop;
+    const blockIndex = options?.hash?.blockIndex ?? this?.blockIndex;
+    if (!prop || blockIndex === undefined || blockIndex === null) {
+      return '';
+    }
+    return new Handlebars.SafeString(`data-bild-block-index="${String(blockIndex)}" data-bild-prop="${String(prop)}"`);
+  });
+
+  // Helper para gerar slugs simples (para futuros hrefs internos)
+  Handlebars.registerHelper('slugify', function(value: string) {
+    if (!value) return '';
+    return String(value)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  });
+
+  // Helper para resolver links do Navbar com heurísticas simples
+  Handlebars.registerHelper('linkHref', function(label: string) {
+    if (!label) return '#';
+    const l = String(label).toLowerCase();
+    if (/(sobre|about)/.test(l)) return '/sobre';
+    if (/(preço|preços|pricing)/.test(l)) return '/precos';
+    if (/(contato|contact)/.test(l)) return '/contato';
+    if (/blog/.test(l)) return '/blog';
+    return '#';
+  });
+
+  // Helper para imagens seguras (placeholder quando ausente)
+  Handlebars.registerHelper('safeImg', function(url: string) {
+    if (url && typeof url === 'string' && url.trim().length > 0) return url;
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'>\n  <rect width='100%' height='100%' fill='hsl(220, 14%, 96%)'/>\n  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='hsl(215, 16%, 47%)' font-family='Inter, Arial' font-size='16'>Imagem</text>\n</svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+  });
 }
 
 function registerPartials(partials: PartialDefinition[], templates: Record<string, string>) {
@@ -180,68 +220,31 @@ async function getBuiltCss(): Promise<string> {
     }
 }
 
-/**
- * Renderiza uma página completa a partir de um PagePlan usando templates Handlebars.
- * @param pagePlan O plano da página validado.
- * @param cssContent O conteúdo CSS compilado do build.
- * @returns Uma Promise que resolve para um array de arquivos gerados.
- */
-export async function renderPage(pagePlan: PagePlan, cssContent: string): Promise<GeneratedFile[]> {
-    const { templates, partials } = await loadTemplates();
-    
-    registerPartials(partials, templates);
+function buildThemeStyleTag(themeName: string, personality?: string): string {
+  // Gera as variáveis CSS do tema
+  const themeConfig = themeVariablesMap[themeName as keyof typeof themeVariablesMap];
+  if (!themeConfig) {
+      console.warn(`Tema "${themeName}" não encontrado. Usando tema padrão.`);
+  }
+  const currentThemeConfig = themeConfig || themeVariablesMap.moderno_azul;
 
-    const bodyContent = pagePlan.blocks.map((block, index) => {
-        const templatePath = `${block.name}/${block.layout || 'default'}.hbs`;
-        let templateString = templates[templatePath];
-        if (!templateString && block.layout && block.layout !== 'default') {
-            // tenta layout default
-            templateString = templates[`${block.name}/default.hbs`];
-        }
+  // Gera CSS para ambos os modos
+  const lightThemeCss = Object.entries(currentThemeConfig.light)
+      .map(([key, value]) => `${key}: ${value};`)
+      .join('\n    ');
+  
+  const darkThemeCss = Object.entries(currentThemeConfig.dark)
+      .map(([key, value]) => `${key}: ${value};`)
+      .join('\n    ');
 
-        if (!templateString) {
-            console.warn(`Template não encontrado para o bloco: ${block.name} com layout: ${block.layout || 'default'}`);
-            return `<!-- Template para ${block.name} (${block.layout || 'default'}) não encontrado em ${templatePath} -->`;
-        }
-        
-        const blockTemplate = Handlebars.compile(templateString, { noEscape: true });
-        
-        const context = { 
-          ...block.properties, 
-          blockIndex: index,
-          designTokens: block.designTokens,
-          theme: pagePlan.theme
-        };
-        
-        return blockTemplate(context);
-    }).join('');
-    
-    // Gera as variáveis CSS do tema
-    const themeConfig = themeVariablesMap[pagePlan.theme.themeName as keyof typeof themeVariablesMap];
-    if (!themeConfig) {
-        console.warn(`Tema "${pagePlan.theme.themeName}" não encontrado. Usando tema padrão.`);
-    }
-    
-    const currentThemeConfig = themeConfig || themeVariablesMap.moderno_azul;
-    
-    // Gera CSS para ambos os modos
-    const lightThemeCss = Object.entries(currentThemeConfig.light)
-        .map(([key, value]) => `${key}: ${value};`)
-        .join('\n    ');
-    
-    const darkThemeCss = Object.entries(currentThemeConfig.dark)
-        .map(([key, value]) => `${key}: ${value};`)
-        .join('\n    ');
-    
-    // Determina o modo padrão baseado na personalidade do tema
-    const defaultToDark = pagePlan.theme.personality === 'tech' || pagePlan.theme.personality === 'creative';
-    const isDarkTheme = defaultToDark;
-    
-    let themeStyleTag = '';
-    if (prebuiltTokensCss) {
-      themeStyleTag = `<style>${prebuiltTokensCss}</style>`;
-    } else {
-      themeStyleTag = `<style>
+  const defaultToDark = personality === 'tech' || personality === 'creative';
+  const isDarkTheme = defaultToDark;
+
+  let themeStyleTag = '';
+  if (prebuiltTokensCss) {
+    themeStyleTag = `<style>${prebuiltTokensCss}</style>`;
+  } else {
+    themeStyleTag = `<style>
   :root {
     ${lightThemeCss}
   }
@@ -254,73 +257,181 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
   .ease-bounce { transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
   .ease-spring { transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 </style>`;
-    }
+  }
 
-    // Gera a tag de estilo com o CSS compilado
-    let compiledCssTag = '';
-    if (cssContent && cssContent.trim().length > 0) {
-      compiledCssTag = `<style>${cssContent}</style>`;
-    } else {
-      compiledCssTag = `<style>body:before{display:block;white-space:pre;content:'[AVISO] CSS de build não encontrado. Rode "next build" para gerar o CSS.';color:red;background:#fff;padding:2rem;}</style>`;
-    }
+  return { tag: themeStyleTag, isDarkTheme } as unknown as string;
+}
 
-    let widgetsHtml = '';
-    if (pagePlan.widgets && pagePlan.widgets.length > 0) {
-      widgetsHtml = pagePlan.widgets.map(widget => {
-        const templatePath = `${widget.name}/default.hbs`;
-        const templateString = templates[templatePath];
+function buildFontCss(fontFamily?: string): string {
+  const font = fontFamily || 'inter';
+  const fontCssMap: Record<string, string> = {
+    'inter': '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Inter", sans-serif; }',
+    'roboto': '@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"); body { font-family: "Roboto", sans-serif; }',
+    'lato': '@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"); body { font-family: "Lato", sans-serif; }',
+    'poppins': '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Poppins", sans-serif; }',
+    'montserrat': '@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Montserrat", sans-serif; }',
+    'playfair': '@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"); body { font-family: "Playfair Display", serif; }',
+    'crimson': '@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap"); body { font-family: "Crimson Text", serif; }'
+  };
+  return fontCssMap[font] || fontCssMap.inter;
+}
 
-        if (!templateString) {
-          console.warn(`Template não encontrado para o widget: ${widget.name} em ${templatePath}`);
-          return `<!-- Template para widget ${widget.name} não encontrado -->`;
-        }
+function normalizePathToHtml(pathname: string): string {
+  if (!pathname || pathname === '/' || pathname === 'index' || pathname === 'index.html') {
+    return 'index.html';
+  }
+  const cleaned = pathname.replace(/^\/+/, '');
+  return cleaned.endsWith('.html') ? cleaned : `${cleaned}.html`;
+}
 
-        const widgetTemplate = Handlebars.compile(templateString, { noEscape: true });
-        const context = {
-          ...widget.properties,
-          designTokens: widget.designTokens,
-          theme: pagePlan.theme
-        };
-        return widgetTemplate(context);
-      }).join('');
-    }
+function composeHtmlDocument(params: {
+  pageTitle: string;
+  pageDescription: string;
+  bodyContent: string;
+  widgetsHtml: string;
+  cssContent: string;
+  themeName: string;
+  fontFamily?: string;
+  personality?: string;
+}): string {
+  const fontCss = buildFontCss(params.fontFamily);
+  const themeStyle = buildThemeStyleTag(params.themeName, params.personality) as unknown as any;
+  const isDarkTheme = (params.personality === 'tech' || params.personality === 'creative');
 
-    // Add font families CSS com mais opções
-    const fontFamily = pagePlan.theme.font || 'inter';
-    const fontCssMap: Record<string, string> = {
-      'inter': '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Inter", sans-serif; }',
-      'roboto': '@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"); body { font-family: "Roboto", sans-serif; }',
-      'lato': '@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"); body { font-family: "Lato", sans-serif; }',
-      'poppins': '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Poppins", sans-serif; }',
-      'montserrat': '@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Montserrat", sans-serif; }',
-      'playfair': '@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"); body { font-family: "Playfair Display", serif; }',
-      'crimson': '@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap"); body { font-family: "Crimson Text", serif; }'
-    };
+  let compiledCssTag = '';
+  if (params.cssContent && params.cssContent.trim().length > 0) {
+    compiledCssTag = `<style>${params.cssContent}</style>`;
+  } else {
+    compiledCssTag = `<style>body:before{display:block;white-space:pre;content:'[AVISO] CSS de build não encontrado. Rode "next build" para gerar o CSS.';color:red;background:#fff;padding:2rem;}</style>`;
+  }
 
-    const fontCss = fontCssMap[fontFamily] || fontCssMap.inter;
-
-    const fullHtml = `
+  const fullHtml = `
 <!DOCTYPE html>
-<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}" data-theme="${pagePlan.theme.themeName}">
+<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}" data-theme="${params.themeName}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${pagePlan.pageTitle}</title>
-    <meta name="description" content="${pagePlan.pageDescription}">
+    <title>${params.pageTitle}</title>
+    <meta name="description" content="${params.pageDescription}">
     <style>${fontCss}</style>
-    ${themeStyleTag}
+    ${themeStyle.tag || themeStyle}
     ${compiledCssTag}
 </head>
 <body>
-${bodyContent}
-${widgetsHtml}
+${params.bodyContent}
+${params.widgetsHtml}
 </body>
 </html>`;
 
-    return [{
-    path: 'index.html',
-        content: fullHtml,
+  return fullHtml;
+}
+
+function renderBlocksToHtml(templates: Record<string, string>, pagePlan: PagePlan, blocks: any[]): string {
+  return blocks.map((block, index) => {
+    const templatePath = `${block.name}/${block.layout || 'default'}.hbs`;
+    let templateString = templates[templatePath];
+    if (!templateString && block.layout && block.layout !== 'default') {
+        templateString = templates[`${block.name}/default.hbs`];
+    }
+
+    if (!templateString) {
+        console.warn(`Template não encontrado para o bloco: ${block.name} com layout: ${block.layout || 'default'}`);
+        return `<!-- Template para ${block.name} (${block.layout || 'default'}) não encontrado em ${templatePath} -->`;
+    }
+    
+    const blockTemplate = Handlebars.compile(templateString, { noEscape: true });
+    
+    const context = { 
+      ...block.properties, 
+      blockIndex: index,
+      designTokens: block.designTokens,
+      theme: pagePlan.theme
+    };
+    
+    return blockTemplate(context);
+  }).join('');
+}
+
+function renderWidgetsToHtml(templates: Record<string, string>, pagePlan: PagePlan, widgets?: any[]): string {
+  if (!widgets || widgets.length === 0) return '';
+  return widgets.map(widget => {
+    const templatePath = `${widget.name}/default.hbs`;
+    const templateString = templates[templatePath];
+
+    if (!templateString) {
+      console.warn(`Template não encontrado para o widget: ${widget.name} em ${templatePath}`);
+      return `<!-- Template para widget ${widget.name} não encontrado -->`;
+    }
+
+    const widgetTemplate = Handlebars.compile(templateString, { noEscape: true });
+    const context = {
+      ...widget.properties,
+      designTokens: widget.designTokens,
+      theme: pagePlan.theme
+    };
+    return widgetTemplate(context);
+  }).join('');
+}
+
+/**
+ * Renderiza uma página completa a partir de um PagePlan usando templates Handlebars.
+ * @param pagePlan O plano da página validado.
+ * @param cssContent O conteúdo CSS compilado do build.
+ * @returns Uma Promise que resolve para um array de arquivos gerados.
+ */
+export async function renderPage(pagePlan: PagePlan, cssContent: string): Promise<GeneratedFile[]> {
+    const { templates, partials } = await loadTemplates();
+    
+    registerPartials(partials, templates);
+
+    const files: GeneratedFile[] = [];
+
+    // Se o plano tiver páginas múltiplas, renderiza cada uma
+    if ((pagePlan as any).pages && Array.isArray((pagePlan as any).pages)) {
+      for (const page of (pagePlan as any).pages) {
+        const bodyContent = renderBlocksToHtml(templates, pagePlan, page.blocks);
+        const widgetsHtml = renderWidgetsToHtml(templates, pagePlan, page.widgets);
+        const html = composeHtmlDocument({
+          pageTitle: page.pageTitle,
+          pageDescription: page.pageDescription,
+          bodyContent,
+          widgetsHtml,
+          cssContent,
+          themeName: pagePlan.theme.themeName,
+          fontFamily: pagePlan.theme.font,
+          personality: pagePlan.theme.personality,
+        });
+        files.push({
+          path: normalizePathToHtml(page.path),
+          content: html,
+          type: 'page',
+          description: 'Página gerada via renderizador determinístico.'
+        });
+      }
+    }
+
+    // Renderiza a página raiz (blocos do topo) se existirem
+    if (pagePlan.blocks && pagePlan.blocks.length > 0) {
+      const bodyContent = renderBlocksToHtml(templates, pagePlan, pagePlan.blocks);
+      const widgetsHtml = renderWidgetsToHtml(templates, pagePlan, pagePlan.widgets);
+      const html = composeHtmlDocument({
+        pageTitle: pagePlan.pageTitle,
+        pageDescription: pagePlan.pageDescription,
+        bodyContent,
+        widgetsHtml,
+        cssContent,
+        themeName: pagePlan.theme.themeName,
+        fontFamily: pagePlan.theme.font,
+        personality: pagePlan.theme.personality,
+      });
+
+      files.push({
+        path: 'index.html',
+        content: html,
         type: 'page',
         description: 'Página principal construída via renderizador determinístico.'
-    }];
+      });
+    }
+
+    return files;
 } 

@@ -1,14 +1,14 @@
 <header class="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
   <nav class="container mx-auto flex items-center justify-between p-4">
-    <a href="#" class="text-2xl font-bold text-foreground hover:text-primary transition-colors" data-bild-block-index="{{blockIndex}}" data-bild-prop="logoText">{{logoText}}</a>
+    <a href="#" class="text-2xl font-bold text-foreground hover:text-primary transition-colors" {{editableAttr prop="logoText"}}>{{logoText}}</a>
     
     <ul class="hidden gap-6 md:flex">
       {{#each links}}
-        <li><a href="#" class="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">{{this}}</a></li>
+        <li><a href="{{linkHref this}}" class="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">{{this}}</a></li>
       {{/each}}
     </ul>
     
-    <button class="hidden rounded-lg bg-primary px-6 py-2.5 font-semibold text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105 md:block" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaText">{{ctaText}}</button>
+    <button class="hidden rounded-lg bg-primary px-6 py-2.5 font-semibold text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105 md:block" {{editableAttr prop="ctaText"}}>{{ctaText}}</button>
     
     <!-- Menu mobile -->
     <button class="p-2 md:hidden hover:bg-accent rounded-lg transition-colors">
