@@ -2,6 +2,27 @@ import { create } from 'zustand';
 import { GeneratedFile, AIResponse } from '@/lib/ai';
 import { PagePlan } from '@/lib/schemas';
 
+function saveSnapshot(title: string, prompt: string, pagePlanJson: string) {
+  try {
+    const raw = localStorage.getItem('bilderama:versions');
+    const list = raw ? JSON.parse(raw) : [];
+    const snap = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      title,
+      prompt,
+      pagePlanJson,
+      createdAt: new Date().toISOString(),
+      isFavorite: false,
+    };
+    list.unshift(snap);
+    // Limite simples para não crescer infinito
+    const limited = list.slice(0, 50);
+    localStorage.setItem('bilderama:versions', JSON.stringify(limited));
+  } catch (err) {
+    console.warn('Falha ao salvar snapshot local:', err);
+  }
+}
+
 type ActiveView = 'preview' | 'code';
 
 type SelectedElement = {
@@ -18,6 +39,7 @@ interface ProjectState {
   selectedElement: SelectedElement | null;
   isEditMode: boolean;
   pagePlan: PagePlan | null;
+  lastPrompt: string;
   
   // Actions
   handleCodeGeneration: (response: AIResponse) => void;
@@ -28,6 +50,8 @@ interface ProjectState {
   setSelectedElement: (element: SelectedElement | null) => void;
   setIsEditMode: (isEditMode: boolean) => void;
   setProjectName: (name: string) => void;
+  setLastPrompt: (prompt: string) => void;
+  saveCurrentSnapshot: () => void;
   resetProject: () => void;
 }
 
@@ -40,6 +64,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   selectedElement: null,
   isEditMode: false,
   pagePlan: null,
+  lastPrompt: '',
 
   // Actions
   setGeneratedFiles: (files) => set({ generatedFiles: files }),
@@ -51,6 +76,18 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     localStorage.setItem('bilderama:project-name', name)
     set({ projectName: name })
   },
+  setLastPrompt: (prompt) => set({ lastPrompt: prompt }),
+  saveCurrentSnapshot: () => {
+    const { pagePlan, lastPrompt } = get();
+    if (!pagePlan) return;
+    try {
+      const json = JSON.stringify(pagePlan);
+      const title = pagePlan.pageTitle || 'Projeto';
+      saveSnapshot(title, lastPrompt || 'Snapshot manual', json);
+    } catch (e) {
+      console.warn('Falha ao serializar pagePlan:', e);
+    }
+  },
   resetProject: () => {
     localStorage.removeItem('bilderama:project-name')
     set({
@@ -61,6 +98,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       selectedElement: null,
       isEditMode: false,
       pagePlan: null,
+      lastPrompt: '',
     })
   },
 
@@ -74,6 +112,11 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     try {
       const pagePlan: PagePlan = JSON.parse(response.pagePlanJson);
       set({ pagePlan }); // Armazena o plano recebido
+
+      // Salva snapshot local com prompt original (se disponível)
+      const { lastPrompt } = get();
+      const promptForSnapshot = lastPrompt || (response as any).explanation || '';
+      saveSnapshot(pagePlan.pageTitle || 'Projeto', promptForSnapshot, response.pagePlanJson);
 
       // Etapa 2: Chamar o renderizador determinístico com o plano.
       const renderResponse = await fetch('/api/render', {

@@ -29,6 +29,8 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
   const [activeSuggestions, setActiveSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  const { setLastPrompt } = useProjectStore()
+
   // Auto-resize do textarea
   useEffect(() => {
     if (!textareaRef.current) return
@@ -68,6 +70,10 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     setIsLoading(true)
     onGenerationStart()
     setActiveSuggestions([])
+
+    // Guarda o último prompt para snapshots
+    setLastPrompt(content)
+
     try {
       const { pagePlan } = useProjectStore.getState();
       const requestBody = { userInput: content, currentPagePlan: pagePlan }

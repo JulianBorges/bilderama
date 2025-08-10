@@ -1,6 +1,6 @@
 export const config = {
   openaiApiKey: process.env.OPENAI_API_KEY,
-  model: 'gpt-4o',
+  model: 'gpt-4o-mini',
   validateApiKey: () => {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
