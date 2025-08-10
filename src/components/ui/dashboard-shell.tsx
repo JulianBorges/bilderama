@@ -13,7 +13,7 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ children }: DashboardShellProps) {
-  const { generatedFiles, projectName, setProjectName, resetProject } = useProjectStore()
+  const { generatedFiles, projectName, setProjectName, resetProject, saveCurrentSnapshot } = useProjectStore()
 
   useEffect(() => {
     const saved = localStorage.getItem('bilderama:project-name')
@@ -56,6 +56,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
           <span className="hidden text-sm font-medium sm:block">{projectName}</span>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePublish} disabled={generatedFiles.length === 0}>Publicar</Button>
+          <Button variant="outline" size="sm" onClick={() => saveCurrentSnapshot()}>Salvar versão</Button>
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Configurações" title="Configurações">
@@ -68,8 +71,6 @@ export function DashboardShell({ children }: DashboardShellProps) {
               <DropdownMenuItem className="text-destructive" onClick={onDelete}>Excluir projeto…</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" size="sm" onClick={handlePublish} disabled={generatedFiles.length === 0}>Publicar</Button>
-          <ThemeToggle />
         </div>
       </header>
       <main className="min-h-0 custom-scrollbar overflow-y-auto">{children}</main>

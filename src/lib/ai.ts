@@ -243,19 +243,50 @@ INSTRUÇÕES CRÍTICAS:
   throw new Error(`O Arquiteto da IA falhou em gerar um plano JSON válido após ${maxRetries} tentativas.`);
 }
 
-// Analisa o código e gera resumo e sugestões em português
-async function generateAnalysis(files: GeneratedFile[]): Promise<{ explanation: string; suggestions: string[] }> {
-  const analysisPrompt = `Baseado nos seguintes arquivos, gere uma breve explicação e 3 sugestões de melhoria: ${JSON.stringify(files)}`;
-  
-  return {
-    explanation: "Seu site foi gerado com sucesso usando um plano de construção estruturado e um motor de renderização determinístico.",
-    suggestions: ["Experimente pedir uma paleta de cores diferente.", "Adicione uma seção de depoimentos de clientes.", "Peça para incluir uma galeria de imagens."]
+// Analisa o PagePlan e gera resumo e sugestões em português
+async function generateAnalysisFromPlan(pagePlanJson: string): Promise<{ explanation: string; suggestions: string[] }> {
+  try {
+    const messages: ChatCompletionRequestMessage[] = [
+      {
+        role: 'system',
+        content: 'Você é um analista de UX/UI e copywriting para o mercado brasileiro. Explique brevemente as escolhas de tema/layout/tokens e gere 5 sugestões práticas de melhoria focadas em conversão e clareza. Responda APENAS em JSON com as chaves: {"explanation": string, "suggestions": string[]}. Sem markdown, sem texto fora do JSON.'
+      },
+      {
+        role: 'user',
+        content: `PAGEPLAN:\n${pagePlanJson}`
+      }
+    ];
+
+    const raw = await callOpenAI(messages);
+    const cleaned = cleanJsonString(raw);
+    const parsed = JSON.parse(cleaned);
+
+    if (!parsed || typeof parsed.explanation !== 'string' || !Array.isArray(parsed.suggestions)) {
+      throw new Error('Formato inesperado do analista');
+    }
+
+    // Limita sugestões a 5 e garante strings
+    const suggestions = parsed.suggestions.filter((s: any) => typeof s === 'string').slice(0, 5);
+    return { explanation: parsed.explanation, suggestions };
+  } catch (err) {
+    console.warn('Falha no generateAnalysisFromPlan, usando fallback.', err);
+    return {
+      explanation: 'Seu site foi gerado com um tema coerente e estrutura focada em clareza. Podemos iterar em textos, hierarquia visual e CTAs para aumentar conversão.',
+      suggestions: [
+        'Refine o título principal com proposta de valor mais específica.',
+        'Inclua prova social (logos de clientes, depoimentos).',
+        'Adicione um CTA secundário para quem não está pronto para comprar.',
+        'Reforce benefícios com bullets curtos e objetivos.',
+        'Ajuste tokens de espaçamento para melhorar legibilidade em mobile.'
+      ]
+    };
   }
 }
 
 export async function processUserInput(userInput: string): Promise<AIResponse> {
   const pagePlanJson = await structurePrompt(userInput)
-  const analysis = await generateAnalysis([]);
+  // Gera explicação e sugestões baseadas no PagePlan gerado
+  const analysis = await generateAnalysisFromPlan(pagePlanJson);
 
   return {
     pagePlanJson,
