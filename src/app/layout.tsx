@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme/theme-provider'
+import { DashboardShell } from '@/components/ui/dashboard-shell'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,19 +20,17 @@ export const viewport: Viewport = {
   ]
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="pt-BR" data-theme="moderno_azul" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-background text-foreground`}>
         <ThemeProvider defaultTheme="light">
-          {children}
+          <DashboardShell>
+            {children}
+          </DashboardShell>
         </ThemeProvider>
       </body>
     </html>

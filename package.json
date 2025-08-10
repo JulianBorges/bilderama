@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prebuild": "node scripts/build-design-css.js",
+    "postinstall": "node scripts/build-design-css.js",
+    "test": "vitest run",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:css": "node scripts/build-template-css.js",
+    "build:all": "npm run build:css && npm run build"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
@@ -48,6 +53,7 @@
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.1"
   }
 }

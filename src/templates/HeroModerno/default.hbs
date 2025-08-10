@@ -1,17 +1,17 @@
-<section class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-primary/80 text-primary-foreground overflow-hidden">
+<section class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-primary/80 text-primary-foreground overflow-hidden {{designTokens designTokens}}">
   <!-- Background decorativo -->
   <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="20" cy="20" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
   
   <div class="container mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-16 text-center relative z-10">
     <div class="max-w-4xl mx-auto space-y-8">
-      <h1 class="text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl md:text-6xl lg:text-7xl animate-in slide-in-from-bottom-4 duration-1000" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+      <h1 class="text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl md:text-6xl lg:text-7xl animate-in slide-in-from-bottom-4 duration-1000 {{themePersonality theme}}" {{editableAttr prop="title"}}>
         {{title}}
       </h1>
-      <p class="max-w-2xl mx-auto text-lg text-primary-foreground/90 sm:text-xl animate-in slide-in-from-bottom-4 duration-1000 delay-200" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+      <p class="max-w-2xl mx-auto text-lg text-primary-foreground/90 sm:text-xl animate-in slide-in-from-bottom-4 duration-1000 delay-200" {{editableAttr prop="subtitle"}}>
         {{subtitle}}
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center animate-in slide-in-from-bottom-4 duration-1000 delay-400">
-        <a href="{{ctaHref}}" class="group inline-flex items-center justify-center rounded-full bg-primary-foreground px-8 py-4 text-lg font-semibold text-primary transition-all duration-300 hover:bg-primary-foreground/90 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-primary-foreground/50 focus:ring-offset-2 focus:ring-offset-primary" data-bild-block-index="{{blockIndex}}" data-bild-prop="ctaText">
+        <a href="{{ctaHref}}" class="group inline-flex items-center justify-center rounded-full bg-primary-foreground px-8 py-4 text-lg font-semibold text-primary transition-all duration-300 hover:bg-primary-foreground/90 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-primary-foreground/50 focus:ring-offset-2 focus:ring-offset-primary" {{editableAttr prop="ctaText"}}>
           {{ctaText}}
           <svg class="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

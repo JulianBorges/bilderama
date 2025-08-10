@@ -1,9 +1,6 @@
-// Log temporário para debug
-console.log('OPENAI_API_KEY está definida?', !!process.env.OPENAI_API_KEY);
-
 export const config = {
   openaiApiKey: process.env.OPENAI_API_KEY,
-  model: 'gpt-4o-mini',
+  model: 'gpt-4o',
   validateApiKey: () => {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {

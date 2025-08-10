@@ -11,6 +11,7 @@ type SelectedElement = {
 }
 
 interface ProjectState {
+  projectName: string;
   generatedFiles: GeneratedFile[];
   isGenerating: boolean;
   activeView: ActiveView;
@@ -26,10 +27,13 @@ interface ProjectState {
   setActiveView: (view: ActiveView) => void;
   setSelectedElement: (element: SelectedElement | null) => void;
   setIsEditMode: (isEditMode: boolean) => void;
+  setProjectName: (name: string) => void;
+  resetProject: () => void;
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
   // State
+  projectName: 'Bilderama',
   generatedFiles: [],
   isGenerating: false,
   activeView: 'preview',
@@ -42,7 +46,23 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setActiveView: (view) => set({ activeView: view }),
   setSelectedElement: (element) => set({ selectedElement: element }),
-  setIsEditMode: (isEditMode) => set({ isEditMode: !get().isEditMode }),
+  setIsEditMode: (isEditMode) => set({ isEditMode }),
+  setProjectName: (name) => {
+    localStorage.setItem('bilderama:project-name', name)
+    set({ projectName: name })
+  },
+  resetProject: () => {
+    localStorage.removeItem('bilderama:project-name')
+    set({
+      projectName: 'Bilderama',
+      generatedFiles: [],
+      isGenerating: false,
+      activeView: 'preview',
+      selectedElement: null,
+      isEditMode: false,
+      pagePlan: null,
+    })
+  },
 
   handleCodeGeneration: async (response) => {
     if (!response.pagePlanJson) {

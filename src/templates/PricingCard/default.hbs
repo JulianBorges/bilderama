@@ -1,6 +1,6 @@
 <div class="relative rounded-lg border {{#if featured}}border-primary{{else}}border-border{{/if}} bg-card p-8 shadow-sm text-card-foreground">
   {{#if featured}}
-  <p class="absolute top-0 -translate-y-1/2 rounded-full bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground">Mais Popular</p>
+  <p class="absolute top-0 -translate-y-1/2 rounded-full bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground">{{featuredText}}</p>
   {{/if}}
   <h3 class="text-lg font-semibold text-foreground">{{planName}}</h3>
   <p class="mt-2 text-sm text-muted-foreground">{{planDescription}}</p>

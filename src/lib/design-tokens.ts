@@ -1,0 +1,149 @@
+// Este módulo centralizará tokens de tema (paleta, radius, tipografia, shadow)
+// Nas próximas tarefas, o objeto completo de tokens será movido para cá e o CSS será
+// gerado no build. Por ora exportamos o tipo e um mapa vazio para manter o build verde.
+
+export type ThemeMode = 'light' | 'dark'
+export type CssVar = `--${string}`
+export type ThemeTokenSet = Record<CssVar, string>
+export type ThemeTokens = Record<ThemeMode, ThemeTokenSet>
+export type ThemeVariablesMap = Record<string, ThemeTokens>
+
+// TODO (Tarefa 2): mover o mapa completo de variáveis de `renderer.ts` para cá.
+export const themeVariablesMap: ThemeVariablesMap = {
+  moderno_azul: {
+    light: {
+      '--background': '0 0% 100%',
+      '--foreground': '222.2 84% 4.9%',
+      '--card': '0 0% 100%',
+      '--card-foreground': '222.2 84% 4.9%',
+      '--popover': '0 0% 100%',
+      '--popover-foreground': '222.2 84% 4.9%',
+      '--primary': '221.2 83.2% 53.3%',
+      '--primary-foreground': '210 40% 98%',
+      '--secondary': '210 40% 96.1%',
+      '--secondary-foreground': '222.2 47.4% 11.2%',
+      '--muted': '210 40% 96.1%',
+      '--muted-foreground': '215.4 16.3% 46.9%',
+      '--accent': '210 40% 96.1%',
+      '--accent-foreground': '222.2 47.4% 11.2%',
+      '--destructive': '0 84.2% 60.2%',
+      '--destructive-foreground': '210 40% 98%',
+      '--border': '214.3 31.8% 91.4%',
+      '--input': '214.3 31.8% 91.4%',
+      '--ring': '221.2 83.2% 53.3%',
+      '--radius': '0.5rem'
+    },
+    dark: {
+      '--background': '222.2 84% 4.9%',
+      '--foreground': '210 40% 98%',
+      '--card': '222.2 84% 4.9%',
+      '--card-foreground': '210 40% 98%',
+      '--popover': '222.2 84% 4.9%',
+      '--popover-foreground': '210 40% 98%',
+      '--primary': '217.2 91.2% 59.8%',
+      '--primary-foreground': '222.2 84% 4.9%',
+      '--secondary': '217.2 32.6% 17.5%',
+      '--secondary-foreground': '210 40% 98%',
+      '--muted': '217.2 32.6% 17.5%',
+      '--muted-foreground': '215 20.2% 65.1%',
+      '--accent': '217.2 32.6% 17.5%',
+      '--accent-foreground': '210 40% 98%',
+      '--destructive': '0 62.8% 30.6%',
+      '--destructive-foreground': '210 40% 98%',
+      '--border': '217.2 32.6% 17.5%',
+      '--input': '217.2 32.6% 17.5%',
+      '--ring': '224.3 76.3% 94.1%',
+      '--radius': '0.5rem'
+    }
+  },
+  calor_tropical: {
+    light: {
+      '--background': '43 74% 66%',
+      '--foreground': '24 9.8% 10%',
+      '--card': '47 84% 91%',
+      '--card-foreground': '24 9.8% 10%',
+      '--popover': '0 0% 100%',
+      '--popover-foreground': '24 9.8% 10%',
+      '--primary': '20.5 90.2% 48.2%',
+      '--primary-foreground': '60 9.1% 97.8%',
+      '--secondary': '60 4.8% 95.9%',
+      '--secondary-foreground': '24 9.8% 10%',
+      '--muted': '60 4.8% 95.9%',
+      '--muted-foreground': '25 5.3% 44.7%',
+      '--accent': '60 4.8% 95.9%',
+      '--accent-foreground': '24 9.8% 10%',
+      '--destructive': '0 84.2% 60.2%',
+      '--destructive-foreground': '60 9.1% 97.8%',
+      '--border': '20 5.9% 90%',
+      '--input': '20 5.9% 90%',
+      '--ring': '20.5 90.2% 48.2%',
+      '--radius': '0.5rem'
+    },
+    dark: {
+      '--background': '20 14.3% 4.1%',
+      '--foreground': '60 9.1% 97.8%',
+      '--card': '20 14.3% 4.1%',
+      '--card-foreground': '60 9.1% 97.8%',
+      '--popover': '20 14.3% 4.1%',
+      '--popover-foreground': '60 9.1% 97.8%',
+      '--primary': '20.5 90.2% 48.2%',
+      '--primary-foreground': '60 9.1% 97.8%',
+      '--secondary': '12 6.5% 15.1%',
+      '--secondary-foreground': '60 9.1% 97.8%',
+      '--muted': '12 6.5% 15.1%',
+      '--muted-foreground': '24 5.4% 63.9%',
+      '--accent': '12 6.5% 15.1%',
+      '--accent-foreground': '60 9.1% 97.8%',
+      '--destructive': '0 72.2% 50.6%',
+      '--destructive-foreground': '60 9.1% 97.8%',
+      '--border': '12 6.5% 15.1%',
+      '--input': '12 6.5% 15.1%',
+      '--ring': '20.5 90.2% 48.2%',
+      '--radius': '0.5rem'
+    }
+  },
+  saas_premium: {
+    light: {
+      '--background': '0 0% 100%', '--foreground': '240 10% 3.9%', '--card': '0 0% 100%', '--card-foreground': '240 10% 3.9%', '--popover': '0 0% 100%', '--popover-foreground': '240 10% 3.9%', '--primary': '263 85% 70%', '--primary-foreground': '210 20% 98%', '--secondary': '210 40% 96.1%', '--secondary-foreground': '222.2 47.4% 11.2%', '--muted': '210 40% 96.1%', '--muted-foreground': '215.4 16.3% 46.9%', '--accent': '210 40% 96.1%', '--accent-foreground': '222.2 47.4% 11.2%', '--destructive': '0 84.2% 60.2%', '--destructive-foreground': '210 40% 98%', '--border': '214.3 31.8% 91.4%', '--input': '214.3 31.8% 91.4%', '--ring': '263 85% 70%', '--radius': '0.5rem'
+    },
+    dark: {
+      '--background': '240 10% 3.9%', '--foreground': '0 0% 98%', '--card': '240 10% 3.9%', '--card-foreground': '0 0% 98%', '--popover': '240 10% 3.9%', '--popover-foreground': '0 0% 98%', '--primary': '263 70% 50.4%', '--primary-foreground': '210 20% 98%', '--secondary': '240 3.7% 15.9%', '--secondary-foreground': '0 0% 98%', '--muted': '240 3.7% 15.9%', '--muted-foreground': '240 5% 64.9%', '--accent': '240 3.7% 15.9%', '--accent-foreground': '0 0% 98%', '--destructive': '0 62.8% 30.6%', '--destructive-foreground': '0 0% 98%', '--border': '240 3.7% 15.9%', '--input': '240 3.7% 15.9%', '--ring': '263 70% 50.4%', '--radius': '0.5rem'
+    }
+  },
+  corporativo_elegante: {
+    light: {
+      '--background': '0 0% 100%', '--foreground': '0 0% 3.9%', '--card': '0 0% 100%', '--card-foreground': '0 0% 3.9%', '--popover': '0 0% 100%', '--popover-foreground': '0 0% 3.9%', '--primary': '142.1 76.2% 36.3%', '--primary-foreground': '355.7 100% 97.3%', '--secondary': '210 40% 96.1%', '--secondary-foreground': '222.2 47.4% 11.2%', '--muted': '210 40% 96.1%', '--muted-foreground': '215.4 16.3% 46.9%', '--accent': '210 40% 96.1%', '--accent-foreground': '222.2 47.4% 11.2%', '--destructive': '0 84.2% 60.2%', '--destructive-foreground': '210 40% 98%', '--border': '214.3 31.8% 91.4%', '--input': '214.3 31.8% 91.4%', '--ring': '142.1 76.2% 36.3%', '--radius': '0.5rem'
+    },
+    dark: {
+      '--background': '0 0% 3.9%', '--foreground': '0 0% 98%', '--card': '0 0% 3.9%', '--card-foreground': '0 0% 98%', '--popover': '0 0% 3.9%', '--popover-foreground': '0 0% 98%', '--primary': '142.1 70.6% 45.3%', '--primary-foreground': '144.9 80.4% 10%', '--secondary': '240 3.7% 15.9%', '--secondary-foreground': '0 0% 98%', '--muted': '240 3.7% 15.9%', '--muted-foreground': '240 5% 64.9%', '--accent': '240 3.7% 15.9%', '--accent-foreground': '0 0% 98%', '--destructive': '0 62.8% 30.6%', '--destructive-foreground': '0 0% 98%', '--border': '240 3.7% 15.9%', '--input': '240 3.7% 15.9%', '--ring': '142.1 70.6% 45.3%', '--radius': '0.5rem'
+    }
+  },
+  ecommerce_luxo: {
+    light: {
+      '--background': '60 9.1% 97.8%', '--foreground': '24 9.8% 10%', '--card': '0 0% 100%', '--card-foreground': '24 9.8% 10%', '--popover': '0 0% 100%', '--popover-foreground': '24 9.8% 10%', '--primary': '24 100% 50%', '--primary-foreground': '60 9.1% 97.8%', '--secondary': '60 4.8% 95.9%', '--secondary-foreground': '24 9.8% 10%', '--muted': '60 4.8% 95.9%', '--muted-foreground': '25 5.3% 44.7%', '--accent': '60 4.8% 95.9%', '--accent-foreground': '24 9.8% 10%', '--destructive': '0 84.2% 60.2%', '--destructive-foreground': '60 9.1% 97.8%', '--border': '20 5.9% 90%', '--input': '20 5.9% 90%', '--ring': '24 100% 50%', '--radius': '0.5rem'
+    },
+    dark: {
+      '--background': '24 9.8% 10%', '--foreground': '60 9.1% 97.8%', '--card': '24 9.8% 10%', '--card-foreground': '60 9.1% 97.8%', '--popover': '24 9.8% 10%', '--popover-foreground': '60 9.1% 97.8%', '--primary': '47.9 95.8% 53.1%', '--primary-foreground': '26 83.3% 14.1%', '--secondary': '12 6.5% 15.1%', '--secondary-foreground': '60 9.1% 97.8%', '--muted': '12 6.5% 15.1%', '--muted-foreground': '24 5.4% 63.9%', '--accent': '12 6.5% 15.1%', '--accent-foreground': '60 9.1% 97.8%', '--destructive': '0 72.2% 50.6%', '--destructive-foreground': '60 9.1% 97.8%', '--border': '12 6.5% 15.1%', '--input': '12 6.5% 15.1%', '--ring': '35.5 91.7% 32.9%', '--radius': '0.5rem'
+    }
+  },
+  startup_tech: {
+    light: { '--background': '210 40% 98%', '--foreground': '215 25% 16%', '--card': '0 0% 100%', '--card-foreground': '215 25% 16%', '--primary': '265 89% 62%', '--primary-foreground': '210 20% 98%', '--secondary': '210 40% 96%', '--secondary-foreground': '215 25% 16%', '--accent': '265 89% 62%', '--accent-foreground': '210 20% 98%', '--border': '214 31% 91%', '--ring': '265 89% 62%', '--radius': '0.75rem' },
+    dark: { '--background': '215 28% 8%', '--foreground': '210 40% 98%', '--card': '215 25% 12%', '--card-foreground': '210 40% 98%', '--primary': '265 89% 62%', '--primary-foreground': '215 28% 8%', '--secondary': '215 25% 16%', '--secondary-foreground': '210 40% 98%', '--accent': '265 89% 62%', '--accent-foreground': '215 28% 8%', '--border': '215 25% 16%', '--ring': '265 89% 62%', '--radius': '0.75rem' }
+  },
+  wellness_natural: {
+    light: { '--background': '120 25% 97%', '--foreground': '120 15% 15%', '--card': '0 0% 100%', '--card-foreground': '120 15% 15%', '--primary': '135 60% 45%', '--primary-foreground': '120 25% 97%', '--secondary': '120 25% 90%', '--secondary-foreground': '120 15% 15%', '--accent': '80 60% 60%', '--accent-foreground': '120 15% 15%', '--border': '120 20% 85%', '--ring': '135 60% 45%', '--radius': '1rem' },
+    dark: { '--background': '120 15% 8%', '--foreground': '120 25% 92%', '--card': '120 15% 12%', '--card-foreground': '120 25% 92%', '--primary': '135 60% 55%', '--primary-foreground': '120 15% 8%', '--secondary': '120 15% 16%', '--secondary-foreground': '120 25% 92%', '--accent': '80 60% 70%', '--accent-foreground': '120 15% 8%', '--border': '120 15% 16%', '--ring': '135 60% 55%', '--radius': '1rem' }
+  },
+  creative_agency: {
+    light: { '--background': '0 0% 100%', '--foreground': '240 15% 12%', '--card': '0 0% 100%', '--card-foreground': '240 15% 12%', '--primary': '348 100% 60%', '--primary-foreground': '0 0% 100%', '--secondary': '240 5% 96%', '--secondary-foreground': '240 15% 12%', '--accent': '45 100% 55%', '--accent-foreground': '240 15% 12%', '--border': '240 10% 90%', '--ring': '348 100% 60%', '--radius': '0.25rem' },
+    dark: { '--background': '240 15% 6%', '--foreground': '0 0% 98%', '--card': '240 15% 10%', '--card-foreground': '0 0% 98%', '--primary': '348 100% 60%', '--primary-foreground': '240 15% 6%', '--secondary': '240 10% 14%', '--secondary-foreground': '0 0% 98%', '--accent': '45 100% 65%', '--accent-foreground': '240 15% 6%', '--border': '240 10% 14%', '--ring': '348 100% 60%', '--radius': '0.25rem' }
+  },
+  finance_trust: {
+    light: { '--background': '210 20% 98%', '--foreground': '210 30% 8%', '--card': '0 0% 100%', '--card-foreground': '210 30% 8%', '--primary': '210 100% 35%', '--primary-foreground': '0 0% 100%', '--secondary': '210 20% 94%', '--secondary-foreground': '210 30% 8%', '--accent': '200 100% 40%', '--accent-foreground': '0 0% 100%', '--border': '210 20% 88%', '--ring': '210 100% 35%', '--radius': '0.375rem' },
+    dark: { '--background': '210 30% 4%', '--foreground': '210 20% 98%', '--card': '210 30% 8%', '--card-foreground': '210 20% 98%', '--primary': '210 100% 45%', '--primary-foreground': '210 30% 4%', '--secondary': '210 25% 12%', '--secondary-foreground': '210 20% 98%', '--accent': '200 100% 50%', '--accent-foreground': '210 30% 4%', '--border': '210 25% 12%', '--ring': '210 100% 45%', '--radius': '0.375rem' }
+  },
+  restaurant_warm: {
+    light: { '--background': '30 50% 96%', '--foreground': '25 25% 15%', '--card': '0 0% 100%', '--card-foreground': '25 25% 15%', '--primary': '15 75% 50%', '--primary-foreground': '0 0% 100%', '--secondary': '30 30% 88%', '--secondary-foreground': '25 25% 15%', '--accent': '35 85% 55%', '--accent-foreground': '25 25% 15%', '--border': '30 25% 82%', '--ring': '15 75% 50%', '--radius': '0.5rem' },
+    dark: { '--background': '25 25% 8%', '--foreground': '30 50% 92%', '--card': '25 25% 12%', '--card-foreground': '30 50% 92%', '--primary': '15 75% 60%', '--primary-foreground': '25 25% 8%', '--secondary': '25 20% 16%', '--secondary-foreground': '30 50% 92%', '--accent': '35 85% 65%', '--accent-foreground': '25 25% 8%', '--border': '25 20% 16%', '--ring': '15 75% 60%', '--radius': '0.5rem' }
+  },
+}; 

@@ -4,119 +4,7 @@ import { GeneratedFile } from './ai';
 import { loadTemplates } from '@/templates';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
-const themeVariablesMap = {
-  moderno_azul: {
-    '--background': '0 0% 100%',
-    '--foreground': '222.2 84% 4.9%',
-    '--card': '0 0% 100%',
-    '--card-foreground': '222.2 84% 4.9%',
-    '--popover': '0 0% 100%',
-    '--popover-foreground': '222.2 84% 4.9%',
-    '--primary': '221.2 83.2% 53.3%',
-    '--primary-foreground': '210 40% 98%',
-    '--secondary': '210 40% 96.1%',
-    '--secondary-foreground': '222.2 47.4% 11.2%',
-    '--muted': '210 40% 96.1%',
-    '--muted-foreground': '215.4 16.3% 46.9%',
-    '--accent': '210 40% 96.1%',
-    '--accent-foreground': '222.2 47.4% 11.2%',
-    '--destructive': '0 84.2% 60.2%',
-    '--destructive-foreground': '210 40% 98%',
-    '--border': '214.3 31.8% 91.4%',
-    '--input': '214.3 31.8% 91.4%',
-    '--ring': '221.2 83.2% 53.3%',
-    '--radius': '0.5rem',
-  },
-  calor_tropical: {
-    '--background': '20 14.3% 4.1%',
-    '--foreground': '60 9.1% 97.8%',
-    '--card': '20 14.3% 4.1%',
-    '--card-foreground': '60 9.1% 97.8%',
-    '--popover': '20 14.3% 4.1%',
-    '--popover-foreground': '60 9.1% 97.8%',
-    '--primary': '20.5 90.2% 48.2%',
-    '--primary-foreground': '60 9.1% 97.8%',
-    '--secondary': '12 6.5% 15.1%',
-    '--secondary-foreground': '60 9.1% 97.8%',
-    '--muted': '12 6.5% 15.1%',
-    '--muted-foreground': '24 5.4% 63.9%',
-    '--accent': '12 6.5% 15.1%',
-    '--accent-foreground': '60 9.1% 97.8%',
-    '--destructive': '0 72.2% 50.6%',
-    '--destructive-foreground': '60 9.1% 97.8%',
-    '--border': '12 6.5% 15.1%',
-    '--input': '12 6.5% 15.1%',
-    '--ring': '20.5 90.2% 48.2%',
-    '--radius': '0.5rem',
-  },
-  saas_premium: {
-    '--background': '240 10% 3.9%',
-    '--foreground': '0 0% 98%',
-    '--card': '240 10% 3.9%',
-    '--card-foreground': '0 0% 98%',
-    '--popover': '240 10% 3.9%',
-    '--popover-foreground': '0 0% 98%',
-    '--primary': '263 70% 50.4%',
-    '--primary-foreground': '210 20% 98%',
-    '--secondary': '240 3.7% 15.9%',
-    '--secondary-foreground': '0 0% 98%',
-    '--muted': '240 3.7% 15.9%',
-    '--muted-foreground': '240 5% 64.9%',
-    '--accent': '240 3.7% 15.9%',
-    '--accent-foreground': '0 0% 98%',
-    '--destructive': '0 62.8% 30.6%',
-    '--destructive-foreground': '0 0% 98%',
-    '--border': '240 3.7% 15.9%',
-    '--input': '240 3.7% 15.9%',
-    '--ring': '263 70% 50.4%',
-    '--radius': '0.5rem',
-  },
-  corporativo_elegante: {
-    '--background': '0 0% 100%',
-    '--foreground': '0 0% 3.9%',
-    '--card': '0 0% 100%',
-    '--card-foreground': '0 0% 3.9%',
-    '--popover': '0 0% 100%',
-    '--popover-foreground': '0 0% 3.9%',
-    '--primary': '142.1 76.2% 36.3%',
-    '--primary-foreground': '355.7 100% 97.3%',
-    '--secondary': '210 40% 96.1%',
-    '--secondary-foreground': '222.2 47.4% 11.2%',
-    '--muted': '210 40% 96.1%',
-    '--muted-foreground': '215.4 16.3% 46.9%',
-    '--accent': '210 40% 96.1%',
-    '--accent-foreground': '222.2 47.4% 11.2%',
-    '--destructive': '0 84.2% 60.2%',
-    '--destructive-foreground': '210 40% 98%',
-    '--border': '214.3 31.8% 91.4%',
-    '--input': '214.3 31.8% 91.4%',
-    '--ring': '142.1 76.2% 36.3%',
-    '--radius': '0.5rem',
-  },
-  ecommerce_luxo: {
-    '--background': '60 9.1% 97.8%',
-    '--foreground': '24 9.8% 10%',
-    '--card': '0 0% 100%',
-    '--card-foreground': '24 9.8% 10%',
-    '--popover': '0 0% 100%',
-    '--popover-foreground': '24 9.8% 10%',
-    '--primary': '24 100% 50%',
-    '--primary-foreground': '60 9.1% 97.8%',
-    '--secondary': '60 4.8% 95.9%',
-    '--secondary-foreground': '24 9.8% 10%',
-    '--muted': '60 4.8% 95.9%',
-    '--muted-foreground': '25 5.3% 44.7%',
-    '--accent': '60 4.8% 95.9%',
-    '--accent-foreground': '24 9.8% 10%',
-    '--destructive': '0 84.2% 60.2%',
-    '--destructive-foreground': '60 9.1% 97.8%',
-    '--border': '20 5.9% 90%',
-    '--input': '20 5.9% 90%',
-    '--ring': '24 100% 50%',
-    '--radius': '0.5rem',
-  }
-};
+import { themeVariablesMap } from './design-tokens';
 
 interface PartialDefinition {
     name: string;
@@ -125,11 +13,161 @@ interface PartialDefinition {
 
 let arePartialsRegistered = false;
 
+// Tenta carregar CSS pré-gerado de design tokens para evitar gerar em tempo de execução
+let prebuiltTokensCss: string | null = null;
+try {
+  const tokensPath = path.join(process.cwd(), 'src', 'lib', 'generated-theme.css');
+  prebuiltTokensCss = require('node:fs').readFileSync(tokensPath, 'utf8');
+} catch (_) {
+  prebuiltTokensCss = null;
+}
+
+// Helper para gerar classes CSS baseadas em design tokens
+function generateDesignTokenClasses(designTokens: any): string {
+  if (!designTokens) return '';
+  
+  const classes: string[] = [];
+  
+  // Card styles
+  if (designTokens.cardStyle) {
+    const cardStyles: Record<string, string> = {
+      elevated: 'shadow-lg hover:shadow-xl',
+      outline: 'border-2 shadow-none hover:shadow-md',
+      glass: 'backdrop-blur-sm bg-white/80 border border-white/20',
+      minimal: 'shadow-none border-0',
+      bold: 'shadow-2xl border-2 border-primary/20'
+    };
+    classes.push(cardStyles[designTokens.cardStyle] || '');
+  }
+  
+  // Spacing variants
+  if (designTokens.spacing) {
+    const spacingStyles: Record<string, string> = {
+      compact: 'py-8 space-y-4',
+      comfortable: 'py-16 space-y-8',
+      spacious: 'py-24 space-y-12',
+      'extra-spacious': 'py-32 space-y-16'
+    };
+    classes.push(spacingStyles[designTokens.spacing] || '');
+  }
+  
+  // Border radius variants
+  if (designTokens.borderRadius) {
+    const radiusStyles: Record<string, string> = {
+      none: 'rounded-none',
+      small: 'rounded-sm',
+      medium: 'rounded-md',
+      large: 'rounded-lg',
+      full: 'rounded-full'
+    };
+    classes.push(radiusStyles[designTokens.borderRadius] || '');
+  }
+  
+  // Shadow intensity
+  if (designTokens.shadowIntensity) {
+    const shadowStyles: Record<string, string> = {
+      none: 'shadow-none',
+      soft: 'shadow-sm',
+      medium: 'shadow-md',
+      strong: 'shadow-lg',
+      dramatic: 'shadow-2xl'
+    };
+    classes.push(shadowStyles[designTokens.shadowIntensity] || '');
+  }
+  
+  // Animation styles
+  if (designTokens.animation) {
+    const animationStyles: Record<string, string> = {
+      none: '',
+      subtle: 'transition-all duration-300 ease-out',
+      smooth: 'transition-all duration-500 ease-in-out',
+      bouncy: 'transition-all duration-300 ease-bounce',
+      dramatic: 'transition-all duration-700 ease-spring'
+    };
+    classes.push(animationStyles[designTokens.animation] || '');
+  }
+  
+  return classes.filter(Boolean).join(' ');
+}
+
+// Helper para registrar helper de design tokens no Handlebars
+function registerDesignTokenHelper() {
+  Handlebars.registerHelper('designTokens', function(designTokens: any) {
+    return new Handlebars.SafeString(generateDesignTokenClasses(designTokens));
+  });
+  
+  // Helper para densidade de espaçamento baseado no tema
+  Handlebars.registerHelper('themeDensity', function(theme: any) {
+    const densityClasses: Record<string, string> = {
+      compact: 'py-8 space-y-6',
+      comfortable: 'py-16 space-y-8',
+      spacious: 'py-24 space-y-12'
+    };
+    return new Handlebars.SafeString(densityClasses[theme.density] || densityClasses.comfortable);
+  });
+  
+  // Helper para personalidade do tema
+  Handlebars.registerHelper('themePersonality', function(theme: any) {
+    const personalityClasses: Record<string, string> = {
+      minimal: 'font-light tracking-wide',
+      bold: 'font-bold tracking-tight',
+      elegant: 'font-medium tracking-normal',
+      playful: 'font-medium tracking-wide',
+      corporate: 'font-normal tracking-normal',
+      creative: 'font-medium tracking-wide',
+      warm: 'font-normal tracking-normal',
+      tech: 'font-mono tracking-tight'
+    };
+    return new Handlebars.SafeString(personalityClasses[theme.personality] || '');
+  });
+
+  // Helper para injetar atributos de edição
+  Handlebars.registerHelper('editableAttr', function(this: any, options: any) {
+    const prop = options?.hash?.prop;
+    const blockIndex = options?.hash?.blockIndex ?? this?.blockIndex;
+    if (!prop || blockIndex === undefined || blockIndex === null) {
+      return '';
+    }
+    return new Handlebars.SafeString(`data-bild-block-index="${String(blockIndex)}" data-bild-prop="${String(prop)}"`);
+  });
+
+  // Helper para gerar slugs simples (para futuros hrefs internos)
+  Handlebars.registerHelper('slugify', function(value: string) {
+    if (!value) return '';
+    return String(value)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  });
+
+  // Helper para resolver links do Navbar com heurísticas simples
+  Handlebars.registerHelper('linkHref', function(label: string) {
+    if (!label) return '#';
+    const l = String(label).toLowerCase();
+    if (/(sobre|about)/.test(l)) return '/sobre';
+    if (/(preço|preços|pricing)/.test(l)) return '/precos';
+    if (/(contato|contact)/.test(l)) return '/contato';
+    if (/blog/.test(l)) return '/blog';
+    return '#';
+  });
+
+  // Helper para imagens seguras (placeholder quando ausente)
+  Handlebars.registerHelper('safeImg', function(url: string) {
+    if (url && typeof url === 'string' && url.trim().length > 0) return url;
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'>\n  <rect width='100%' height='100%' fill='hsl(220, 14%, 96%)'/>\n  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='hsl(215, 16%, 47%)' font-family='Inter, Arial' font-size='16'>Imagem</text>\n</svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+  });
+}
+
 function registerPartials(partials: PartialDefinition[], templates: Record<string, string>) {
     if (arePartialsRegistered) {
         return;
     }
 
+    // Register partials
     partials.forEach(partial => {
         const templateKey = `${partial.name}/${partial.layout}.hbs`;
         const template = templates[templateKey];
@@ -138,6 +176,26 @@ function registerPartials(partials: PartialDefinition[], templates: Record<strin
         } else {
             console.warn(`Parcial "${partial.name}" com layout "${partial.layout}" não encontrado (chave: ${templateKey}).`);
         }
+    });
+
+    // Register container helper to centralize container logic
+    Handlebars.registerHelper('sectionContainer', function(content: string) {
+        return new Handlebars.SafeString(`<div class="container mx-auto px-4">${content}</div>`);
+    });
+
+    // Register section wrapper helper
+    Handlebars.registerHelper('sectionWrapper', function(bgClass: string, pyClass: string, content: string) {
+        const backgroundClass = bgClass || 'bg-background';
+        const paddingClass = pyClass || 'py-16';
+        return new Handlebars.SafeString(`<section class="${backgroundClass} ${paddingClass}">${content}</section>`);
+    });
+
+    // Register design token helpers
+    registerDesignTokenHelper();
+
+    // Register helper for alternating layouts
+    Handlebars.registerHelper('isOdd', function(index: number) {
+        return index % 2 === 1;
     });
 
     arePartialsRegistered = true;
@@ -162,6 +220,159 @@ async function getBuiltCss(): Promise<string> {
     }
 }
 
+function buildThemeStyleTag(themeName: string, personality?: string): string {
+  // Gera as variáveis CSS do tema
+  const themeConfig = themeVariablesMap[themeName as keyof typeof themeVariablesMap];
+  if (!themeConfig) {
+      console.warn(`Tema "${themeName}" não encontrado. Usando tema padrão.`);
+  }
+  const currentThemeConfig = themeConfig || themeVariablesMap.moderno_azul;
+
+  // Gera CSS para ambos os modos
+  const lightThemeCss = Object.entries(currentThemeConfig.light)
+      .map(([key, value]) => `${key}: ${value};`)
+      .join('\n    ');
+  
+  const darkThemeCss = Object.entries(currentThemeConfig.dark)
+      .map(([key, value]) => `${key}: ${value};`)
+      .join('\n    ');
+
+  const defaultToDark = personality === 'tech' || personality === 'creative';
+  const isDarkTheme = defaultToDark;
+
+  let themeStyleTag = '';
+  if (prebuiltTokensCss) {
+    themeStyleTag = `<style>${prebuiltTokensCss}</style>`;
+  } else {
+    themeStyleTag = `<style>
+  :root {
+    ${lightThemeCss}
+  }
+  
+  .dark {
+    ${darkThemeCss}
+  }
+  
+  /* Design Token Classes */
+  .ease-bounce { transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+  .ease-spring { transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+</style>`;
+  }
+
+  return { tag: themeStyleTag, isDarkTheme } as unknown as string;
+}
+
+function buildFontCss(fontFamily?: string): string {
+  const font = fontFamily || 'inter';
+  const fontCssMap: Record<string, string> = {
+    'inter': '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Inter", sans-serif; }',
+    'roboto': '@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"); body { font-family: "Roboto", sans-serif; }',
+    'lato': '@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"); body { font-family: "Lato", sans-serif; }',
+    'poppins': '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Poppins", sans-serif; }',
+    'montserrat': '@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Montserrat", sans-serif; }',
+    'playfair': '@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"); body { font-family: "Playfair Display", serif; }',
+    'crimson': '@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap"); body { font-family: "Crimson Text", serif; }'
+  };
+  return fontCssMap[font] || fontCssMap.inter;
+}
+
+function normalizePathToHtml(pathname: string): string {
+  if (!pathname || pathname === '/' || pathname === 'index' || pathname === 'index.html') {
+    return 'index.html';
+  }
+  const cleaned = pathname.replace(/^\/+/, '');
+  return cleaned.endsWith('.html') ? cleaned : `${cleaned}.html`;
+}
+
+function composeHtmlDocument(params: {
+  pageTitle: string;
+  pageDescription: string;
+  bodyContent: string;
+  widgetsHtml: string;
+  cssContent: string;
+  themeName: string;
+  fontFamily?: string;
+  personality?: string;
+}): string {
+  const fontCss = buildFontCss(params.fontFamily);
+  const themeStyle = buildThemeStyleTag(params.themeName, params.personality) as unknown as any;
+  const isDarkTheme = (params.personality === 'tech' || params.personality === 'creative');
+
+  let compiledCssTag = '';
+  if (params.cssContent && params.cssContent.trim().length > 0) {
+    compiledCssTag = `<style>${params.cssContent}</style>`;
+  } else {
+    compiledCssTag = `<style>body:before{display:block;white-space:pre;content:'[AVISO] CSS de build não encontrado. Rode "next build" para gerar o CSS.';color:red;background:#fff;padding:2rem;}</style>`;
+  }
+
+  const fullHtml = `
+<!DOCTYPE html>
+<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}" data-theme="${params.themeName}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${params.pageTitle}</title>
+    <meta name="description" content="${params.pageDescription}">
+    <style>${fontCss}</style>
+    ${themeStyle.tag || themeStyle}
+    ${compiledCssTag}
+</head>
+<body>
+${params.bodyContent}
+${params.widgetsHtml}
+</body>
+</html>`;
+
+  return fullHtml;
+}
+
+function renderBlocksToHtml(templates: Record<string, string>, pagePlan: PagePlan, blocks: any[]): string {
+  return blocks.map((block, index) => {
+    const templatePath = `${block.name}/${block.layout || 'default'}.hbs`;
+    let templateString = templates[templatePath];
+    if (!templateString && block.layout && block.layout !== 'default') {
+        templateString = templates[`${block.name}/default.hbs`];
+    }
+
+    if (!templateString) {
+        console.warn(`Template não encontrado para o bloco: ${block.name} com layout: ${block.layout || 'default'}`);
+        return `<!-- Template para ${block.name} (${block.layout || 'default'}) não encontrado em ${templatePath} -->`;
+    }
+    
+    const blockTemplate = Handlebars.compile(templateString, { noEscape: true });
+    
+    const context = { 
+      ...block.properties, 
+      blockIndex: index,
+      designTokens: block.designTokens,
+      theme: pagePlan.theme
+    };
+    
+    return blockTemplate(context);
+  }).join('');
+}
+
+function renderWidgetsToHtml(templates: Record<string, string>, pagePlan: PagePlan, widgets?: any[]): string {
+  if (!widgets || widgets.length === 0) return '';
+  return widgets.map(widget => {
+    const templatePath = `${widget.name}/default.hbs`;
+    const templateString = templates[templatePath];
+
+    if (!templateString) {
+      console.warn(`Template não encontrado para o widget: ${widget.name} em ${templatePath}`);
+      return `<!-- Template para widget ${widget.name} não encontrado -->`;
+    }
+
+    const widgetTemplate = Handlebars.compile(templateString, { noEscape: true });
+    const context = {
+      ...widget.properties,
+      designTokens: widget.designTokens,
+      theme: pagePlan.theme
+    };
+    return widgetTemplate(context);
+  }).join('');
+}
+
 /**
  * Renderiza uma página completa a partir de um PagePlan usando templates Handlebars.
  * @param pagePlan O plano da página validado.
@@ -173,95 +384,54 @@ export async function renderPage(pagePlan: PagePlan, cssContent: string): Promis
     
     registerPartials(partials, templates);
 
-    const bodyContent = pagePlan.blocks.map((block, index) => {
-        const templatePath = `${block.name}/${block.layout || 'default'}.hbs`;
-        const templateString = templates[templatePath];
+    const files: GeneratedFile[] = [];
 
-        if (!templateString) {
-            console.warn(`Template não encontrado para o bloco: ${block.name} com layout: ${block.layout || 'default'}`);
-            return `<!-- Template para ${block.name} (${block.layout || 'default'}) não encontrado em ${templatePath} -->`;
-        }
-        
-        const blockTemplate = Handlebars.compile(templateString, { noEscape: true });
-        
-        const context = { ...block.properties, blockIndex: index };
-        
-        return blockTemplate(context);
-    }).join('');
-    
-    // Gera as variáveis CSS do tema
-    const themeVariables = themeVariablesMap[pagePlan.theme.themeName];
-    if (!themeVariables) {
-        console.warn(`Tema "${pagePlan.theme.themeName}" não encontrado. Usando tema padrão.`);
-    }
-    
-    const currentThemeVars = themeVariables || themeVariablesMap.moderno_azul;
-    const themeCss = Object.entries(currentThemeVars)
-        .map(([key, value]) => `${key}: ${value};`)
-        .join('\n    ');
-    
-    // Verifica se é um tema escuro
-    const isDarkTheme = ['calor_tropical', 'saas_premium'].includes(pagePlan.theme.themeName);
-    const themeStyleTag = isDarkTheme
-        ? `<style>\n  .dark {\n    ${themeCss}\n  }\n</style>`
-        : `<style>\n  :root {\n    ${themeCss}\n  }\n</style>`;
-
-    // Gera a tag de estilo com o CSS compilado
-    let compiledCssTag = '';
-    if (cssContent && cssContent.trim().length > 0) {
-      compiledCssTag = `<style>${cssContent}</style>`;
-    } else {
-      compiledCssTag = `<style>body:before{display:block;white-space:pre;content:'[AVISO] CSS de build não encontrado. Rode "next build" para gerar o CSS.';color:red;background:#fff;padding:2rem;}</style>`;
+    // Se o plano tiver páginas múltiplas, renderiza cada uma
+    if ((pagePlan as any).pages && Array.isArray((pagePlan as any).pages)) {
+      for (const page of (pagePlan as any).pages) {
+        const bodyContent = renderBlocksToHtml(templates, pagePlan, page.blocks);
+        const widgetsHtml = renderWidgetsToHtml(templates, pagePlan, page.widgets);
+        const html = composeHtmlDocument({
+          pageTitle: page.pageTitle,
+          pageDescription: page.pageDescription,
+          bodyContent,
+          widgetsHtml,
+          cssContent,
+          themeName: pagePlan.theme.themeName,
+          fontFamily: pagePlan.theme.font,
+          personality: pagePlan.theme.personality,
+        });
+        files.push({
+          path: normalizePathToHtml(page.path),
+          content: html,
+          type: 'page',
+          description: 'Página gerada via renderizador determinístico.'
+        });
+      }
     }
 
-    let widgetsHtml = '';
-    if (pagePlan.widgets && pagePlan.widgets.length > 0) {
-      widgetsHtml = pagePlan.widgets.map(widget => {
-        const templatePath = `${widget.name}/default.hbs`;
-        const templateString = templates[templatePath];
+    // Renderiza a página raiz (blocos do topo) se existirem
+    if (pagePlan.blocks && pagePlan.blocks.length > 0) {
+      const bodyContent = renderBlocksToHtml(templates, pagePlan, pagePlan.blocks);
+      const widgetsHtml = renderWidgetsToHtml(templates, pagePlan, pagePlan.widgets);
+      const html = composeHtmlDocument({
+        pageTitle: pagePlan.pageTitle,
+        pageDescription: pagePlan.pageDescription,
+        bodyContent,
+        widgetsHtml,
+        cssContent,
+        themeName: pagePlan.theme.themeName,
+        fontFamily: pagePlan.theme.font,
+        personality: pagePlan.theme.personality,
+      });
 
-        if (!templateString) {
-          console.warn(`Template não encontrado para o widget: ${widget.name} em ${templatePath}`);
-          return `<!-- Template para widget ${widget.name} não encontrado -->`;
-        }
-
-        const widgetTemplate = Handlebars.compile(templateString, { noEscape: true });
-        return widgetTemplate(widget.properties);
-      }).join('');
-    }
-
-    // Add font families CSS
-    const fontFamily = pagePlan.theme.font || 'inter';
-    const fontCssMap = {
-      'inter': '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"); body { font-family: "Inter", sans-serif; }',
-      'roboto': '@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"); body { font-family: "Roboto", sans-serif; }',
-      'lato': '@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"); body { font-family: "Lato", sans-serif; }'
-    };
-
-    const fontCss = fontCssMap[fontFamily] || fontCssMap.inter;
-
-    const fullHtml = `
-<!DOCTYPE html>
-<html lang="pt-BR" class="${isDarkTheme ? 'dark' : ''}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${pagePlan.pageTitle}</title>
-    <meta name="description" content="${pagePlan.pageDescription}">
-    <style>${fontCss}</style>
-    ${themeStyleTag}
-    ${compiledCssTag}
-</head>
-<body>
-${bodyContent}
-${widgetsHtml}
-</body>
-</html>`;
-
-    return [{
-    path: 'index.html',
-        content: fullHtml,
+      files.push({
+        path: 'index.html',
+        content: html,
         type: 'page',
         description: 'Página principal construída via renderizador determinístico.'
-    }];
+      });
+    }
+
+    return files;
 } 

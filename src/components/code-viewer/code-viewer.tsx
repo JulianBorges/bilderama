@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { CodeIcon, FileIcon } from '@radix-ui/react-icons'
+import { CodeIcon, EyeOpenIcon, FileIcon } from '@radix-ui/react-icons'
 import { FolderIcon } from 'lucide-react'
 import { GeneratedFile } from '@/lib/ai'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { useTheme } from '@/components/theme/theme-provider'
+import { useProjectStore } from '@/store/project-store'
 
 interface FileNode {
   name: string
@@ -45,6 +46,7 @@ const getLanguage = (path: string): string => {
 export function CodeViewer({ files }: CodeViewerProps) {
   const [selectedFile, setSelectedFile] = useState<GeneratedFile | null>(null)
   const { theme } = useTheme()
+  const { setActiveView } = useProjectStore()
 
   // Organiza os arquivos em uma estrutura de árvore
   const buildFileTree = (files: GeneratedFile[]): { [key: string]: FileNode } => {
@@ -116,39 +118,53 @@ export function CodeViewer({ files }: CodeViewerProps) {
   }
 
   return (
-    <div className="flex h-full divide-x">
-      <div className="w-64 overflow-y-auto p-4">
-        <div className="font-medium">Arquivos do Projeto</div>
-        <div className="mt-4 space-y-1">{renderFileTree(fileStructure)}</div>
+    <div className="flex h-full flex-col">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b px-2 py-2">
+        <div className="flex items-center gap-1">
+          <Button size="icon" variant="ghost" aria-label="Pré-visualizar" title="Pré-visualizar" onClick={() => setActiveView('preview')}>
+            <EyeOpenIcon className="h-5 w-5" />
+          </Button>
+          <Button size="icon" variant="default" aria-label="Código" title="Código">
+            <CodeIcon className="h-5 w-5" />
+          </Button>
+        </div>
+        <div className="mx-auto text-xs text-muted-foreground">Visualizando código</div>
+        <div />
       </div>
-      <div className="flex-1 overflow-y-auto bg-muted/30">
-        {selectedFile ? (
-          <SyntaxHighlighter
-            language={getLanguage(selectedFile.path)}
-            style={theme === 'dark' ? vscDarkPlus : vs}
-            showLineNumbers
-            wrapLines={true}
-            customStyle={{
-                width: '100%',
-                height: '100%',
-                margin: 0,
-                padding: '1rem',
-                backgroundColor: 'transparent',
-            }}
-            codeTagProps={{
-                style: {
-                    fontSize: '0.9rem',
-                    fontFamily: 'var(--font-mono, monospace)',
-                }
-            }}
-          >
-            {selectedFile.content}
-          </SyntaxHighlighter>
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
-            Selecione um arquivo para visualizar o código
-          </div>
-        )}
+      <div className="flex h-full divide-x">
+        <div className="w-64 overflow-y-auto p-4">
+          <div className="font-medium">Arquivos do Projeto</div>
+          <div className="mt-4 space-y-1">{renderFileTree(fileStructure)}</div>
+        </div>
+        <div className="flex-1 overflow-y-auto bg-muted/30">
+          {selectedFile ? (
+            <SyntaxHighlighter
+              language={getLanguage(selectedFile.path)}
+              style={theme === 'dark' ? vscDarkPlus : vs}
+              showLineNumbers
+              wrapLines={true}
+              customStyle={{
+                  width: '100%',
+                  height: '100%',
+                  margin: 0,
+                  padding: '1rem',
+                  backgroundColor: 'transparent',
+              }}
+              codeTagProps={{
+                  style: {
+                      fontSize: '0.9rem',
+                      fontFamily: 'var(--font-mono, monospace)',
+                  }
+              }}
+            >
+              {selectedFile.content}
+            </SyntaxHighlighter>
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              Selecione um arquivo para visualizar o código
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1,96 +1,71 @@
-# Bilderama - Seu Copiloto de Desenvolvimento Web com IA
+# Bilderama - Copiloto Inteligente para Criação de Sites Comerciais
 
-Bilderama é um projeto ambicioso com o objetivo de se tornar um copiloto inteligente para o desenvolvimento de aplicações web. A visão é permitir que usuários criem e refinem interfaces web de alta qualidade através de uma combinação de linguagem natural e edição visual interativa, com foco no mercado brasileiro.
-
-Este projeto inspira-se em ferramentas como v0.dev e Lovable, buscando combinar o poder da IA generativa com uma experiência de usuário fluida e um resultado final profissional.
-
-## Estado do Projeto: Uma Fundação Sólida e Pronta para Escalar
-
-O projeto concluiu com sucesso uma fase crítica de desenvolvimento, estabelecendo uma fundação arquitetural que é, ao mesmo tempo, robusta, escalável e de alta performance. O núcleo do Bilderama está estável e pronto para a implementação de funcionalidades que entregarão um verdadeiro "fator wow" e alto valor comercial.
-
-### Tecnologias Principais
-
-* **Frontend:** Next.js 14, React, TypeScript
-* **Gerenciamento de Estado:** Zustand
-* **Estilização:** Tailwind CSS
-* **Motor de Templates:** Handlebars.js
-* **Inteligência Artificial:** OpenAI (GPT-4o-mini)
-* **Validação de Dados:** Zod
-* **Componentes de UI:** Radix UI, Lucide Icons
-
-### Arquitetura e Fluxo de Dados: A Vantagem Determinística
-
-A arquitetura do Bilderama é seu maior diferencial, garantindo velocidade e confiabilidade.
-
-1.  **IA Arquiteta:** O processo começa quando o usuário descreve seu site. Uma **IA Arquiteta** interpreta o pedido e, usando um catálogo de componentes pré-definidos, gera um plano de construção em JSON, o `PagePlan`. Este plano é a única "fonte da verdade" do site.
-2.  **Validação com Zod:** O `PagePlan` gerado pela IA passa por uma validação rigorosa com Zod, garantindo que a IA obedeça às regras do nosso sistema e que nenhum dado malformado prossiga.
-3.  **Renderizador Determinístico:** O `PagePlan` validado é então entregue a um **renderizador local (Handlebars)**. Este motor, que não usa IA, combina os dados do plano com templates de componentes (`.hbs`) para construir o código HTML final de forma **instantânea e 100% previsível**.
-4.  **Edição "Source-Driven":** O ciclo de edição é robusto. Qualquer alteração (seja visual ou conversacional) atualiza o `PagePlan` em nosso estado central (Zustand). Essa mudança dispara o renderizador determinístico, que reconstrói o HTML, garantindo que o preview esteja sempre sincronizado com a fonte da verdade.
-
-### Funcionalidades Atuais
-
-* **Geração Inicial via Chat:** Interface para o usuário descrever o site que deseja.
-* **Edição Conversacional Funcional:** A lógica central para editar o site via comandos de texto está implementada. A IA pode entender um pedido de alteração e gerar as "mutações" necessárias para modificar a estrutura do site (`PagePlan`).
-* **Renderização Determinística e Instantânea:** Geração de código a partir do `PagePlan`.
-* **Preview Interativo e Visualizador de Código:** Abas para alternar entre a visualização do site e a análise do código-fonte gerado.
-* **Download do Projeto:** Funcionalidade para baixar o site completo como um arquivo `.zip`.
-
-## Roteiro Estratégico: O Caminho para o Mercado
-
-### Visão de Longo Prazo
-
-#### Fase 1: O MVP Comercial e a Experiência "Premium"
-*O objetivo desta fase é fazer com que o Bilderama gere sites visualmente ricos e variados, e que a experiência de usar a ferramenta seja elegante e impressionante.*
-
-1.  **Enriquecimento da Biblioteca de Componentes (Prioridade Máxima):** Adicionar novos blocos de construção, aprimorar os existentes e adicionar outros elementos modernos para aumentar a variedade e a qualidade dos sites gerados.
-2.  **Melhoria da IA Arquiteta:** Refinar continuamente os prompts para que a IA gere `PagePlans` mais criativos, completos e alinhados com as melhores práticas de design
-3.  **Refinamento da UI do Dashboard:** Aprimorar o design da nossa própria interface para que ela tenha uma aparência "premium", aumentando o valor percebido da ferramenta.
-4.  **Refinamento da Experiência "Copiloto":** Melhorar a comunicação da IA, para que ela descreva as ações que realizou e ofereça sugestões mais contextuais.
-5.  **Renderização Progressiva (UX):** Implementar o efeito visual de "live coding" ou de construção bloco a bloco para reforçar o "fator wow" e a sensação de que a IA está trabalhando para o usuário.
-
-#### Fase 2: Expansão da Plataforma e Persistência
-*Com a experiência de criação no ponto, agora expandimos o escopo do que o Bilderama pode fazer e garantimos que o trabalho do usuário seja permanente.*
-
-1.  **Persistência em Banco de Dados:** Implementar um backend com autenticação de usuários e banco de dados (ex: Supabase) para permitir o salvamento de múltiplos projetos e o versionamento de alterações.
-2.  **Suporte a Múltiplas Páginas:** Permitir a criação de sites completos (Home, Sobre, Contato, etc.) com navegação interligada.
-3.  **Ampliação dos Tipos de Geração:** Com a base de componentes e o suporte a múltiplas páginas, oferecer a criação de Blogs, Dashboards e sites de E-commerce simples.
-
-#### Fase 3: Monetização e Ecossistema
-*Com uma plataforma robusta, focamos em monetizar e nos conectar ao ecossistema mais amplo.*
-
-1.  **Sistema de Deploy e Domínios:** Implementar a publicação com 1 clique em subdomínios `*.bilderama.com` (gratuito) e a conexão de domínios próprios (planos pagos).
-2.  **Integração com Ecossistema DEV:** Explorar funcionalidades "Pro" como o suporte a LLMs locais (Ollama) e a exportação de projetos para o GitHub.
+**Bilderama** é um copiloto visual que combina IA com um sistema de design determinístico para gerar sites únicos e comercialmente viáveis. Foco no mercado brasileiro, em português, com diversidade visual elevada.
 
 ---
 
-### Plano de Ação Imediato (Prioridades Atuais)
+## 🎯 Estado Atual (Capacidades)
 
-Para executar a visão acima, nosso roadmap tático atual está organizado da seguinte forma:
+- **Geração determinística** via `PagePlan (Zod)` → `Renderer (Handlebars)` → `HTML` com temas e tokens de design.
+- **IA Arquiteta**: prompt especializado (BR) que produz JSON válido e diverso; agora com detecção de intenção para **múltiplas páginas** (`pages[]`).
+- **Editor Conversacional**: instruções naturais para editar o `PagePlan` mantendo o schema.
+- **Preview moderno**: desktop/mobile, seletor de páginas centralizado, overlay de loading e edição inline.
+- **Dashboard clean**: topbar única com logo/quick actions, publicar, **tema claro/escuro**; painel dividido (chat ↔ preview/código) com divisor sutil.
+- **Publicação 1‑clique**: rota `/api/publish` e página pública `/p/[slug]`.
+- **Testes**: smoke para renderer, middleware e schema.
 
-#### 1. Prioridade Máxima: Persistência de Projetos
-* **Missão:** Transformar o Bilderama de uma demonstração tecnológica em uma ferramenta de trabalho real.
-* **Tarefas:** Implementar autenticação de usuários e um banco de dados para salvar, carregar e gerenciar múltiplos projetos.
+> Nota: Usuários utilizam os sites dentro da plataforma. Download ZIP está desativado neste estágio.
 
-#### 2. Prioridade Alta: Integração Profunda com Tailwind CSS
-* **Missão:** Elevar a qualidade e o profissionalismo do código gerado.
-* **Tarefas:** Refatorar o sistema para usar o Tailwind CSS em tempo de build, eliminando a dependência do CDN e permitindo otimizações e uso de funcionalidades avançadas.
+---
 
-#### 3. Prioridade Média: Aumentar o Arsenal Criativo da IA
-* **Missão:** Enriquecer a biblioteca para que a IA possa criar sites mais ricos e variados.
-* **Tarefas:** Expansão do catálogo de componentes (FAQ, Contato, Galeria) e implementação de layouts alternativos para os componentes existentes.
+## 🚀 Novidades de UI (MVP)
 
-#### 4. Prioridade Média-Baixa: Aprimorar a Inteligência e a Interação
-* **Missão:** Tornar a IA mais autônoma e a experiência de uso mais fluida.
-* **Tarefas:** Dinamização do `ARCHITECT_SYSTEM_PROMPT` e implementação de sugestões de acompanhamento no chat.
+- **Topbar**: logo com QuickNav (Novo Projeto), engrenagem de acesso rápido, botão Publicar e seletor de tema.
+- **Chat**: área com abas (Chat/Histórico), textarea sticky (sempre visível), auto‑resize, envio com Ctrl/Cmd+Enter e sugestões clicáveis.
+- **Área de Preview/Código**:
+  - Header minimalista com ícones de alternância (sem texto), seletor central de páginas e ícones Desktop/Mobile.
+  - Visualizador de código com header próprio e atalho para retornar ao Preview.
+- **Consistência visual**: botões padronizados, bordas finas, paddings uniformes, divisor do painel com 1px.
+- **Tema claro/escuro**: habilitado via `darkMode: 'class'` e tokens em `generated-theme.css` importados no `globals.css`.
 
-#### 5. Prioridade Futura: Funcionalidades de Grande Escala
-* **Missão:** Expandir o escopo do que o Bilderama pode criar.
-* **Tarefas:** Adicionar suporte a múltiplas páginas e animações.
+---
 
-## Como Executar o Projeto
+## 🛣️ Próximos passos
 
-1.  Clone o repositório.
-2.  Instale as dependências com `npm install`.
-3.  Crie um arquivo `.env.local` e adicione sua chave da API da OpenAI: `OPENAI_API_KEY=sua_chave_api_aqui`.
-4.  Execute com `npm run dev`.
-5.  Abra http://localhost:3000 no seu navegador.
+1) Edição visual total: aplicar `editableAttr` em todos os templates e painel por tipo de campo.
+2) Persistência: auth + projetos e versões (rollback por bloco).
+3) Integrações: handler de formulário e analytics por projeto.
+4) Deploy: domínios customizáveis após o slug público.
+
+---
+
+## 🔧 Como Executar
+
+```bash
+npm install
+# .env.local
+# OPENAI_API_KEY=...
+
+npm run dev
+```
+
+Scripts úteis:
+```bash
+npm run build       # Build produção
+npm run build:css   # Build do CSS dos templates
+npm run build:all   # CSS + build
+npm run test        # Testes
+```
+
+---
+
+## Observações Técnicas
+
+- `pages[]` validado em `/api/render` (formato e duplicatas).
+- Helpers de renderer: `editableAttr`, `linkHref`, `slugify`, `safeImg`.
+- Modo dark/light consistente via `ThemeProvider` + Tailwind `darkMode: 'class'` + tokens CSS importados no `globals.css`.
+
+---
+
+## Licença
+MIT.

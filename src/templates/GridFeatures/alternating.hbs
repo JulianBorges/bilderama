@@ -1,0 +1,44 @@
+<section class="py-16 bg-background text-foreground">
+  <div class="container mx-auto px-4">
+    <div class="text-center space-y-4 mb-16">
+      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl" data-bild-block-index="{{blockIndex}}" data-bild-prop="title">
+        {{title}}
+      </h2>
+      <p class="mx-auto max-w-2xl text-lg text-muted-foreground" data-bild-block-index="{{blockIndex}}" data-bild-prop="subtitle">
+        {{subtitle}}
+      </p>
+    </div>
+    
+    <div class="space-y-16">
+      {{#each featureCards}}
+      <div class="grid lg:grid-cols-2 gap-12 items-center {{#if (isOdd @index)}}lg:flex-row-reverse{{/if}}">
+        <div class="{{#if (isOdd @index)}}lg:order-2{{/if}}">
+          <div class="space-y-4">
+            <div class="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="{{iconSvgPath}}" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold" data-bild-block-index="{{../blockIndex}}" data-bild-feature-index="{{@index}}" data-bild-prop="title">
+              {{title}}
+            </h3>
+            <p class="text-muted-foreground text-lg leading-relaxed" data-bild-block-index="{{../blockIndex}}" data-bild-feature-index="{{@index}}" data-bild-prop="description">
+              {{description}}
+            </p>
+          </div>
+        </div>
+        
+        <div class="{{#if (isOdd @index)}}lg:order-1{{/if}}">
+          <div class="aspect-[4/3] rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center">
+            <div class="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center">
+              <svg class="h-12 w-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="{{iconSvgPath}}" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section> 

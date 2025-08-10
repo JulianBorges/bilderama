@@ -1,0 +1,21 @@
+{
+  "blocks": [
+    { "name": "Navbar", "layouts": ["default"] },
+    { "name": "HeroModerno", "layouts": ["default", "centered", "split"] },
+    { "name": "HeroClassico", "layouts": ["default"] },
+    { "name": "InfoProductHero", "layouts": ["default"] },
+    { "name": "GridFeatures", "layouts": ["default", "masonry", "alternating"] },
+    { "name": "Statistics", "layouts": ["default"] },
+    { "name": "Team", "layouts": ["default"] },
+    { "name": "Blog", "layouts": ["default"] },
+    { "name": "Contact", "layouts": ["default"] },
+    { "name": "Testimonials", "layouts": ["default", "grid"] },
+    { "name": "Pricing", "layouts": ["default", "compact"] },
+    { "name": "MenuGrid", "layouts": ["default"] },
+    { "name": "FAQ", "layouts": ["default"] },
+    { "name": "CallToAction", "layouts": ["default"] },
+    { "name": "LogoCloud", "layouts": ["default"] },
+    { "name": "Footer", "layouts": ["default"] }
+  ],
+  "widgets": ["WhatsappButton"]
+} 
