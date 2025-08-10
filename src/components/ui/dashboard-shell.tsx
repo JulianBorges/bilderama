@@ -1,57 +1,78 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { PanelLeftOpen, PanelLeftClose } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { QuickNav } from '@/components/dashboard/quick-nav'
+import { useProjectStore } from '@/store/project-store'
+import { Settings } from 'lucide-react'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 
 interface DashboardShellProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function DashboardShell({ children }: DashboardShellProps) {
-  const [collapsed, setCollapsed] = useState(false)
+  const { generatedFiles, projectName, setProjectName, resetProject } = useProjectStore()
 
   useEffect(() => {
-    const saved = localStorage.getItem('bilderama:sidebar-collapsed')
-    if (saved) setCollapsed(saved === '1')
-  }, [])
+    const saved = localStorage.getItem('bilderama:project-name')
+    if (saved) setProjectName(saved)
+  }, [setProjectName])
 
-  const toggle = () => {
-    const next = !collapsed
-    setCollapsed(next)
-    localStorage.setItem('bilderama:sidebar-collapsed', next ? '1' : '0')
+  const handlePublish = useCallback(async () => {
+    try {
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: generatedFiles })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Falha na publicação')
+      const url = `/p/${data.slug}`
+      window.open(url, '_blank')
+    } catch (err: any) {
+      alert(err.message || 'Erro ao publicar')
+    }
+  }, [generatedFiles])
+
+  const onRename = () => {
+    const next = window.prompt('Renomear projeto', projectName)
+    if (next && next.trim()) setProjectName(next.trim())
+  }
+
+  const onDelete = () => {
+    if (window.confirm('Tem certeza que deseja excluir este projeto? Essa ação não pode ser desfeita.')) {
+      resetProject()
+      window.location.reload()
+    }
   }
 
   return (
-    <div className={`min-h-screen grid grid-rows-[auto_1fr] grid-cols-1 lg:grid-cols-[auto_1fr]`}>
-      <aside className={`hidden lg:flex flex-col border-r bg-muted/20 transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[240px]'}`}>
-        <div className="h-14 flex items-center justify-between px-3 border-b">
-          <div className={`text-xl font-bold truncate transition-opacity duration-200 ${collapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>Bilderama</div>
-          <Button size="icon" variant="ghost" onClick={toggle} aria-label="Alternar sidebar" className="shrink-0">
-            {collapsed ? <PanelLeftOpen className="h-4 w-4"/> : <PanelLeftClose className="h-4 w-4"/>}
-          </Button>
+    <div className="min-h-screen grid grid-rows-[auto_1fr]">
+      <header className="flex h-12 items-center justify-between border-b bg-background px-3">
+        <div className="flex items-center gap-3">
+          <QuickNav />
+          <span className="hidden text-sm font-medium sm:block">{projectName}</span>
         </div>
-        <nav className="p-2 space-y-1">
-          {['Editor','Projetos','Publicações'].map((item) => (
-            <div key={item} className={`rounded-md px-2 py-2 text-sm hover:bg-muted cursor-default transition-colors ${collapsed ? 'text-center' : ''}`}>{collapsed ? item[0] : item}</div>
-          ))}
-        </nav>
-      </aside>
-
-      <div className="col-span-1 grid grid-rows-[auto_1fr] min-h-0">
-        <header className="flex items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 h-14">
-          <div className="flex items-center gap-2 lg:hidden">
-            <Button size="icon" variant="ghost" onClick={toggle} aria-label="Abrir sidebar">
-              {collapsed ? <PanelLeftOpen className="h-4 w-4"/> : <PanelLeftClose className="h-4 w-4"/>}
-            </Button>
-            <div className="text-lg font-bold">Bilderama</div>
-          </div>
-          <div className="text-sm text-muted-foreground hidden lg:block">Copiloto web com IA — MVP</div>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Configurações" title="Configurações">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent sideOffset={6} className="w-48">
+              <DropdownMenuItem onClick={onRename}>Renomear projeto</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive" onClick={onDelete}>Excluir projeto…</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" size="sm" onClick={handlePublish} disabled={generatedFiles.length === 0}>Publicar</Button>
           <ThemeToggle />
-        </header>
-        <main className="min-h-0 custom-scrollbar overflow-y-auto">{children}</main>
-      </div>
+        </div>
+      </header>
+      <main className="min-h-0 custom-scrollbar overflow-y-auto">{children}</main>
     </div>
   )
 } 

@@ -4,12 +4,10 @@ import { useEffect, useRef } from 'react'
 import { ChatInterface } from '@/components/chat/chat-interface'
 import { PreviewIframe } from '@/components/preview/preview-iframe'
 import { CodeViewer } from '@/components/code-viewer/code-viewer'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { SplitPanel } from '@/components/ui/split-panel'
-import { Button } from '@/components/ui/button'
-import { CodeIcon, EyeOpenIcon, Pencil1Icon } from '@radix-ui/react-icons'
 import { EditorPanel } from '@/components/editor/editor-panel'
 import { useProjectStore } from '@/store/project-store'
+import { ChatPanel } from '@/components/chat/chat-panel'
 
 export default function Home() {
   const {
@@ -70,69 +68,11 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background px-4">
-        <h1 className="text-2xl font-bold">Bilderama</h1>
-        <div className="flex items-center gap-4">
-          <Button
-            variant={isEditMode ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setIsEditMode(!isEditMode)}
-            className="gap-2"
-          >
-            <Pencil1Icon className="h-4 w-4" />
-            {isEditMode ? 'Sair da Edição' : 'Editar Site'}
-          </Button>
-          <div className="flex items-center rounded-lg border bg-background p-1">
-            <Button
-              variant={activeView === 'preview' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveView('preview')}
-              className="gap-2"
-            >
-              <EyeOpenIcon className="h-4 w-4" />
-              Preview
-            </Button>
-            <Button
-              variant={activeView === 'code' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveView('code')}
-              className="gap-2"
-            >
-              <CodeIcon className="h-4 w-4" />
-              Código
-            </Button>
-          </div>
-          <Button
-            variant="default"
-            size="sm"
-            disabled={generatedFiles.length === 0}
-            onClick={async () => {
-              try {
-                const res = await fetch('/api/publish', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ files: generatedFiles })
-                })
-                const data = await res.json()
-                if (!res.ok) throw new Error(data?.error || 'Falha na publicação')
-                const url = `/p/${data.slug}`
-                window.open(url, '_blank')
-              } catch (err: any) {
-                alert(err.message || 'Erro ao publicar')
-              }
-            }}
-            className="gap-2"
-          >
-            Publicar
-          </Button>
-          <ThemeToggle />
-        </div>
-      </header>
-
       <main className="flex flex-1">
         <SplitPanel defaultSplit={40}>
           <div className="flex h-full flex-col rounded-lg border-r bg-background">
-            <ChatInterface
+            {/* Painel esquerdo com abas (Chat / Histórico) */}
+            <ChatPanel
               onCodeGeneration={generationHandler}
               onGenerationStart={() => setIsGenerating(true)}
             />

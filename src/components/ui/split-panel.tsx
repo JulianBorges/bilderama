@@ -66,13 +66,13 @@ export function SplitPanel({
         {children[0]}
       </div>
       <div
-        className="absolute h-[93vh] cursor-col-resize border-x w-2 bg-background hover:bg-accent"
+        className="absolute h-[93vh] cursor-col-resize w-px bg-border/50 hover:bg-border"
         style={{ left: `${split}%`, transform: 'translateX(-50%)' }}
         onMouseDown={handleMouseDown}
       >
       </div>
       <div
-        className="relative h-full p-6"
+        className="relative h-full p-4"
         style={{ width: `${100 - split}%` }}
       >
         {children[1]}

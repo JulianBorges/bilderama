@@ -34,7 +34,7 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     if (!textareaRef.current) return
     textareaRef.current.style.height = '0px'
     const scrollH = textareaRef.current.scrollHeight
-    textareaRef.current.style.height = Math.min(scrollH, 160) + 'px'
+    textareaRef.current.style.height = Math.min(scrollH, 240) + 'px'
   }, [input])
 
   // Placeholder animado
@@ -58,99 +58,6 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     timeoutId = setTimeout(animate, 300)
     return () => clearTimeout(timeoutId)
   }, [isTyping])
-
-  const renderMessage = (message: ChatMessage) => {
-    if (message.role === 'user') {
-      return <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
-    }
-    switch (message.type) {
-      case 'prompt':
-        return (
-          <div className="space-y-2">
-            <div className="font-medium">🔨 Especificações do Projeto:</div>
-            <pre className="whitespace-pre-wrap break-words text-sm font-mono bg-muted/50 p-2 rounded-md">
-              {message.content.replace('🔨 Gerando o site com estas especificações:\n\n', '')}
-            </pre>
-          </div>
-        )
-      case 'files':
-        return (
-          <div className="space-y-2">
-            <div className="font-medium">📁 Arquivos Gerados:</div>
-            <div className="space-y-1">
-              {message.files?.map((file, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm">
-                  <FileIcon className="h-4 w-4" />
-                  <span className="font-mono">{file.path}</span>
-                  <span className="text-muted-foreground">({file.type})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      case 'explanation':
-        return (
-          <div className="space-y-2">
-            <div className="font-medium">✨ Resumo:</div>
-            <div className="text-sm">{message.content.replace('✨ ', '')}</div>
-          </div>
-        )
-      case 'suggestions':
-        return (
-          <div className="space-y-2">
-            <div className="font-medium">💡 Sugestões de Melhorias:</div>
-            <div className="text-sm space-y-1">
-              {message.content
-                .replace('💡 Sugestões de melhorias:\n\n', '')
-                .split('\n')
-                .map((suggestion, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span>•</span>
-                    <span>{suggestion.substring(2)}</span>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )
-      case 'error':
-        return (
-          <div className="space-y-2">
-            <div className="font-medium text-destructive">❌ Erro:</div>
-            <div className="text-sm text-destructive">{message.content}</div>
-          </div>
-        )
-      default:
-        return <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
-    }
-  }
-
-  const handleSuggestionClick = (suggestion: string) => {
-    const userMessage: ChatMessage = { role: 'user', content: suggestion }
-    setMessages((prev) => [...prev, userMessage])
-    setInput('')
-    setIsTyping(false)
-    handleSubmit(suggestion)
-  }
-
-  const renderSuggestions = () => {
-    if (activeSuggestions.length === 0) return null
-    return (
-      <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="overflow-x-auto px-4 py-3 flex gap-2 no-scrollbar">
-          {activeSuggestions.map((suggestion, index) => (
-            <button
-              key={index}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="flex-none flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors whitespace-nowrap"
-            >
-              <SparklesIcon className="w-4 h-4" />
-              {suggestion}
-            </button>
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   const handleSubmit = async (content: string) => {
     if (!content.trim() || isLoading) return
@@ -185,40 +92,62 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(input)
     }
   }
 
-  return (
-    <div className="flex flex-col h-[92vh] max-h-[92vh] bg-background">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message, i) => (
-          <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : message.type === 'error' ? 'bg-destructive/10 border border-destructive/20' : 'bg-muted'}`}>
-              {message.role === 'user' ? (
-                <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
-              ) : message.type === 'error' ? (
-                <div className="space-y-2">
-                  <div className="font-medium text-destructive">❌ Erro:</div>
-                  <div className="text-sm text-destructive">{message.content}</div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="font-medium">✨ Resumo:</div>
-                  <div className="text-sm">{message.content}</div>
-                </div>
-              )}
-            </div>
+  const renderMessageBubble = (message: ChatMessage, i: number) => (
+    <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+      <div className={`max-w-[80%] rounded-xl border px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground border-primary/30' : message.type === 'error' ? 'bg-destructive/10 border-destructive/30' : 'bg-card border-border/60'}`}>
+        {message.role === 'user' ? (
+          <pre className="whitespace-pre-wrap break-words text-sm">{message.content}</pre>
+        ) : message.type === 'error' ? (
+          <div className="space-y-2">
+            <div className="font-medium text-destructive">❌ Erro:</div>
+            <div className="text-sm text-destructive">{message.content}</div>
           </div>
-        ))}
+        ) : (
+          <div className="space-y-2">
+            <div className="font-medium">✨ Resumo:</div>
+            <div className="text-sm">{message.content}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderSuggestions = () => {
+    if (activeSuggestions.length === 0) return null
+    return (
+      <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="overflow-x-auto px-4 py-3 flex gap-2 no-scrollbar">
+          {activeSuggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => handleSubmit(suggestion)}
+              className="flex-none flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors whitespace-nowrap"
+            >
+              <SparklesIcon className="w-4 h-4" />
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex h-full min-h-[92vh] flex-col bg-background">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.map(renderMessageBubble)}
       </div>
 
       {renderSuggestions()}
 
-      <form onSubmit={handleFormSubmit} className="border-t px-6 pb-5 pt-3 bg-background">
-        <div className="flex items-end gap-2 rounded-lg border border-border bg-muted/60 px-3 py-2 shadow-sm">
+      <form onSubmit={handleFormSubmit} className="sticky bottom-0 border-t px-4 pb-4 pt-2 bg-background">
+        <div className="flex items-end gap-2 rounded-xl border border-border/70 bg-muted/40 px-3 py-3 shadow-sm">
           <textarea
             ref={textareaRef}
             value={input}
@@ -226,11 +155,11 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
             onBlur={() => setIsTyping(false)}
             onKeyDown={handleKeyDown}
             placeholder={placeholderText}
-            className="flex-1 bg-transparent px-0 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 resize-none max-h-40"
+            className="min-h-[56px] flex-1 bg-transparent px-0 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 resize-none max-h-60"
             disabled={isLoading}
           />
-          <Button type="submit" size="icon" className="rounded-md shadow-sm h-9 w-9" disabled={isLoading} variant="default">
-            {isLoading ? <ReloadIcon className="h-4 w-4 animate-spin" /> : <ChevronUpIcon className="h-4 w-4" />}
+          <Button type="submit" size="icon" className="rounded-md shadow-sm h-10 w-10" disabled={isLoading} variant="default">
+            {isLoading ? <ReloadIcon className="h-5 w-5 animate-spin" /> : <ChevronUpIcon className="h-5 w-5" />}
           </Button>
         </div>
       </form>

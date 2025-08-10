@@ -2,21 +2,27 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { DesktopIcon, MobileIcon } from '@radix-ui/react-icons'
+import { DesktopIcon, MobileIcon, EyeOpenIcon, CodeIcon } from '@radix-ui/react-icons'
 import { GeneratedFile } from '@/lib/ai'
+import { useProjectStore } from '@/store/project-store'
 
 interface PreviewIframeProps {
   files: GeneratedFile[]
   isLoading: boolean
   onElementSelect: (element: { id: string; tagName: string; innerText: string; blockIndex?: string; propKey?: string }) => void;
   isEditMode: boolean;
+  currentPath?: string;
+  onPathChange?: (path: string) => void;
 }
 
-export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }: PreviewIframeProps) {
+export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, currentPath: externalPath, onPathChange }: PreviewIframeProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
-  const [currentPath, setCurrentPath] = useState<string>('/')
+  const [internalPath, setInternalPath] = useState<string>('/')
   const [selectedElement, setSelectedElement] = useState<string | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const { activeView, setActiveView } = useProjectStore()
+
+  const currentPath = externalPath ?? internalPath
 
   const htmlFiles = files.filter(f => f.path.endsWith('.html'))
   const cssFiles = files.filter(f => f.path.endsWith('.css'))
@@ -25,6 +31,15 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
   const availableRoutes = useMemo(() => {
     return htmlFiles.map(f => (f.path === 'index.html' ? '/' : `/${f.path.replace(/\.html$/, '')}`))
   }, [htmlFiles])
+
+  useEffect(() => {
+    if (!availableRoutes.includes(currentPath) && availableRoutes.length > 0) {
+      const next = availableRoutes[0]
+      if (onPathChange) onPathChange(next)
+      else setInternalPath(next)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableRoutes.join('|')])
 
   const findHtmlFile = (path: string) => {
     const normalizedPath = path === '/' ? 'index.html' : `${path.slice(1)}.html`
@@ -106,37 +121,61 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode }:
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'navigation') { setCurrentPath(event.data.path); setSelectedElement(null) }
-      else if (event.data.type === 'form') { console.log('Dados do formulário:', event.data.data) }
+      if (event.data.type === 'navigation') {
+        const next = event.data.path
+        if (onPathChange) onPathChange(next)
+        else setInternalPath(next)
+        setSelectedElement(null)
+      } else if (event.data.type === 'form') { console.log('Dados do formulário:', event.data.data) }
       else if (event.data.type === 'element-select') {
         onElementSelect({ id: event.data.elementId, tagName: event.data.tagName, innerText: event.data.innerText, blockIndex: event.data.blockIndex, propKey: event.data.propKey });
       }
     }
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [onElementSelect])
+  }, [onElementSelect, onPathChange])
 
   useEffect(() => {
     if (iframeRef.current) { iframeRef.current.srcdoc = generateFullHtml(currentPath, isEditMode) }
   }, [currentPath, files, isEditMode])
 
+  const handlePathChange = (path: string) => {
+    if (onPathChange) onPathChange(path)
+    else setInternalPath(path)
+  }
+
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="flex items-center justify-between border-b p-2">
-        <div className="flex items-center gap-2">
-          <Button variant={viewMode === 'desktop' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('desktop')}>
-            <DesktopIcon className="mr-2 h-4 w-4" /> Desktop
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b px-2 py-2">
+        {/* Esquerda: Preview/Código somente ícones */}
+        <div className="flex items-center gap-1">
+          <Button variant={activeView === 'preview' ? 'default' : 'ghost'} size="icon" aria-label="Pré-visualizar" title="Pré-visualizar" onClick={() => setActiveView('preview')}>
+            <EyeOpenIcon className="h-5 w-5" />
           </Button>
-          <Button variant={viewMode === 'mobile' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('mobile')}>
-            <MobileIcon className="mr-2 h-4 w-4" /> Mobile
+          <Button variant={activeView === 'code' ? 'default' : 'ghost'} size="icon" aria-label="Código" title="Código" onClick={() => setActiveView('code')}>
+            <CodeIcon className="h-5 w-5" />
           </Button>
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          {availableRoutes.map((route) => (
-            <button key={route} onClick={() => setCurrentPath(route)} className={`px-3 py-1.5 rounded-md text-sm border transition-colors ${currentPath === route ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted hover:bg-muted/70 border-border'}`}>
-              {route}
-            </button>
-          ))}
+        {/* Centro: seletor de páginas */}
+        <div className="mx-auto w-full max-w-xs">
+          <select
+            value={currentPath}
+            onChange={(e) => handlePathChange(e.target.value)}
+            className="w-full appearance-none rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none"
+          >
+            {availableRoutes.map((route) => (
+              <option key={route} value={route}>{route}</option>
+            ))}
+          </select>
+        </div>
+        {/* Direita: device icons somente ícones */}
+        <div className="ml-auto flex items-center gap-1">
+          <Button variant={viewMode === 'desktop' ? 'default' : 'ghost'} size="icon" aria-label="Desktop" title="Desktop" onClick={() => setViewMode('desktop')}>
+            <DesktopIcon className="h-5 w-5" />
+          </Button>
+          <Button variant={viewMode === 'mobile' ? 'default' : 'ghost'} size="icon" aria-label="Mobile" title="Mobile" onClick={() => setViewMode('mobile')}>
+            <MobileIcon className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
