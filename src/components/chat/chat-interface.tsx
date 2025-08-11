@@ -6,6 +6,7 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { ChevronUpIcon, FileIcon, SparklesIcon } from 'lucide-react'
 import { GeneratedFile, AIResponse } from '@/lib/ai'
 import { useProjectStore } from '@/store/project-store'
+import type { DiffOperation } from '@/lib/vfs'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -13,6 +14,18 @@ interface ChatMessage {
   type?: 'prompt' | 'explanation' | 'suggestions' | 'files' | 'error'
   files?: GeneratedFile[]
   suggestions?: string[]
+}
+
+interface AgentToolResult {
+  type: 'format' | 'typecheck' | 'tests'
+  ok: boolean
+  details: any
+  durationMs: number
+}
+
+interface AgentExtras {
+  diffPreview?: DiffOperation[]
+  toolResults?: AgentToolResult[]
 }
 
 interface ChatInterfaceProps {
@@ -29,7 +42,10 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
   const [activeSuggestions, setActiveSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const { setLastPrompt, setChatMessages, addChatMessage } = useProjectStore()
+  const { setLastPrompt, setChatMessages, addChatMessage, applyVfsDiff, setActiveView } = useProjectStore()
+
+  const [agentToolResults, setAgentToolResults] = useState<AgentToolResult[] | null>(null)
+  const [agentDiffPreview, setAgentDiffPreview] = useState<DiffOperation[] | null>(null)
 
   // Carregar histórico inicial do store (se houver)
   useEffect(() => {
@@ -94,10 +110,10 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     setLastPrompt(content)
 
     try {
-      const { pagePlan } = useProjectStore.getState();
-      const requestBody = { userInput: content, currentPagePlan: pagePlan }
+      const { pagePlan, generatedFiles } = useProjectStore.getState();
+      const requestBody = { userInput: content, currentPagePlan: pagePlan, currentFiles: generatedFiles }
       const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) })
-      const result: AIResponse = await response.json()
+      const result: AIResponse & AgentExtras = await response.json()
       if (!response.ok) throw new Error((result as any).error || `Erro da API: ${response.statusText}`)
       if (!result.pagePlanJson || !result.explanation) throw new Error('Resposta incompleta da API')
       onCodeGeneration(result)
@@ -105,6 +121,9 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
       setMessages((prev) => [...prev, assistant])
       addChatMessage(assistant)
       if (result.suggestions && result.suggestions.length > 0) setActiveSuggestions(result.suggestions)
+      // Extras do agente
+      setAgentToolResults(result.toolResults || null)
+      setAgentDiffPreview(result.diffPreview || null)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro inesperado ao processar sua solicitação'
       const assistant: ChatMessage = { role: 'assistant', content: `Desculpe, mas encontrei um problema: ${errorMessage}. Por favor, tente novamente com um prompt diferente.`, type: 'error' }
@@ -125,6 +144,44 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
       e.preventDefault()
       handleSubmit(input)
     }
+  }
+
+  const renderToolResults = () => {
+    if (!agentToolResults || agentToolResults.length === 0) return null
+    return (
+      <div className="border-t px-4 py-3 text-xs text-muted-foreground flex flex-wrap gap-2 items-center">
+        <span className="mr-1">Validações:</span>
+        {agentToolResults.map((t, idx) => (
+          <span key={idx} className={`inline-flex items-center gap-1 rounded-full px-2 py-1 border ${t.ok ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : 'border-red-300 text-red-700 bg-red-50'}`}>
+            <span className="font-medium">{t.type}</span>
+            <span>({t.durationMs}ms)</span>
+          </span>
+        ))}
+      </div>
+    )
+  }
+
+  const renderDiffCta = () => {
+    if (!agentDiffPreview || agentDiffPreview.length === 0) return null
+    return (
+      <div className="border-t px-4 py-3 flex items-center justify-between gap-2">
+        <div className="text-sm text-muted-foreground">O agente propôs {agentDiffPreview.length} mudança(s) no workspace.</div>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={async () => {
+              try {
+                await applyVfsDiff(agentDiffPreview)
+                setActiveView('code')
+              } catch {}
+            }}
+          >
+            Aplicar mudanças sugeridas
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   const renderMessageBubble = (message: ChatMessage, i: number) => (
@@ -173,6 +230,8 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
         {messages.map(renderMessageBubble)}
       </div>
 
+      {renderToolResults()}
+      {renderDiffCta()}
       {renderSuggestions()}
 
       <form onSubmit={handleFormSubmit} className="sticky bottom-0 border-t px-4 pb-4 pt-2 bg-background">

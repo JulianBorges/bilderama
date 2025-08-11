@@ -8,13 +8,17 @@
 
 - **Geração determinística** via `PagePlan (Zod)` → `Renderer (Handlebars)` → `HTML` com temas e tokens de design.
 - **IA Arquiteta**: prompt especializado (PT‑BR) que produz JSON válido e diverso; com detecção de intenção para **múltiplas páginas** (`pages[]`).
-- **Editor Conversacional (MVP)**: instruções naturais para editar o `PagePlan` mantendo o schema (via `/api/chat` + `conversationalEditorService`).
-- **Preview moderno**: desktop/mobile, seletor de páginas centralizado, overlay de loading e seleção inline de elementos com `data-bild-*`.
-- **Dashboard clean**: topbar com quick actions, **Publicar**, **Salvar versão**, **tema claro/escuro** e **Configurações** à direita; painel dividido (chat ↔ preview/código).
+- **Editor Conversacional**: instruções naturais para editar o `PagePlan` mantendo o schema (via `/api/chat`).
+- **Agente multi‑etapas (Refatoração 2)**: orquestrador que executa o ciclo `Planejar → Aplicar (VFS) → Format/Typecheck/Tests → Explicar` e retorna diffs propostos e relatórios de validações.
+- **Preview moderno**: desktop/mobile, seletor de páginas, overlay de loading e seleção inline de elementos com `data-bild-*`.
+- **Dashboard clean**: topbar com quick actions, **Publicar**, **Salvar versão**, **tema claro/escuro** e **Configurações**; painel dividido (chat ↔ preview/código).
 - **Publicação 1‑clique**: rota `/api/publish` e página pública `/p/[slug]` (armazenamento em memória).
-- **Histórico de versões (local)**: snapshots automáticos a cada geração e **Salvar versão** manual na topbar; painel de **Diff** (Atual vs Selecionada) e **Restaurar esta versão**.
-- **Explicações e sugestões inteligentes**: a cada geração, a IA analisa o `PagePlan` e retorna um resumo e até 5 sugestões focadas em conversão/UX.
-- **Testes**: smoke para renderer, middleware e schema.
+- **Histórico de versões (local)**: snapshots automáticos a cada geração e **Salvar versão** manual; painel de **Diff** (Atual vs Selecionada) e **Restaurar esta versão**.
+- **Explicações e sugestões inteligentes**: análise do `PagePlan` gera resumo e até 5 sugestões focadas em conversão/UX.
+- **VFS + Tools do agente**: endpoints `apply_diff`, `list/read/snapshot`, `search`, `format` (Prettier), `typecheck` (TypeScript) e `run_tests` (Vitest, timeout), com rate‑limit simples.
+- **UI de diffs**: colagem de operações em JSON, staging por operação, pré‑visualização por arquivo com side‑by‑side e realce de linhas, aplicar selecionadas e reverter última mudança.
+- **Multi‑preview**: HTML determinístico (base/fallback) e Sandpack (opcional) para execução real client‑only.
+- **Testes**: suíte verde cobrindo renderer, middleware, schemas, VFS e endpoints do agente.
 
 > Nota: Usuários utilizam os sites dentro da plataforma. Download ZIP está desativado neste estágio.
 
@@ -40,17 +44,16 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
   - “Pickers” para design tokens com **valores permitidos**.
 
 ### 3) Agente multi‑etapas com reflexão e explicações
-- **Gap**: `generateAnalysis` é stub e não há reflexão, nem explicações passo a passo ou correções automáticas com verificação.
-- **Necessário**:
-  - Fluxo do agente: Planejar → Propor → Aplicar em VFS → Rodar build/test/typecheck → Refletir → Explicar → Pedir aceite.
-  - Respostas do assistente com: resumo, justificativas, riscos, alternativas, e links para diffs/arquivos.
-  - Prompts especializados: “Arquiteto” (já existe), “Engenheiro de Código”, “Designer de UI (tokens/layout)”, “QA/Typecheck”.
+- ✅ Implementado nesta refatoração:
+  - Orquestrador: Planejar (Engenheiro) → Aplicar em VFS → `format` (Prettier) → `typecheck` (TS) → `tests` (Vitest) → Explicação (Analista) → Retorno com `diffPreview`, `toolResults`, `pagePlanJson`.
+  - UI do chat: badges de validação (verde/vermelho com duração) e CTA “Aplicar mudanças sugeridas”.
+- **Próximos incrementos**:
+  - Prompt de `Designer` para tokens/layout quando pedido; iterações automáticas de correção (QA) com limite de tentativas.
 
 ### 4) Execução/Preview de código real
 - **Gap**: Preview mostra HTML renderizado; não roda componentes React/Tailwind como código real.
 - **Necessário**:
-  - Integração com Sandpack ou bundler web para executar **projeto React** gerado no VFS, permitindo iterar em tempo real.
-  - Alternar entre “HTML determinístico” e “App React” conforme a complexidade do projeto.
+  - Estratégia **multi‑preview** (já iniciada): HTML determinístico e Sandpack. Planejar build remoto efêmero.
 
 ### 5) Persistência real, histórico e colaboração
 - **Gap**: Publicação em memória; histórico local via `localStorage`; não há autenticação.
@@ -99,26 +102,53 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
 
 ---
 
+## Fluxo do Agente (Refatoração 2)
+
+- Entrada (chat, modo edição): `{ userInput, currentPagePlan, currentFiles }`.
+- Orquestração:
+  1. Engenheiro produz `AgentPlan` com `diffs?` e/ou `pagePlanPatchedJson?`.
+  2. Aplica diffs em VFS e valida com `format` → `typecheck` → `tests`.
+  3. Gera explicação e sugestões a partir do `PagePlan` final (quando houver).
+- Saída (`/api/chat`):
+  - `pagePlanJson: string`
+  - `files: GeneratedFile[] | null`
+  - `explanation: string`
+  - `suggestions: string[]`
+  - `diffPreview?: DiffOperation[]`
+  - `toolResults?: { type: 'format'|'typecheck'|'tests', ok: boolean, details: any, durationMs: number }[]`
+
+---
+
+## 🏗️ Arquitetura de Produção (SaaS escalável)
+
+- **Multi‑preview**: HTML determinístico (fallback rápido) + Sandpack (client‑only) + build remoto efêmero (paridade de produção).
+- **Build remoto efêmero**: sandbox Node (Vite/esbuild), sem rede, limites de CPU/mem; artefatos versionados (hash do VFS) em S3/R2 + CDN.
+- **Persistência**: DB (Postgres), storage de artefatos, histórico versionado (PagePlan + VFS), auditoria.
+- **Segurança**: sanitização, CSP no preview, isolamento de sandbox, rate‑limit por IP/usuário/plano, RBAC básico.
+- **Observabilidade**: logs estruturados, tracing opcional, métricas de agente (tempo por tool, taxa de sucesso), Sentry, PostHog.
+- **CI/CD**: testes (unit/integração/e2e), typecheck, lint/format no CI; deploy automatizado.
+- **SaaS BR**: billing local (Pix/cartão), LGPD (consentimento, DPA, exportação/eliminação), timezone PT‑BR/BRL.
+
+---
+
 ## 🛣️ Plano de Refatoração (prioridades e entregáveis)
 
-1) Fundamentos de edição de código
-- VFS em memória com `read/write/delete/rename/search/snapshot/applyDiff` (rollback transacional) e endpoints REST do agente.
-- Tools do agente prontas: `search`, `list/read/snapshot`, `apply_diff`, `format` (Prettier), `typecheck` (TypeScript), `run_tests` (Vitest, timeout).
-- Preview alternável: HTML determinístico e execução real via Sandpack (vanilla).
-- UI de diffs: colar JSON de operações, staging por operação, pré-visualização por arquivo com side-by-side e realce de linhas alteradas, aplicar selecionadas e reverter última mudança.
-
-2) Mapeamento completo `editableAttr` e Editor por tipo
+1) Mapeamento completo `editableAttr` e Editor por tipo
 - Padronizar `data-bild-*` em TODOS os templates.
 - Editor com campos tipados (texto, imagem, link interno, enum token) validado por Zod.
 
-3) Agente multi‑etapas com explicação
+2) Agente multi‑etapas com explicação
 - Prompts especializados e reflexão.
 - `generateAnalysis` real (não‑stub) com sugestões contextuais.
 
-4) Persistência + Auth + Histórico versionado
+3) Persistência + Auth + Histórico versionado
 - NextAuth + Supabase/Neon + Prisma/Drizzle.
 - Tabelas para projetos, versões e publicação.
 - Rollback e rótulos de versões.
+
+4) Execução/Preview de produção (novo)
+- Build remoto efêmero com Vite/esbuild em sandbox.
+- Cache por hash do VFS; artefatos em S3/R2 + CDN; preview servindo artefatos reais.
 
 5) Publicação em produção
 - Storage S3/CDN + deploy automático (Vercel/Cloudflare Pages).
@@ -126,13 +156,13 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
 
 6) Qualidade e segurança
 - Testes unit/integração/e2e; typecheck/eslint/prettier no CI.
-- Sanitização/CSP; Sentry; PostHog.
+- Sanitização/CSP; Sentry; PostHog; rate‑limit por endpoint/usuário/plano.
 
 7) SaaS Brasil
 - Billing (Pix/cartão) e limites por plano.
 - LGPD (consentimento, exportação, deleção, políticas).
 
-> Sprints sugeridos: (1) VFS+diffs, (2) mapeamento+editor, (3) agente+explicações, (4) persistência+histórico, (5) publicação, (6) billing+LGPD.
+> Sprints sugeridos: (1) mapeamento+editor, (2) agente+explicações, (3) persistência+histórico, (4) build remoto+preview, (5) publicação, (6) billing+LGPD).
 
 ---
 
@@ -162,7 +192,9 @@ npm run test        # Testes
 - Helpers do renderer: `editableAttr`, `linkHref`, `slugify`, `safeImg`.
 - Modo dark/light via `ThemeProvider` + Tailwind `darkMode: 'class'` + tokens CSS importados no `globals.css`.
 - Modelos LLM: configurável em `src/lib/config.ts` (usar modelos mais fortes para o agente de código).
-- **Novidades implementadas**: análise inteligente do `PagePlan` (explicação e até 5 sugestões); snapshots automáticos e botão **Salvar versão** (topbar); painel de **Diff** com restauração.
+- **Ferramentas do agente**: VFS + endpoints `apply_diff`, `list/read/snapshot`, `search`, `format`, `typecheck`, `run_tests`; rate‑limit simples aplicado.
+- **Multi‑preview**: HTML determinístico (base/fallback) e Sandpack (opcional).
+- **Novidades implementadas**: análise inteligente do `PagePlan`; orquestrador multi‑etapas; UI de validações/diffs no chat; snapshots automáticos e botão **Salvar versão**; painel de **Diff** com restauração.
 
 ---
 
@@ -170,10 +202,10 @@ npm run test        # Testes
 
 - `src/templates/**`: aplicar `editableAttr` exaustivo (incluindo arrays e nested props).
 - `src/components/editor/**`: novos controles tipados, validação Zod e ligação com `pagePlan`/VFS.
-- `src/lib/ai.ts` e `src/lib/services/conversationalEditorService.ts`: implementar tools e reflexão; substituir `generateAnalysis` stub.
-- `src/components/code-viewer/code-viewer.tsx`: modo diffs e “Aplicar/Reverter”.
+- `src/lib/ai.ts`, `src/lib/services/conversationalEditorService.ts`, `src/lib/services/agentOrchestrator.ts`: evolução de prompts e reflexão (Designer/QA).
+- `src/components/code-viewer/code-viewer.tsx`: modo diffs com staging e highlight.
 - `src/lib/publishStore.ts` → persistência real (DB/Storage) e jobs de deploy.
-- Novo módulo `src/lib/vfs/**` e `src/app/api/agent/**` para operações do agente.
+- `src/lib/vfs/**` e `src/app/api/agent/**` para operações do agente.
 
 ---
 

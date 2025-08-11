@@ -6,10 +6,11 @@ import { createHash } from 'node:crypto'
 import { getCache, setCache } from '@/lib/cache'
 import { getEditedPagePlan } from '@/lib/services/conversationalEditorService'
 import { PagePlan } from '@/lib/schemas'
+import { runAgentIteration } from '@/lib/services/agentOrchestrator'
 
 export async function POST(req: Request) {
   try {
-    const { userInput, currentPagePlan } = await req.json()
+    const { userInput, currentPagePlan, currentFiles } = await req.json()
 
     if (!userInput) {
       return NextResponse.json({ error: 'userInput é obrigatório' }, { status: 400 });
@@ -25,15 +26,18 @@ export async function POST(req: Request) {
 
     // Se um plano de página atual for fornecido, entramos no modo de edição.
     if (currentPagePlan) {
-      const newPlan = await getEditedPagePlan(userInput as string, currentPagePlan as PagePlan);
-      
-      // Criamos uma resposta no formato que o frontend espera.
+      // Ramo novo: invocar orquestrador para propor diffs e patch do PagePlan
+      const files = Array.isArray(currentFiles) ? currentFiles : []
+      const result = await runAgentIteration({ instruction: userInput as string, pagePlan: currentPagePlan as PagePlan, files })
+
       const aiResponse = {
-        pagePlanJson: JSON.stringify(newPlan),
-        // A explicação e as sugestões podem ser genéricas no modo de edição por enquanto.
-        explanation: "Seu site foi atualizado com base na sua instrução.",
-        suggestions: ["O que mais gostaria de alterar?", "Peça para mudar o tema.", "Adicione uma nova seção."]
-      };
+        pagePlanJson: result.pagePlanJson || JSON.stringify(currentPagePlan),
+        files: result.files || null,
+        explanation: result.explanation,
+        suggestions: result.suggestions,
+        diffPreview: result.diffPreview,
+        toolResults: result.toolResults,
+      }
 
       setCache(promptHash, aiResponse)
       return NextResponse.json(aiResponse, { headers: { 'X-Cache': 'MISS', 'X-Prompt-Size': String(userInput.length) } });

@@ -244,7 +244,7 @@ INSTRUÇÕES CRÍTICAS:
 }
 
 // Analisa o PagePlan e gera resumo e sugestões em português
-async function generateAnalysisFromPlan(pagePlanJson: string): Promise<{ explanation: string; suggestions: string[] }> {
+export async function generateAnalysisFromPlan(pagePlanJson: string): Promise<{ explanation: string; suggestions: string[] }> {
   try {
     const messages: ChatCompletionRequestMessage[] = [
       {
