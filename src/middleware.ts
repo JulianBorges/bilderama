@@ -4,11 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 const MAX_BODY_SIZE = 25 * 1024 // 25 kB
 
 export function middleware(req: NextRequest) {
-  // Verifica se a key da OpenAI está configurada no servidor
-  if (process.env.NODE_ENV !== 'test' && !process.env.OPENAI_API_KEY) {
-    return NextResponse.json({ error: 'OPENAI_API_KEY não configurada no servidor' }, { status: 500 })
-  }
-
   // Pathname resiliente para ambientes de teste
   let pathname = ''
   try {
@@ -20,6 +15,15 @@ export function middleware(req: NextRequest) {
   // Permite payloads grandes para publicação
   if (pathname.startsWith('/api/publish')) {
     return NextResponse.next()
+  }
+
+  // Endpoints do agente/VFS não exigem OPENAI_API_KEY
+  const skipApiKey = pathname.startsWith('/api/agent/') || pathname.startsWith('/api/render') || pathname.startsWith('/api/publish')
+  if (!skipApiKey) {
+    // Verifica se a key da OpenAI está configurada no servidor
+    if (process.env.NODE_ENV !== 'test' && !process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'OPENAI_API_KEY não configurada no servidor' }, { status: 500 })
+    }
   }
 
   // Checa cabeçalho Content-Length para evitar payloads enormes

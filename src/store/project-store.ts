@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { GeneratedFile, AIResponse } from '@/lib/ai';
 import { PagePlan } from '@/lib/schemas';
+import type { DiffOperation } from '@/lib/vfs';
 
 export type ChatMessage = {
   role: 'user' | 'assistant';
@@ -48,6 +49,9 @@ interface ProjectState {
   pagePlan: PagePlan | null;
   lastPrompt: string;
   chatMessages: ChatMessage[];
+
+  // Histórico de diffs aplicados
+  previousGeneratedFilesStack: GeneratedFile[][];
   
   // Actions
   handleCodeGeneration: (response: AIResponse) => void;
@@ -63,6 +67,13 @@ interface ProjectState {
   addChatMessage: (msg: ChatMessage) => void;
   saveCurrentSnapshot: () => void;
   resetProject: () => void;
+
+  // Agent/VFS
+  applyVfsDiff: (operations: DiffOperation[]) => Promise<void>;
+  revertLastChange: () => void;
+
+  // Pré-visualização (sem aplicar)
+  previewDiffOnce: (operations: DiffOperation[]) => Promise<{ files: GeneratedFile[]; changedFiles: string[] }>
 }
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -76,6 +87,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   pagePlan: null,
   lastPrompt: '',
   chatMessages: [],
+  previousGeneratedFilesStack: [],
 
   // Actions
   setGeneratedFiles: (files) => set({ generatedFiles: files }),
@@ -113,6 +125,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       pagePlan: null,
       lastPrompt: '',
       chatMessages: [],
+      previousGeneratedFilesStack: [],
     })
   },
 
@@ -185,4 +198,46 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     
     set({ pagePlan: newPagePlan });
   },
+
+  applyVfsDiff: async (operations) => {
+    const { generatedFiles, previousGeneratedFilesStack } = get();
+    // Guarda estado anterior para possível reversão
+    set({ previousGeneratedFilesStack: [...previousGeneratedFilesStack, generatedFiles], isGenerating: true })
+    try {
+      const res = await fetch('/api/agent/vfs/apply-diff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: generatedFiles, operations })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Falha ao aplicar diffs')
+      set({ generatedFiles: data.files, isGenerating: false, activeView: 'code' })
+    } catch (err) {
+      console.error('Erro ao aplicar diffs na VFS:', err)
+      // Reverte o push na pilha caso falhe
+      const stack = get().previousGeneratedFilesStack.slice()
+      stack.pop()
+      set({ previousGeneratedFilesStack: stack, isGenerating: false })
+      throw err
+    }
+  },
+
+  revertLastChange: () => {
+    const stack = get().previousGeneratedFilesStack.slice()
+    if (stack.length === 0) return
+    const previous = stack.pop()!
+    set({ generatedFiles: previous, previousGeneratedFilesStack: stack, activeView: 'code' })
+  },
+
+  previewDiffOnce: async (operations) => {
+    const { generatedFiles } = get()
+    const res = await fetch('/api/agent/vfs/apply-diff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ files: generatedFiles, operations })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data?.error || 'Falha ao pré-visualizar diffs')
+    return { files: data.files as GeneratedFile[], changedFiles: data.changedFiles as string[] }
+  }
 })); 

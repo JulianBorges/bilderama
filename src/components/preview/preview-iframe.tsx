@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DesktopIcon, MobileIcon, EyeOpenIcon, CodeIcon } from '@radix-ui/react-icons'
 import { GeneratedFile } from '@/lib/ai'
 import { useProjectStore } from '@/store/project-store'
+import { SandpackRunner } from './sandpack-runner'
 
 interface PreviewIframeProps {
   files: GeneratedFile[]
@@ -21,6 +22,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
   const [selectedElement, setSelectedElement] = useState<string | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const { activeView, setActiveView } = useProjectStore()
+  const [runtimeMode, setRuntimeMode] = useState<'html' | 'sandpack'>('html')
 
   const currentPath = externalPath ?? internalPath
 
@@ -55,7 +57,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
     const cssMatch = htmlFile.content.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
     const extractedCss = cssMatch ? cssMatch.join('\n') : '';
     let processedHtmlContent = htmlFile.content;
-    processedHtmlContent = processedHtmlContent.replace(/<link\s+[^>]*?href\s*=\s*["']{1}[^"']*tailwindcss[^"']*["']{1}[^>]*?>/gi, '');
+    processedHtmlContent = processedHtmlContent.replace(/<link\s+[^>]*?href\s*=\s*["]{1}[^""]*tailwindcss[^""]*["]{1}[^>]*?>/gi, '');
     processedHtmlContent = processedHtmlContent.replace(/<link\s+[^>]*?href\s*=\s*(["'])(?!http)([^\s>"']+?\.css)\1[^>]*?>/gi, '');
     processedHtmlContent = processedHtmlContent.replace(/<script\s+[^>]*?src\s*=\s*(["'])(?!http)([^\s>"']+?\.js)\1[^>]*?>\s*<\/script>/gi, '');
 
@@ -136,8 +138,8 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
   }, [onElementSelect, onPathChange])
 
   useEffect(() => {
-    if (iframeRef.current) { iframeRef.current.srcdoc = generateFullHtml(currentPath, isEditMode) }
-  }, [currentPath, files, isEditMode])
+    if (runtimeMode === 'html' && iframeRef.current) { iframeRef.current.srcdoc = generateFullHtml(currentPath, isEditMode) }
+  }, [currentPath, files, isEditMode, runtimeMode])
 
   const handlePathChange = (path: string) => {
     if (onPathChange) onPathChange(path)
@@ -158,18 +160,25 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
         </div>
         {/* Centro: seletor de páginas */}
         <div className="mx-auto w-full max-w-xs">
-          <select
-            value={currentPath}
-            onChange={(e) => handlePathChange(e.target.value)}
-            className="w-full appearance-none rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none"
-          >
-            {availableRoutes.map((route) => (
-              <option key={route} value={route}>{route}</option>
-            ))}
-          </select>
+          {runtimeMode === 'html' ? (
+            <select
+              value={currentPath}
+              onChange={(e) => handlePathChange(e.target.value)}
+              className="w-full appearance-none rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none"
+            >
+              {availableRoutes.map((route) => (
+                <option key={route} value={route}>{route}</option>
+              ))}
+            </select>
+          ) : (
+            <div className="text-xs text-muted-foreground">Executando via Sandpack</div>
+          )}
         </div>
-        {/* Direita: device icons */}
+        {/* Direita: device icons + runtime toggle */}
         <div className="ml-auto flex items-center gap-1">
+          <Button variant="outline" size="sm" onClick={() => setRuntimeMode(runtimeMode === 'html' ? 'sandpack' : 'html')}>
+            {runtimeMode === 'html' ? 'Sandpack' : 'HTML'}
+          </Button>
           <Button variant={viewMode === 'desktop' ? 'default' : 'ghost'} size="icon" aria-label="Desktop" title="Desktop" onClick={() => setViewMode('desktop')}>
             <DesktopIcon className="h-5 w-5" />
           </Button>
@@ -185,8 +194,10 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
             <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             </div>
-          ) : (
+          ) : runtimeMode === 'html' ? (
             <iframe ref={iframeRef} srcDoc={generateFullHtml(currentPath, isEditMode)} className="h-full w-full" sandbox="allow-scripts allow-same-origin allow-forms" title="Preview" loading="lazy" />
+          ) : (
+            <SandpackRunner files={files} />
           )}
         </div>
       </div>

@@ -102,9 +102,10 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
 ## 🛣️ Plano de Refatoração (prioridades e entregáveis)
 
 1) Fundamentos de edição de código
-- VFS + Sandpack para React/Tailwind.
-- Tools do agente (`read/write/search/apply_diff/run_tests/typecheck/format`).
-- UI de diffs com “Aplicar/Descartar”.
+- VFS em memória com `read/write/delete/rename/search/snapshot/applyDiff` (rollback transacional) e endpoints REST do agente.
+- Tools do agente prontas: `search`, `list/read/snapshot`, `apply_diff`, `format` (Prettier), `typecheck` (TypeScript), `run_tests` (Vitest, timeout).
+- Preview alternável: HTML determinístico e execução real via Sandpack (vanilla).
+- UI de diffs: colar JSON de operações, staging por operação, pré-visualização por arquivo com side-by-side e realce de linhas alteradas, aplicar selecionadas e reverter última mudança.
 
 2) Mapeamento completo `editableAttr` e Editor por tipo
 - Padronizar `data-bild-*` em TODOS os templates.
