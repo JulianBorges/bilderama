@@ -2,7 +2,13 @@ import { create } from 'zustand';
 import { GeneratedFile, AIResponse } from '@/lib/ai';
 import { PagePlan } from '@/lib/schemas';
 
-function saveSnapshot(title: string, prompt: string, pagePlanJson: string) {
+export type ChatMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+  type?: 'prompt' | 'explanation' | 'suggestions' | 'files' | 'error';
+}
+
+function saveSnapshot(title: string, prompt: string, pagePlanJson: string, chat: ChatMessage[]) {
   try {
     const raw = localStorage.getItem('bilderama:versions');
     const list = raw ? JSON.parse(raw) : [];
@@ -11,6 +17,7 @@ function saveSnapshot(title: string, prompt: string, pagePlanJson: string) {
       title,
       prompt,
       pagePlanJson,
+      chat,
       createdAt: new Date().toISOString(),
       isFavorite: false,
     };
@@ -40,6 +47,7 @@ interface ProjectState {
   isEditMode: boolean;
   pagePlan: PagePlan | null;
   lastPrompt: string;
+  chatMessages: ChatMessage[];
   
   // Actions
   handleCodeGeneration: (response: AIResponse) => void;
@@ -51,6 +59,8 @@ interface ProjectState {
   setIsEditMode: (isEditMode: boolean) => void;
   setProjectName: (name: string) => void;
   setLastPrompt: (prompt: string) => void;
+  setChatMessages: (msgs: ChatMessage[]) => void;
+  addChatMessage: (msg: ChatMessage) => void;
   saveCurrentSnapshot: () => void;
   resetProject: () => void;
 }
@@ -65,6 +75,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   isEditMode: false,
   pagePlan: null,
   lastPrompt: '',
+  chatMessages: [],
 
   // Actions
   setGeneratedFiles: (files) => set({ generatedFiles: files }),
@@ -77,13 +88,15 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ projectName: name })
   },
   setLastPrompt: (prompt) => set({ lastPrompt: prompt }),
+  setChatMessages: (msgs) => set({ chatMessages: msgs }),
+  addChatMessage: (msg) => set((s) => ({ chatMessages: [...s.chatMessages, msg] })),
   saveCurrentSnapshot: () => {
-    const { pagePlan, lastPrompt } = get();
+    const { pagePlan, lastPrompt, chatMessages } = get();
     if (!pagePlan) return;
     try {
       const json = JSON.stringify(pagePlan);
       const title = pagePlan.pageTitle || 'Projeto';
-      saveSnapshot(title, lastPrompt || 'Snapshot manual', json);
+      saveSnapshot(title, lastPrompt || 'Snapshot manual', json, chatMessages);
     } catch (e) {
       console.warn('Falha ao serializar pagePlan:', e);
     }
@@ -99,6 +112,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       isEditMode: false,
       pagePlan: null,
       lastPrompt: '',
+      chatMessages: [],
     })
   },
 
@@ -113,10 +127,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       const pagePlan: PagePlan = JSON.parse(response.pagePlanJson);
       set({ pagePlan }); // Armazena o plano recebido
 
-      // Salva snapshot local com prompt original (se disponível)
-      const { lastPrompt } = get();
+      // Salva snapshot local com prompt e chat atuais
+      const { lastPrompt, chatMessages } = get();
       const promptForSnapshot = lastPrompt || (response as any).explanation || '';
-      saveSnapshot(pagePlan.pageTitle || 'Projeto', promptForSnapshot, response.pagePlanJson);
+      saveSnapshot(pagePlan.pageTitle || 'Projeto', promptForSnapshot, response.pagePlanJson, chatMessages);
 
       // Etapa 2: Chamar o renderizador determinístico com o plano.
       const renderResponse = await fetch('/api/render', {

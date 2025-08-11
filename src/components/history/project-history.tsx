@@ -4,11 +4,18 @@ import { useState, useEffect } from 'react'
 import { Clock, Star, Trash2, RotateCcw, XCircle } from 'lucide-react'
 import { useProjectStore } from '@/store/project-store'
 
+export type SnapshotChatMessage = {
+  role: 'user' | 'assistant'
+  content: string
+  type?: 'prompt' | 'explanation' | 'suggestions' | 'files' | 'error'
+}
+
 type ProjectSnapshot = {
   id: string
   title: string
   prompt: string
   pagePlanJson: string
+  chat?: SnapshotChatMessage[]
   createdAt: string
   isFavorite: boolean
 }
@@ -16,7 +23,7 @@ type ProjectSnapshot = {
 export function ProjectHistory() {
   const [snapshots, setSnapshots] = useState<ProjectSnapshot[]>([])
   const [diffTarget, setDiffTarget] = useState<ProjectSnapshot | null>(null)
-  const { setGeneratedFiles, setIsGenerating, setSelectedElement, setActiveView, pagePlan } = useProjectStore()
+  const { setGeneratedFiles, setIsGenerating, setSelectedElement, setActiveView, pagePlan, setChatMessages } = useProjectStore()
 
   useEffect(() => {
     const saved = localStorage.getItem('bilderama:versions')
@@ -46,6 +53,12 @@ export function ProjectHistory() {
       setIsGenerating(true)
       setSelectedElement(null)
       setActiveView('preview')
+
+      // Restaura chat salvo (store + localStorage) se existir
+      if (snap.chat && Array.isArray(snap.chat)) {
+        setChatMessages(snap.chat)
+        localStorage.setItem('bilderama:chat', JSON.stringify(snap.chat))
+      }
 
       const response = await fetch('/api/render', {
         method: 'POST',
@@ -141,6 +154,7 @@ export function ProjectHistory() {
                 <pre className="overflow-auto rounded border bg-muted/30 p-3 text-xs">{pretty(diffTarget.pagePlanJson)}</pre>
               </div>
             </div>
+            <div className="mt-3 text-xs text-muted-foreground">Chat salvo: {diffTarget.chat ? `${diffTarget.chat.length} mensagens` : 'sem histórico'}</div>
             <div className="mt-3 flex justify-end gap-2">
               <button onClick={() => restoreSnapshot(diffTarget)} className="rounded-md border bg-primary px-3 py-1.5 text-sm text-primary-foreground">Restaurar esta versão</button>
             </div>

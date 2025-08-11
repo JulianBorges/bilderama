@@ -29,7 +29,25 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
   const [activeSuggestions, setActiveSuggestions] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const { setLastPrompt } = useProjectStore()
+  const { setLastPrompt, setChatMessages, addChatMessage } = useProjectStore()
+
+  // Carregar histórico inicial do store (se houver)
+  useEffect(() => {
+    const savedRaw = localStorage.getItem('bilderama:chat')
+    if (savedRaw) {
+      try {
+        const saved: ChatMessage[] = JSON.parse(savedRaw)
+        setMessages(saved)
+        setChatMessages(saved)
+      } catch {}
+    }
+  }, [setChatMessages])
+
+  // Persistir localStorage e store a cada mudança
+  useEffect(() => {
+    localStorage.setItem('bilderama:chat', JSON.stringify(messages))
+    setChatMessages(messages)
+  }, [messages, setChatMessages])
 
   // Auto-resize do textarea
   useEffect(() => {
@@ -65,6 +83,7 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
     if (!content.trim() || isLoading) return
     const userMessage: ChatMessage = { role: 'user', content }
     setMessages((prev) => [...prev, userMessage])
+    addChatMessage(userMessage)
     setInput('')
     setIsTyping(false)
     setIsLoading(true)
@@ -82,11 +101,15 @@ export function ChatInterface({ onCodeGeneration, onGenerationStart }: ChatInter
       if (!response.ok) throw new Error((result as any).error || `Erro da API: ${response.statusText}`)
       if (!result.pagePlanJson || !result.explanation) throw new Error('Resposta incompleta da API')
       onCodeGeneration(result)
-      setMessages((prev) => [...prev, { role: 'assistant', content: result.explanation, type: 'explanation' }])
+      const assistant: ChatMessage = { role: 'assistant', content: result.explanation, type: 'explanation' }
+      setMessages((prev) => [...prev, assistant])
+      addChatMessage(assistant)
       if (result.suggestions && result.suggestions.length > 0) setActiveSuggestions(result.suggestions)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro inesperado ao processar sua solicitação'
-      setMessages((prev) => [...prev, { role: 'assistant', content: `Desculpe, mas encontrei um problema: ${errorMessage}. Por favor, tente novamente com um prompt diferente.`, type: 'error' }])
+      const assistant: ChatMessage = { role: 'assistant', content: `Desculpe, mas encontrei um problema: ${errorMessage}. Por favor, tente novamente com um prompt diferente.`, type: 'error' }
+      setMessages((prev) => [...prev, assistant])
+      addChatMessage(assistant)
     } finally {
       setIsLoading(false)
     }

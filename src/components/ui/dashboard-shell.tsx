@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { QuickNav } from '@/components/dashboard/quick-nav'
 import { useProjectStore } from '@/store/project-store'
-import { Settings } from 'lucide-react'
+import { Settings, Save } from 'lucide-react'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 
 interface DashboardShellProps {
@@ -57,7 +57,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handlePublish} disabled={generatedFiles.length === 0}>Publicar</Button>
-          <Button variant="outline" size="sm" onClick={() => saveCurrentSnapshot()}>Salvar versão</Button>
+          <Button variant="ghost" size="icon" aria-label="Salvar versão" title="Salvar versão" onClick={() => saveCurrentSnapshot()}>
+            <Save className="h-5 w-5" />
+          </Button>
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

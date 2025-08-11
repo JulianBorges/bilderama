@@ -20,7 +20,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
   const [internalPath, setInternalPath] = useState<string>('/')
   const [selectedElement, setSelectedElement] = useState<string | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const { activeView, setActiveView, saveCurrentSnapshot } = useProjectStore()
+  const { activeView, setActiveView } = useProjectStore()
 
   const currentPath = externalPath ?? internalPath
 
@@ -168,7 +168,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
             ))}
           </select>
         </div>
-        {/* Direita: device icons + salvar versão */}
+        {/* Direita: device icons */}
         <div className="ml-auto flex items-center gap-1">
           <Button variant={viewMode === 'desktop' ? 'default' : 'ghost'} size="icon" aria-label="Desktop" title="Desktop" onClick={() => setViewMode('desktop')}>
             <DesktopIcon className="h-5 w-5" />
@@ -176,7 +176,6 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
           <Button variant={viewMode === 'mobile' ? 'default' : 'ghost'} size="icon" aria-label="Mobile" title="Mobile" onClick={() => setViewMode('mobile')}>
             <MobileIcon className="h-5 w-5" />
           </Button>
-          <Button variant="outline" size="sm" className="ml-2" title="Salvar versão" onClick={() => saveCurrentSnapshot()}>Salvar versão</Button>
         </div>
       </div>
 
