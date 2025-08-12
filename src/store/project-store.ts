@@ -66,6 +66,7 @@ interface ProjectState {
   setChatMessages: (msgs: ChatMessage[]) => void;
   addChatMessage: (msg: ChatMessage) => void;
   saveCurrentSnapshot: () => void;
+  saveCurrentSnapshotServer: () => Promise<void>;
   resetProject: () => void;
 
   // Agent/VFS
@@ -111,6 +112,25 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       saveSnapshot(title, lastPrompt || 'Snapshot manual', json, chatMessages);
     } catch (e) {
       console.warn('Falha ao serializar pagePlan:', e);
+    }
+  },
+  saveCurrentSnapshotServer: async () => {
+    const { pagePlan, lastPrompt, chatMessages } = get();
+    if (!pagePlan) return;
+    try {
+      const pagePlanJson = JSON.stringify(pagePlan)
+      const snapshot = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title: pagePlan.pageTitle || 'Projeto',
+        prompt: lastPrompt || 'Snapshot manual',
+        pagePlanJson,
+        chat: chatMessages,
+        createdAt: new Date().toISOString(),
+        isFavorite: false,
+      }
+      await fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'default', snapshot }) })
+    } catch (e) {
+      console.warn('Falha ao salvar snapshot no servidor:', e)
     }
   },
   resetProject: () => {

@@ -12,8 +12,8 @@
 - **Agente multi‑etapas (Refatoração 2)**: orquestrador que executa o ciclo `Planejar → Aplicar (VFS) → Format/Typecheck/Tests → Explicar` e retorna diffs propostos e relatórios de validações.
 - **Preview moderno**: desktop/mobile, seletor de páginas, overlay de loading e seleção inline de elementos com `data-bild-*`.
 - **Dashboard clean**: topbar com quick actions, **Publicar**, **Salvar versão**, **tema claro/escuro** e **Configurações**; painel dividido (chat ↔ preview/código).
-- **Publicação 1‑clique**: rota `/api/publish` e página pública `/p/[slug]` (armazenamento em memória).
-- **Histórico de versões (local)**: snapshots automáticos a cada geração e **Salvar versão** manual; painel de **Diff** (Atual vs Selecionada) e **Restaurar esta versão**.
+- **Publicação 1‑clique**: rota `/api/publish` e página pública `/p/[slug]` (persistência local em `.data/published/` com cache em memória).
+- **Histórico de versões (local)**: snapshots automáticos a cada geração, **Salvar versão** manual; painel de **Diff** (Atual vs Selecionada) e **Restaurar**. Endpoint `/api/projects` para salvar/listar snapshots do projeto (MVP em FS local).
 - **Explicações e sugestões inteligentes**: análise do `PagePlan` gera resumo e até 5 sugestões focadas em conversão/UX.
 - **VFS + Tools do agente**: endpoints `apply_diff`, `list/read/snapshot`, `search`, `format` (Prettier), `typecheck` (TypeScript) e `run_tests` (Vitest, timeout), com rate‑limit simples.
 - **UI de diffs**: colagem de operações em JSON, staging por operação, pré‑visualização por arquivo com side‑by‑side e realce de linhas, aplicar selecionadas e reverter última mudança.
@@ -138,7 +138,7 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
 - Editor com campos tipados (texto, imagem, link interno, enum token) validado por Zod.
 
 2) Agente multi‑etapas com explicação
-- Prompts especializados e reflexão.
+- Prompts especializados (Engenheiro, Analista) + adicionar **Designer (tokens/layout)** e **QA** com iterações limitadas.
 - `generateAnalysis` real (não‑stub) com sugestões contextuais.
 
 3) Persistência + Auth + Histórico versionado
@@ -161,6 +161,14 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
 7) SaaS Brasil
 - Billing (Pix/cartão) e limites por plano.
 - LGPD (consentimento, exportação, deleção, políticas).
+
+8) Catálogo verticalizado e conteúdo por nicho
+- Kits verticais (restaurantes, clínicas, imobiliárias, educação, etc.) com variações de blocos e copy PT‑BR nativa.
+- Regras de diversidade visual por nicho (cores, densidade, tipografia) orientadas pelo prompt de Designer.
+
+9) Assets e mídia
+- Otimização de imagens (formatos modernos, resize, lazy‑load, placeholders) e pipeline de upload/transformação.
+- Diretrizes para ícones/ilustrações consistentes por nicho.
 
 > Sprints sugeridos: (1) mapeamento+editor, (2) agente+explicações, (3) persistência+histórico, (4) build remoto+preview, (5) publicação, (6) billing+LGPD).
 

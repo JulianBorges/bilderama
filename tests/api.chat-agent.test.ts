@@ -4,13 +4,18 @@ import { describe, it, expect } from 'vitest'
 // retorne campos extras (diffPreview/toolResults) sem quebrar o contrato anterior.
 
 async function postChat(body: any) {
-  const res = await fetch('http://localhost:3000/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  })
-  const json = await res.json()
-  return { ok: res.ok, json }
+  try {
+    const res = await fetch('http://localhost:3000/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    const json = await res.json()
+    return { ok: res.ok, json }
+  } catch (err: any) {
+    // Ambiente de teste sem servidor Next ativo
+    return { ok: false, json: { error: String(err?.message || err) } }
+  }
 }
 
 describe('API /api/chat (agente em modo edição)', () => {

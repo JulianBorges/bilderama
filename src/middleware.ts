@@ -17,8 +17,8 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Endpoints do agente/VFS não exigem OPENAI_API_KEY
-  const skipApiKey = pathname.startsWith('/api/agent/') || pathname.startsWith('/api/render') || pathname.startsWith('/api/publish')
+  // Endpoints do agente/VFS e persistência local não exigem OPENAI_API_KEY
+  const skipApiKey = pathname.startsWith('/api/agent/') || pathname.startsWith('/api/render') || pathname.startsWith('/api/publish') || pathname.startsWith('/api/projects')
   if (!skipApiKey) {
     // Verifica se a key da OpenAI está configurada no servidor
     if (process.env.NODE_ENV !== 'test' && !process.env.OPENAI_API_KEY) {
