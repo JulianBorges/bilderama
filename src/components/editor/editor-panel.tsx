@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useProjectStore } from '@/store/project-store'
 
 interface EditorPanelProps {
   selectedElement: {
@@ -17,22 +18,64 @@ interface EditorPanelProps {
 }
 
 export function EditorPanel({ selectedElement, onUpdate, onClose }: EditorPanelProps) {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState('')
+  const [linkValue, setLinkValue] = useState('')
+  const [imageValue, setImageValue] = useState('')
+  const pagePlan = useProjectStore((s) => s.pagePlan)
+
+  const parsedSelection = useMemo(() => {
+    if (!selectedElement) return null
+    const [blockIndexStr, propKey] = selectedElement.id.split(':')
+    const blockIndex = Number(blockIndexStr)
+    if (Number.isNaN(blockIndex) || !propKey) return null
+    return { blockIndex, propKey }
+  }, [selectedElement])
 
   useEffect(() => {
-    if (selectedElement) {
-      setContent(selectedElement.innerText);
+    if (!selectedElement) return
+    setContent(selectedElement.innerText || '')
+
+    // Deriva valores atuais do plano (quando disponível)
+    if (pagePlan && parsedSelection) {
+      const block = pagePlan.blocks?.[parsedSelection.blockIndex]
+      const props: Record<string, any> | undefined = block?.properties as any
+      if (props) {
+        // Heurística: se for texto tipo XYZText, tenta par XYZHref
+        const base = parsedSelection.propKey.replace(/Text$/, '')
+        const maybeHrefKey = `${base}Href`
+        const maybeSrcKey = `${base}Src`
+
+        if (typeof props[maybeHrefKey] === 'string') setLinkValue(props[maybeHrefKey] as string)
+        else setLinkValue('')
+
+        if (typeof props[maybeSrcKey] === 'string') setImageValue(props[maybeSrcKey] as string)
+        else setImageValue('')
+      }
+    } else {
+      setLinkValue('')
+      setImageValue('')
     }
-  }, [selectedElement]);
+  }, [selectedElement, pagePlan, parsedSelection])
 
   if (!selectedElement) {
     return null;
   }
 
   const handleUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    onUpdate(selectedElement.id, content);
+    e.preventDefault()
+    if (!selectedElement || !parsedSelection) return
+    // Atualiza a prop principal
+    onUpdate(`${parsedSelection.blockIndex}:${parsedSelection.propKey}`, content)
+
+    // Heurística: atualiza par Href se aplicável
+    const base = parsedSelection.propKey.replace(/Text$/, '')
+    if (linkValue && base !== parsedSelection.propKey) {
+      onUpdate(`${parsedSelection.blockIndex}:${base}Href`, linkValue)
+    }
+    // Heurística: atualiza par Src se aplicável
+    if (imageValue && base !== parsedSelection.propKey) {
+      onUpdate(`${parsedSelection.blockIndex}:${base}Src`, imageValue)
+    }
   }
 
   return (
@@ -59,6 +102,30 @@ export function EditorPanel({ selectedElement, onUpdate, onClose }: EditorPanelP
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Novo texto..." />
             </div>
+            {parsedSelection && selectedElement.tagName === 'A' && (
+              <div>
+                <Label htmlFor="link">Link (Href)</Label>
+                <Input
+                  id="link"
+                  name="link"
+                  value={linkValue}
+                  onChange={(e) => setLinkValue(e.target.value)}
+                  placeholder="/caminho-ou-url"
+                />
+              </div>
+            )}
+            {parsedSelection && /image|img|src/i.test(parsedSelection.propKey) && (
+              <div>
+                <Label htmlFor="image">Imagem (Src)</Label>
+                <Input
+                  id="image"
+                  name="image"
+                  value={imageValue}
+                  onChange={(e) => setImageValue(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+            )}
             <Button type="submit" className="w-full">Atualizar</Button>
           </form>
         </CardContent>
