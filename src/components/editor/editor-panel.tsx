@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useProjectStore } from '@/store/project-store'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface EditorPanelProps {
   selectedElement: {
@@ -24,6 +23,14 @@ export function EditorPanel({ selectedElement, onUpdate, onClose }: EditorPanelP
   const [imageValue, setImageValue] = useState('')
   const pagePlan = useProjectStore((s) => s.pagePlan)
   const updateToken = useProjectStore((s) => s.updateDesignToken)
+
+  const getCurrentToken = (key: 'cardStyle' | 'spacing' | 'emphasis' | 'borderRadius' | 'shadowIntensity' | 'animation'): string => {
+    if (!pagePlan || !parsedSelection) return ''
+    const block: any = pagePlan.blocks?.[parsedSelection.blockIndex]
+    const tokens = (block && block.designTokens) || {}
+    const v = tokens[key]
+    return typeof v === 'string' ? v : ''
+  }
 
   const parsedSelection = useMemo(() => {
     if (!selectedElement) return null
@@ -134,79 +141,67 @@ export function EditorPanel({ selectedElement, onUpdate, onClose }: EditorPanelP
                 <div className="grid grid-cols-1 gap-2">
                   <div>
                     <Label className="text-xs">Card Style</Label>
-                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'cardStyle', v)}>
-                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="elevated">elevated</SelectItem>
-                        <SelectItem value="outline">outline</SelectItem>
-                        <SelectItem value="glass">glass</SelectItem>
-                        <SelectItem value="minimal">minimal</SelectItem>
-                        <SelectItem value="bold">bold</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select className="h-8 w-full rounded border bg-background px-2 text-sm" value={getCurrentToken('cardStyle')} onChange={(e) => updateToken(parsedSelection.blockIndex, 'cardStyle', e.target.value || undefined)}>
+                      <option value="">(omitir)</option>
+                      <option value="elevated">elevated</option>
+                      <option value="outline">outline</option>
+                      <option value="glass">glass</option>
+                      <option value="minimal">minimal</option>
+                      <option value="bold">bold</option>
+                    </select>
                   </div>
                   <div>
                     <Label className="text-xs">Spacing</Label>
-                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'spacing', v)}>
-                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="compact">compact</SelectItem>
-                        <SelectItem value="comfortable">comfortable</SelectItem>
-                        <SelectItem value="spacious">spacious</SelectItem>
-                        <SelectItem value="extra-spacious">extra-spacious</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select className="h-8 w-full rounded border bg-background px-2 text-sm" value={getCurrentToken('spacing')} onChange={(e) => updateToken(parsedSelection.blockIndex, 'spacing', e.target.value || undefined)}>
+                      <option value="">(omitir)</option>
+                      <option value="compact">compact</option>
+                      <option value="comfortable">comfortable</option>
+                      <option value="spacious">spacious</option>
+                      <option value="extra-spacious">extra-spacious</option>
+                    </select>
                   </div>
                   <div>
                     <Label className="text-xs">Emphasis</Label>
-                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'emphasis', v)}>
-                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="primary">primary</SelectItem>
-                        <SelectItem value="accent">accent</SelectItem>
-                        <SelectItem value="neutral">neutral</SelectItem>
-                        <SelectItem value="muted">muted</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select className="h-8 w-full rounded border bg-background px-2 text-sm" value={getCurrentToken('emphasis')} onChange={(e) => updateToken(parsedSelection.blockIndex, 'emphasis', e.target.value || undefined)}>
+                      <option value="">(omitir)</option>
+                      <option value="primary">primary</option>
+                      <option value="accent">accent</option>
+                      <option value="neutral">neutral</option>
+                      <option value="muted">muted</option>
+                    </select>
                   </div>
                   <div>
                     <Label className="text-xs">Border Radius</Label>
-                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'borderRadius', v)}>
-                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">none</SelectItem>
-                        <SelectItem value="small">small</SelectItem>
-                        <SelectItem value="medium">medium</SelectItem>
-                        <SelectItem value="large">large</SelectItem>
-                        <SelectItem value="full">full</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select className="h-8 w-full rounded border bg-background px-2 text-sm" value={getCurrentToken('borderRadius')} onChange={(e) => updateToken(parsedSelection.blockIndex, 'borderRadius', e.target.value || undefined)}>
+                      <option value="">(omitir)</option>
+                      <option value="none">none</option>
+                      <option value="small">small</option>
+                      <option value="medium">medium</option>
+                      <option value="large">large</option>
+                      <option value="full">full</option>
+                    </select>
                   </div>
                   <div>
                     <Label className="text-xs">Shadow Intensity</Label>
-                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'shadowIntensity', v)}>
-                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">none</SelectItem>
-                        <SelectItem value="soft">soft</SelectItem>
-                        <SelectItem value="medium">medium</SelectItem>
-                        <SelectItem value="strong">strong</SelectItem>
-                        <SelectItem value="dramatic">dramatic</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select className="h-8 w-full rounded border bg-background px-2 text-sm" value={getCurrentToken('shadowIntensity')} onChange={(e) => updateToken(parsedSelection.blockIndex, 'shadowIntensity', e.target.value || undefined)}>
+                      <option value="">(omitir)</option>
+                      <option value="none">none</option>
+                      <option value="soft">soft</option>
+                      <option value="medium">medium</option>
+                      <option value="strong">strong</option>
+                      <option value="dramatic">dramatic</option>
+                    </select>
                   </div>
                   <div>
                     <Label className="text-xs">Animation</Label>
-                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'animation', v)}>
-                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">none</SelectItem>
-                        <SelectItem value="subtle">subtle</SelectItem>
-                        <SelectItem value="smooth">smooth</SelectItem>
-                        <SelectItem value="bouncy">bouncy</SelectItem>
-                        <SelectItem value="dramatic">dramatic</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select className="h-8 w-full rounded border bg-background px-2 text-sm" value={getCurrentToken('animation')} onChange={(e) => updateToken(parsedSelection.blockIndex, 'animation', e.target.value || undefined)}>
+                      <option value="">(omitir)</option>
+                      <option value="none">none</option>
+                      <option value="subtle">subtle</option>
+                      <option value="smooth">smooth</option>
+                      <option value="bouncy">bouncy</option>
+                      <option value="dramatic">dramatic</option>
+                    </select>
                   </div>
                 </div>
               </div>
