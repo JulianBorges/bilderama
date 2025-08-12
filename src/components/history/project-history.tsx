@@ -23,7 +23,7 @@ type ProjectSnapshot = {
 export function ProjectHistory() {
   const [snapshots, setSnapshots] = useState<ProjectSnapshot[]>([])
   const [diffTarget, setDiffTarget] = useState<ProjectSnapshot | null>(null)
-  const { setGeneratedFiles, setIsGenerating, setSelectedElement, setActiveView, pagePlan, setChatMessages } = useProjectStore()
+  const { setGeneratedFiles, setIsGenerating, setSelectedElement, setActiveView, pagePlan, setChatMessages, saveCurrentSnapshotServer } = useProjectStore()
 
   useEffect(() => {
     const saved = localStorage.getItem('bilderama:versions')
@@ -31,6 +31,20 @@ export function ProjectHistory() {
       setSnapshots(JSON.parse(saved))
     }
   }, [])
+
+  const syncFromServer = async () => {
+    try {
+      const res = await fetch('/api/projects?id=default', { method: 'GET' })
+      const data = await res.json()
+      const serverSnaps = (data?.project?.snapshots || []) as ProjectSnapshot[]
+      if (Array.isArray(serverSnaps) && serverSnaps.length > 0) {
+        setSnapshots(serverSnaps)
+        persist(serverSnaps)
+      }
+    } catch (_) {
+      // silencioso
+    }
+  }
 
   const persist = (list: ProjectSnapshot[]) => {
     localStorage.setItem('bilderama:versions', JSON.stringify(list))
@@ -86,7 +100,21 @@ export function ProjectHistory() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <h2 className="text-2xl font-bold">Histórico de versões</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Histórico de versões</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={() => saveCurrentSnapshotServer()}
+            className="rounded-md border bg-primary px-3 py-1.5 text-sm text-primary-foreground"
+            title="Salvar versão atual no servidor"
+          >Salvar no servidor</button>
+          <button
+            onClick={syncFromServer}
+            className="rounded-md border px-3 py-1.5 text-sm"
+            title="Sincronizar do servidor"
+          >Sincronizar</button>
+        </div>
+      </div>
       {snapshots.length === 0 ? (
         <p className="text-muted-foreground">Nenhuma versão salva ainda. Gere um projeto para criar snapshots automáticos.</p>
       ) : (
