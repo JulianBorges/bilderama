@@ -4,17 +4,22 @@ import { describe, it, expect } from 'vitest'
 // retorne campos extras (diffPreview/toolResults) sem quebrar o contrato anterior.
 
 async function postChat(body: any) {
+  const controller = new AbortController()
+  const to = setTimeout(() => controller.abort(), 1500)
   try {
     const res = await fetch('http://localhost:3000/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: controller.signal,
     })
     const json = await res.json()
     return { ok: res.ok, json }
   } catch (err: any) {
-    // Ambiente de teste sem servidor Next ativo
+    // Ambiente de teste sem servidor Next ativo ou conexão lenta
     return { ok: false, json: { error: String(err?.message || err) } }
+  } finally {
+    clearTimeout(to)
   }
 }
 

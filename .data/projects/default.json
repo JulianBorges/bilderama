@@ -1,0 +1,121 @@
+{
+  "id": "default",
+  "name": "Bilderama",
+  "snapshots": [
+    {
+      "id": "1754962114071-ds8a2k",
+      "title": "Startup Innovate - Transformando Ideias em Realidade",
+      "prompt": "crie um site para uma startup ",
+      "pagePlanJson": "{\"pageTitle\":\"Startup Innovate - Transformando Ideias em Realidade\",\"pageDescription\":\"Desenvolvemos soluções inovadoras para o futuro\",\"theme\":{\"themeName\":\"startup_tech\",\"font\":\"poppins\",\"personality\":\"bold\",\"density\":\"comfortable\"},\"blocks\":[{\"name\":\"Navbar\",\"properties\":{\"logoText\":\"Startup Innovate\",\"links\":[\"Soluções\",\"Sobre\",\"Contato\"],\"ctaText\":\"Iniciar\"}},{\"name\":\"HeroModerno\",\"properties\":{\"title\":\"Inovação que Transforma\",\"subtitle\":\"Soluções tecnológicas para desafios modernos\",\"ctaText\":\"Saiba Mais\",\"ctaHref\":\"/sobre\"}},{\"name\":\"GridFeatures\",\"properties\":{\"title\":\"Nossas Soluções\",\"subtitle\":\"Descubra como podemos ajudar\",\"featureCards\":[{\"title\":\"Consultoria\",\"description\":\"Analisamos suas necessidades e oferecemos as melhores soluções.\",\"iconSvgPath\":\"consultoria.svg\"},{\"title\":\"Desenvolvimento\",\"description\":\"Criamos softwares personalizados para sua empresa.\",\"iconSvgPath\":\"desenvolvimento.svg\"},{\"title\":\"Suporte\",\"description\":\"Oferecemos suporte técnico eficiente e ágil.\",\"iconSvgPath\":\"suporte.svg\"}]}},{\"name\":\"Testimonials\",\"properties\":{\"title\":\"O que dizem nossos clientes\",\"subtitle\":\"A opinião dos nossos parceiros\",\"items\":[{\"quote\":\"A Startup Innovate transformou nossa empresa!\",\"authorName\":\"Ana Paula\",\"authorRole\":\"CEO da Tech Solutions\",\"avatarUrl\":\"ana.jpg\"},{\"quote\":\"Serviço de alta qualidade e equipe excelente.\",\"authorName\":\"Roberto Silva\",\"authorRole\":\"Gerente de Projetos\",\"avatarUrl\":\"roberto.jpg\"}]}},{\"name\":\"CallToAction\",\"properties\":{\"title\":\"Pronto para começar sua jornada?\",\"subtitle\":\"Entre em contato conosco hoje mesmo!\",\"buttonText\":\"Fale Conosco\"}},{\"name\":\"Footer\",\"properties\":{\"companyName\":\"Startup Innovate\",\"companyDescription\":\"A Startup que impulsiona inovação.\",\"linkSections\":[{\"title\":\"Links Úteis\",\"links\":[\"Política de Privacidade\",\"Termos de Serviço\"]},{\"title\":\"Contato\",\"links\":[\"Email\",\"Telefone\"]}],\"copyrightText\":\"© 2023 Startup Innovate. Todos os direitos reservados.\",\"socialLinks\":[{\"iconSvgPath\":\"facebook.svg\"},{\"iconSvgPath\":\"twitter.svg\"}]}}],\"pages\":[{\"path\":\"/sobre\",\"pageTitle\":\"Sobre a Startup Innovate\",\"pageDescription\":\"Conheça nossa história e missão\",\"blocks\":[{\"name\":\"HeroClassico\",\"properties\":{\"title\":\"Sobre Nós\",\"subtitle\":\"Inovação e tecnologia em cada passo\",\"ctaText\":\"Voltar para o início\",\"ctaHref\":\"/\"}},{\"name\":\"Team\",\"properties\":{\"title\":\"Nossa Equipe\",\"subtitle\":\"Profissionais dedicados e qualificados\",\"members\":[{\"name\":\"Marcos Mendes\",\"role\":\"Fundador\",\"bio\":\"Entusiasta de tecnologia e empreendedor.\",\"avatarUrl\":\"marcos.jpg\"},{\"name\":\"Lucia Ferreira\",\"role\":\"Gestora de Projetos\",\"bio\":\"Com mais de 10 anos de experiência na área.\",\"avatarUrl\":\"lucia.jpg\"}]}}]}]}",
+      "chat": [
+        {
+          "role": "user",
+          "content": "crie um site para uma startup "
+        },
+        {
+          "role": "assistant",
+          "content": "O layout escolhido para a página reflete uma abordagem moderna e tecnológica, adequada para uma startup que visa inovação. A tipografia Poppins traz uma aparência amigável e contemporânea, enquanto a paleta de cores e ícones reforçam a personalidade ousada da empresa. No entanto, a clareza e a conversão podem ser aprimoradas em alguns aspectos, como reforço das calls-to-action e apresentação mais direta das informações.",
+          "type": "explanation"
+        }
+      ],
+      "createdAt": "2025-08-12T01:28:34.071Z",
+      "isFavorite": false
+    },
+    {
+      "id": "1754962113889-881sqs",
+      "title": "Startup Innovate - Transformando Ideias em Realidade",
+      "prompt": "crie um site para uma startup ",
+      "pagePlanJson": "{\"pageTitle\":\"Startup Innovate - Transformando Ideias em Realidade\",\"pageDescription\":\"Desenvolvemos soluções inovadoras para o futuro\",\"theme\":{\"themeName\":\"startup_tech\",\"font\":\"poppins\",\"personality\":\"bold\",\"density\":\"comfortable\"},\"blocks\":[{\"name\":\"Navbar\",\"properties\":{\"logoText\":\"Startup Innovate\",\"links\":[\"Soluções\",\"Sobre\",\"Contato\"],\"ctaText\":\"Iniciar\"}},{\"name\":\"HeroModerno\",\"properties\":{\"title\":\"Inovação que Transforma\",\"subtitle\":\"Soluções tecnológicas para desafios modernos\",\"ctaText\":\"Saiba Mais\",\"ctaHref\":\"/sobre\"}},{\"name\":\"GridFeatures\",\"properties\":{\"title\":\"Nossas Soluções\",\"subtitle\":\"Descubra como podemos ajudar\",\"featureCards\":[{\"title\":\"Consultoria\",\"description\":\"Analisamos suas necessidades e oferecemos as melhores soluções.\",\"iconSvgPath\":\"consultoria.svg\"},{\"title\":\"Desenvolvimento\",\"description\":\"Criamos softwares personalizados para sua empresa.\",\"iconSvgPath\":\"desenvolvimento.svg\"},{\"title\":\"Suporte\",\"description\":\"Oferecemos suporte técnico eficiente e ágil.\",\"iconSvgPath\":\"suporte.svg\"}]}},{\"name\":\"Testimonials\",\"properties\":{\"title\":\"O que dizem nossos clientes\",\"subtitle\":\"A opinião dos nossos parceiros\",\"items\":[{\"quote\":\"A Startup Innovate transformou nossa empresa!\",\"authorName\":\"Ana Paula\",\"authorRole\":\"CEO da Tech Solutions\",\"avatarUrl\":\"ana.jpg\"},{\"quote\":\"Serviço de alta qualidade e equipe excelente.\",\"authorName\":\"Roberto Silva\",\"authorRole\":\"Gerente de Projetos\",\"avatarUrl\":\"roberto.jpg\"}]}},{\"name\":\"CallToAction\",\"properties\":{\"title\":\"Pronto para começar sua jornada?\",\"subtitle\":\"Entre em contato conosco hoje mesmo!\",\"buttonText\":\"Fale Conosco\"}},{\"name\":\"Footer\",\"properties\":{\"companyName\":\"Startup Innovate\",\"companyDescription\":\"A Startup que impulsiona inovação.\",\"linkSections\":[{\"title\":\"Links Úteis\",\"links\":[\"Política de Privacidade\",\"Termos de Serviço\"]},{\"title\":\"Contato\",\"links\":[\"Email\",\"Telefone\"]}],\"copyrightText\":\"© 2023 Startup Innovate. Todos os direitos reservados.\",\"socialLinks\":[{\"iconSvgPath\":\"facebook.svg\"},{\"iconSvgPath\":\"twitter.svg\"}]}}],\"pages\":[{\"path\":\"/sobre\",\"pageTitle\":\"Sobre a Startup Innovate\",\"pageDescription\":\"Conheça nossa história e missão\",\"blocks\":[{\"name\":\"HeroClassico\",\"properties\":{\"title\":\"Sobre Nós\",\"subtitle\":\"Inovação e tecnologia em cada passo\",\"ctaText\":\"Voltar para o início\",\"ctaHref\":\"/\"}},{\"name\":\"Team\",\"properties\":{\"title\":\"Nossa Equipe\",\"subtitle\":\"Profissionais dedicados e qualificados\",\"members\":[{\"name\":\"Marcos Mendes\",\"role\":\"Fundador\",\"bio\":\"Entusiasta de tecnologia e empreendedor.\",\"avatarUrl\":\"marcos.jpg\"},{\"name\":\"Lucia Ferreira\",\"role\":\"Gestora de Projetos\",\"bio\":\"Com mais de 10 anos de experiência na área.\",\"avatarUrl\":\"lucia.jpg\"}]}}]}]}",
+      "chat": [
+        {
+          "role": "user",
+          "content": "crie um site para uma startup "
+        },
+        {
+          "role": "assistant",
+          "content": "O layout escolhido para a página reflete uma abordagem moderna e tecnológica, adequada para uma startup que visa inovação. A tipografia Poppins traz uma aparência amigável e contemporânea, enquanto a paleta de cores e ícones reforçam a personalidade ousada da empresa. No entanto, a clareza e a conversão podem ser aprimoradas em alguns aspectos, como reforço das calls-to-action e apresentação mais direta das informações.",
+          "type": "explanation"
+        }
+      ],
+      "createdAt": "2025-08-12T01:28:33.889Z",
+      "isFavorite": false
+    },
+    {
+      "id": "1754962113739-mtgn41",
+      "title": "Startup Innovate - Transformando Ideias em Realidade",
+      "prompt": "crie um site para uma startup ",
+      "pagePlanJson": "{\"pageTitle\":\"Startup Innovate - Transformando Ideias em Realidade\",\"pageDescription\":\"Desenvolvemos soluções inovadoras para o futuro\",\"theme\":{\"themeName\":\"startup_tech\",\"font\":\"poppins\",\"personality\":\"bold\",\"density\":\"comfortable\"},\"blocks\":[{\"name\":\"Navbar\",\"properties\":{\"logoText\":\"Startup Innovate\",\"links\":[\"Soluções\",\"Sobre\",\"Contato\"],\"ctaText\":\"Iniciar\"}},{\"name\":\"HeroModerno\",\"properties\":{\"title\":\"Inovação que Transforma\",\"subtitle\":\"Soluções tecnológicas para desafios modernos\",\"ctaText\":\"Saiba Mais\",\"ctaHref\":\"/sobre\"}},{\"name\":\"GridFeatures\",\"properties\":{\"title\":\"Nossas Soluções\",\"subtitle\":\"Descubra como podemos ajudar\",\"featureCards\":[{\"title\":\"Consultoria\",\"description\":\"Analisamos suas necessidades e oferecemos as melhores soluções.\",\"iconSvgPath\":\"consultoria.svg\"},{\"title\":\"Desenvolvimento\",\"description\":\"Criamos softwares personalizados para sua empresa.\",\"iconSvgPath\":\"desenvolvimento.svg\"},{\"title\":\"Suporte\",\"description\":\"Oferecemos suporte técnico eficiente e ágil.\",\"iconSvgPath\":\"suporte.svg\"}]}},{\"name\":\"Testimonials\",\"properties\":{\"title\":\"O que dizem nossos clientes\",\"subtitle\":\"A opinião dos nossos parceiros\",\"items\":[{\"quote\":\"A Startup Innovate transformou nossa empresa!\",\"authorName\":\"Ana Paula\",\"authorRole\":\"CEO da Tech Solutions\",\"avatarUrl\":\"ana.jpg\"},{\"quote\":\"Serviço de alta qualidade e equipe excelente.\",\"authorName\":\"Roberto Silva\",\"authorRole\":\"Gerente de Projetos\",\"avatarUrl\":\"roberto.jpg\"}]}},{\"name\":\"CallToAction\",\"properties\":{\"title\":\"Pronto para começar sua jornada?\",\"subtitle\":\"Entre em contato conosco hoje mesmo!\",\"buttonText\":\"Fale Conosco\"}},{\"name\":\"Footer\",\"properties\":{\"companyName\":\"Startup Innovate\",\"companyDescription\":\"A Startup que impulsiona inovação.\",\"linkSections\":[{\"title\":\"Links Úteis\",\"links\":[\"Política de Privacidade\",\"Termos de Serviço\"]},{\"title\":\"Contato\",\"links\":[\"Email\",\"Telefone\"]}],\"copyrightText\":\"© 2023 Startup Innovate. Todos os direitos reservados.\",\"socialLinks\":[{\"iconSvgPath\":\"facebook.svg\"},{\"iconSvgPath\":\"twitter.svg\"}]}}],\"pages\":[{\"path\":\"/sobre\",\"pageTitle\":\"Sobre a Startup Innovate\",\"pageDescription\":\"Conheça nossa história e missão\",\"blocks\":[{\"name\":\"HeroClassico\",\"properties\":{\"title\":\"Sobre Nós\",\"subtitle\":\"Inovação e tecnologia em cada passo\",\"ctaText\":\"Voltar para o início\",\"ctaHref\":\"/\"}},{\"name\":\"Team\",\"properties\":{\"title\":\"Nossa Equipe\",\"subtitle\":\"Profissionais dedicados e qualificados\",\"members\":[{\"name\":\"Marcos Mendes\",\"role\":\"Fundador\",\"bio\":\"Entusiasta de tecnologia e empreendedor.\",\"avatarUrl\":\"marcos.jpg\"},{\"name\":\"Lucia Ferreira\",\"role\":\"Gestora de Projetos\",\"bio\":\"Com mais de 10 anos de experiência na área.\",\"avatarUrl\":\"lucia.jpg\"}]}}]}]}",
+      "chat": [
+        {
+          "role": "user",
+          "content": "crie um site para uma startup "
+        },
+        {
+          "role": "assistant",
+          "content": "O layout escolhido para a página reflete uma abordagem moderna e tecnológica, adequada para uma startup que visa inovação. A tipografia Poppins traz uma aparência amigável e contemporânea, enquanto a paleta de cores e ícones reforçam a personalidade ousada da empresa. No entanto, a clareza e a conversão podem ser aprimoradas em alguns aspectos, como reforço das calls-to-action e apresentação mais direta das informações.",
+          "type": "explanation"
+        }
+      ],
+      "createdAt": "2025-08-12T01:28:33.739Z",
+      "isFavorite": false
+    },
+    {
+      "id": "1754962113432-yiedc3",
+      "title": "Startup Innovate - Transformando Ideias em Realidade",
+      "prompt": "crie um site para uma startup ",
+      "pagePlanJson": "{\"pageTitle\":\"Startup Innovate - Transformando Ideias em Realidade\",\"pageDescription\":\"Desenvolvemos soluções inovadoras para o futuro\",\"theme\":{\"themeName\":\"startup_tech\",\"font\":\"poppins\",\"personality\":\"bold\",\"density\":\"comfortable\"},\"blocks\":[{\"name\":\"Navbar\",\"properties\":{\"logoText\":\"Startup Innovate\",\"links\":[\"Soluções\",\"Sobre\",\"Contato\"],\"ctaText\":\"Iniciar\"}},{\"name\":\"HeroModerno\",\"properties\":{\"title\":\"Inovação que Transforma\",\"subtitle\":\"Soluções tecnológicas para desafios modernos\",\"ctaText\":\"Saiba Mais\",\"ctaHref\":\"/sobre\"}},{\"name\":\"GridFeatures\",\"properties\":{\"title\":\"Nossas Soluções\",\"subtitle\":\"Descubra como podemos ajudar\",\"featureCards\":[{\"title\":\"Consultoria\",\"description\":\"Analisamos suas necessidades e oferecemos as melhores soluções.\",\"iconSvgPath\":\"consultoria.svg\"},{\"title\":\"Desenvolvimento\",\"description\":\"Criamos softwares personalizados para sua empresa.\",\"iconSvgPath\":\"desenvolvimento.svg\"},{\"title\":\"Suporte\",\"description\":\"Oferecemos suporte técnico eficiente e ágil.\",\"iconSvgPath\":\"suporte.svg\"}]}},{\"name\":\"Testimonials\",\"properties\":{\"title\":\"O que dizem nossos clientes\",\"subtitle\":\"A opinião dos nossos parceiros\",\"items\":[{\"quote\":\"A Startup Innovate transformou nossa empresa!\",\"authorName\":\"Ana Paula\",\"authorRole\":\"CEO da Tech Solutions\",\"avatarUrl\":\"ana.jpg\"},{\"quote\":\"Serviço de alta qualidade e equipe excelente.\",\"authorName\":\"Roberto Silva\",\"authorRole\":\"Gerente de Projetos\",\"avatarUrl\":\"roberto.jpg\"}]}},{\"name\":\"CallToAction\",\"properties\":{\"title\":\"Pronto para começar sua jornada?\",\"subtitle\":\"Entre em contato conosco hoje mesmo!\",\"buttonText\":\"Fale Conosco\"}},{\"name\":\"Footer\",\"properties\":{\"companyName\":\"Startup Innovate\",\"companyDescription\":\"A Startup que impulsiona inovação.\",\"linkSections\":[{\"title\":\"Links Úteis\",\"links\":[\"Política de Privacidade\",\"Termos de Serviço\"]},{\"title\":\"Contato\",\"links\":[\"Email\",\"Telefone\"]}],\"copyrightText\":\"© 2023 Startup Innovate. Todos os direitos reservados.\",\"socialLinks\":[{\"iconSvgPath\":\"facebook.svg\"},{\"iconSvgPath\":\"twitter.svg\"}]}}],\"pages\":[{\"path\":\"/sobre\",\"pageTitle\":\"Sobre a Startup Innovate\",\"pageDescription\":\"Conheça nossa história e missão\",\"blocks\":[{\"name\":\"HeroClassico\",\"properties\":{\"title\":\"Sobre Nós\",\"subtitle\":\"Inovação e tecnologia em cada passo\",\"ctaText\":\"Voltar para o início\",\"ctaHref\":\"/\"}},{\"name\":\"Team\",\"properties\":{\"title\":\"Nossa Equipe\",\"subtitle\":\"Profissionais dedicados e qualificados\",\"members\":[{\"name\":\"Marcos Mendes\",\"role\":\"Fundador\",\"bio\":\"Entusiasta de tecnologia e empreendedor.\",\"avatarUrl\":\"marcos.jpg\"},{\"name\":\"Lucia Ferreira\",\"role\":\"Gestora de Projetos\",\"bio\":\"Com mais de 10 anos de experiência na área.\",\"avatarUrl\":\"lucia.jpg\"}]}}]}]}",
+      "chat": [
+        {
+          "role": "user",
+          "content": "crie um site para uma startup "
+        },
+        {
+          "role": "assistant",
+          "content": "O layout escolhido para a página reflete uma abordagem moderna e tecnológica, adequada para uma startup que visa inovação. A tipografia Poppins traz uma aparência amigável e contemporânea, enquanto a paleta de cores e ícones reforçam a personalidade ousada da empresa. No entanto, a clareza e a conversão podem ser aprimoradas em alguns aspectos, como reforço das calls-to-action e apresentação mais direta das informações.",
+          "type": "explanation"
+        }
+      ],
+      "createdAt": "2025-08-12T01:28:33.432Z",
+      "isFavorite": false
+    },
+    {
+      "id": "1754962113251-hclu1b",
+      "title": "Startup Innovate - Transformando Ideias em Realidade",
+      "prompt": "crie um site para uma startup ",
+      "pagePlanJson": "{\"pageTitle\":\"Startup Innovate - Transformando Ideias em Realidade\",\"pageDescription\":\"Desenvolvemos soluções inovadoras para o futuro\",\"theme\":{\"themeName\":\"startup_tech\",\"font\":\"poppins\",\"personality\":\"bold\",\"density\":\"comfortable\"},\"blocks\":[{\"name\":\"Navbar\",\"properties\":{\"logoText\":\"Startup Innovate\",\"links\":[\"Soluções\",\"Sobre\",\"Contato\"],\"ctaText\":\"Iniciar\"}},{\"name\":\"HeroModerno\",\"properties\":{\"title\":\"Inovação que Transforma\",\"subtitle\":\"Soluções tecnológicas para desafios modernos\",\"ctaText\":\"Saiba Mais\",\"ctaHref\":\"/sobre\"}},{\"name\":\"GridFeatures\",\"properties\":{\"title\":\"Nossas Soluções\",\"subtitle\":\"Descubra como podemos ajudar\",\"featureCards\":[{\"title\":\"Consultoria\",\"description\":\"Analisamos suas necessidades e oferecemos as melhores soluções.\",\"iconSvgPath\":\"consultoria.svg\"},{\"title\":\"Desenvolvimento\",\"description\":\"Criamos softwares personalizados para sua empresa.\",\"iconSvgPath\":\"desenvolvimento.svg\"},{\"title\":\"Suporte\",\"description\":\"Oferecemos suporte técnico eficiente e ágil.\",\"iconSvgPath\":\"suporte.svg\"}]}},{\"name\":\"Testimonials\",\"properties\":{\"title\":\"O que dizem nossos clientes\",\"subtitle\":\"A opinião dos nossos parceiros\",\"items\":[{\"quote\":\"A Startup Innovate transformou nossa empresa!\",\"authorName\":\"Ana Paula\",\"authorRole\":\"CEO da Tech Solutions\",\"avatarUrl\":\"ana.jpg\"},{\"quote\":\"Serviço de alta qualidade e equipe excelente.\",\"authorName\":\"Roberto Silva\",\"authorRole\":\"Gerente de Projetos\",\"avatarUrl\":\"roberto.jpg\"}]}},{\"name\":\"CallToAction\",\"properties\":{\"title\":\"Pronto para começar sua jornada?\",\"subtitle\":\"Entre em contato conosco hoje mesmo!\",\"buttonText\":\"Fale Conosco\"}},{\"name\":\"Footer\",\"properties\":{\"companyName\":\"Startup Innovate\",\"companyDescription\":\"A Startup que impulsiona inovação.\",\"linkSections\":[{\"title\":\"Links Úteis\",\"links\":[\"Política de Privacidade\",\"Termos de Serviço\"]},{\"title\":\"Contato\",\"links\":[\"Email\",\"Telefone\"]}],\"copyrightText\":\"© 2023 Startup Innovate. Todos os direitos reservados.\",\"socialLinks\":[{\"iconSvgPath\":\"facebook.svg\"},{\"iconSvgPath\":\"twitter.svg\"}]}}],\"pages\":[{\"path\":\"/sobre\",\"pageTitle\":\"Sobre a Startup Innovate\",\"pageDescription\":\"Conheça nossa história e missão\",\"blocks\":[{\"name\":\"HeroClassico\",\"properties\":{\"title\":\"Sobre Nós\",\"subtitle\":\"Inovação e tecnologia em cada passo\",\"ctaText\":\"Voltar para o início\",\"ctaHref\":\"/\"}},{\"name\":\"Team\",\"properties\":{\"title\":\"Nossa Equipe\",\"subtitle\":\"Profissionais dedicados e qualificados\",\"members\":[{\"name\":\"Marcos Mendes\",\"role\":\"Fundador\",\"bio\":\"Entusiasta de tecnologia e empreendedor.\",\"avatarUrl\":\"marcos.jpg\"},{\"name\":\"Lucia Ferreira\",\"role\":\"Gestora de Projetos\",\"bio\":\"Com mais de 10 anos de experiência na área.\",\"avatarUrl\":\"lucia.jpg\"}]}}]}]}",
+      "chat": [
+        {
+          "role": "user",
+          "content": "crie um site para uma startup "
+        },
+        {
+          "role": "assistant",
+          "content": "O layout escolhido para a página reflete uma abordagem moderna e tecnológica, adequada para uma startup que visa inovação. A tipografia Poppins traz uma aparência amigável e contemporânea, enquanto a paleta de cores e ícones reforçam a personalidade ousada da empresa. No entanto, a clareza e a conversão podem ser aprimoradas em alguns aspectos, como reforço das calls-to-action e apresentação mais direta das informações.",
+          "type": "explanation"
+        }
+      ],
+      "createdAt": "2025-08-12T01:28:33.251Z",
+      "isFavorite": false
+    },
+    {
+      "id": "1754962105214-90iu0v",
+      "title": "Startup Innovate - Transformando Ideias em Realidade",
+      "prompt": "crie um site para uma startup ",
+      "pagePlanJson": "{\"pageTitle\":\"Startup Innovate - Transformando Ideias em Realidade\",\"pageDescription\":\"Desenvolvemos soluções inovadoras para o futuro\",\"theme\":{\"themeName\":\"startup_tech\",\"font\":\"poppins\",\"personality\":\"bold\",\"density\":\"comfortable\"},\"blocks\":[{\"name\":\"Navbar\",\"properties\":{\"logoText\":\"Startup Innovate\",\"links\":[\"Soluções\",\"Sobre\",\"Contato\"],\"ctaText\":\"Iniciar\"}},{\"name\":\"HeroModerno\",\"properties\":{\"title\":\"Inovação que Transforma\",\"subtitle\":\"Soluções tecnológicas para desafios modernos\",\"ctaText\":\"Saiba Mais\",\"ctaHref\":\"/sobre\"}},{\"name\":\"GridFeatures\",\"properties\":{\"title\":\"Nossas Soluções\",\"subtitle\":\"Descubra como podemos ajudar\",\"featureCards\":[{\"title\":\"Consultoria\",\"description\":\"Analisamos suas necessidades e oferecemos as melhores soluções.\",\"iconSvgPath\":\"consultoria.svg\"},{\"title\":\"Desenvolvimento\",\"description\":\"Criamos softwares personalizados para sua empresa.\",\"iconSvgPath\":\"desenvolvimento.svg\"},{\"title\":\"Suporte\",\"description\":\"Oferecemos suporte técnico eficiente e ágil.\",\"iconSvgPath\":\"suporte.svg\"}]}},{\"name\":\"Testimonials\",\"properties\":{\"title\":\"O que dizem nossos clientes\",\"subtitle\":\"A opinião dos nossos parceiros\",\"items\":[{\"quote\":\"A Startup Innovate transformou nossa empresa!\",\"authorName\":\"Ana Paula\",\"authorRole\":\"CEO da Tech Solutions\",\"avatarUrl\":\"ana.jpg\"},{\"quote\":\"Serviço de alta qualidade e equipe excelente.\",\"authorName\":\"Roberto Silva\",\"authorRole\":\"Gerente de Projetos\",\"avatarUrl\":\"roberto.jpg\"}]}},{\"name\":\"CallToAction\",\"properties\":{\"title\":\"Pronto para começar sua jornada?\",\"subtitle\":\"Entre em contato conosco hoje mesmo!\",\"buttonText\":\"Fale Conosco\"}},{\"name\":\"Footer\",\"properties\":{\"companyName\":\"Startup Innovate\",\"companyDescription\":\"A Startup que impulsiona inovação.\",\"linkSections\":[{\"title\":\"Links Úteis\",\"links\":[\"Política de Privacidade\",\"Termos de Serviço\"]},{\"title\":\"Contato\",\"links\":[\"Email\",\"Telefone\"]}],\"copyrightText\":\"© 2023 Startup Innovate. Todos os direitos reservados.\",\"socialLinks\":[{\"iconSvgPath\":\"facebook.svg\"},{\"iconSvgPath\":\"twitter.svg\"}]}}],\"pages\":[{\"path\":\"/sobre\",\"pageTitle\":\"Sobre a Startup Innovate\",\"pageDescription\":\"Conheça nossa história e missão\",\"blocks\":[{\"name\":\"HeroClassico\",\"properties\":{\"title\":\"Sobre Nós\",\"subtitle\":\"Inovação e tecnologia em cada passo\",\"ctaText\":\"Voltar para o início\",\"ctaHref\":\"/\"}},{\"name\":\"Team\",\"properties\":{\"title\":\"Nossa Equipe\",\"subtitle\":\"Profissionais dedicados e qualificados\",\"members\":[{\"name\":\"Marcos Mendes\",\"role\":\"Fundador\",\"bio\":\"Entusiasta de tecnologia e empreendedor.\",\"avatarUrl\":\"marcos.jpg\"},{\"name\":\"Lucia Ferreira\",\"role\":\"Gestora de Projetos\",\"bio\":\"Com mais de 10 anos de experiência na área.\",\"avatarUrl\":\"lucia.jpg\"}]}}]}]}",
+      "chat": [
+        {
+          "role": "user",
+          "content": "crie um site para uma startup "
+        },
+        {
+          "role": "assistant",
+          "content": "O layout escolhido para a página reflete uma abordagem moderna e tecnológica, adequada para uma startup que visa inovação. A tipografia Poppins traz uma aparência amigável e contemporânea, enquanto a paleta de cores e ícones reforçam a personalidade ousada da empresa. No entanto, a clareza e a conversão podem ser aprimoradas em alguns aspectos, como reforço das calls-to-action e apresentação mais direta das informações.",
+          "type": "explanation"
+        }
+      ],
+      "createdAt": "2025-08-12T01:28:25.214Z",
+      "isFavorite": false
+    }
+  ],
+  "updatedAt": "2025-08-12T01:28:34.094Z"
+}

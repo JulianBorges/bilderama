@@ -23,6 +23,7 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const { activeView, setActiveView } = useProjectStore()
   const [runtimeMode, setRuntimeMode] = useState<'html' | 'sandpack'>('html')
+  const [buildHash, setBuildHash] = useState<string | null>(null)
 
   const currentPath = externalPath ?? internalPath
 
@@ -176,8 +177,26 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
         </div>
         {/* Direita: device icons + runtime toggle */}
         <div className="ml-auto flex items-center gap-1">
-          <Button variant="outline" size="sm" onClick={() => setRuntimeMode(runtimeMode === 'html' ? 'sandpack' : 'html')}>
-            {runtimeMode === 'html' ? 'Sandpack' : 'HTML'}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              if (runtimeMode === 'html') {
+                setRuntimeMode('sandpack')
+                return
+              }
+              // Modo experimento: envia VFS atual para /api/build e guarda hash (para futura integração de artefatos reais)
+              try {
+                const { generatedFiles } = useProjectStore.getState()
+                const res = await fetch('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: generatedFiles }) })
+                const data = await res.json()
+                if (res.ok && data?.hash) setBuildHash(data.hash)
+              } catch {}
+              setRuntimeMode('html')
+            }}
+          >
+            {runtimeMode === 'html' ? 'Sandpack' : 'Build'
+            }
           </Button>
           <Button variant={viewMode === 'desktop' ? 'default' : 'ghost'} size="icon" aria-label="Desktop" title="Desktop" onClick={() => setViewMode('desktop')}>
             <DesktopIcon className="h-5 w-5" />
@@ -197,7 +216,11 @@ export function PreviewIframe({ files, isLoading, onElementSelect, isEditMode, c
           ) : runtimeMode === 'html' ? (
             <iframe ref={iframeRef} srcDoc={generateFullHtml(currentPath, isEditMode)} className="h-full w-full" sandbox="allow-scripts allow-same-origin allow-forms" title="Preview" loading="lazy" />
           ) : (
-            <SandpackRunner files={files} />
+            buildHash ? (
+              <iframe src={`/api/build/index?hash=${encodeURIComponent(buildHash)}`} className="h-full w-full" title="Build Preview" />
+            ) : (
+              <SandpackRunner files={files} />
+            )
           )}
         </div>
       </div>

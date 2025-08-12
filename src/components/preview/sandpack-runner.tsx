@@ -29,7 +29,9 @@ export function SandpackRunner({ files }: RunnerProps) {
   return (
     <SandpackProvider template="vanilla" files={spFiles} options={{ activeFile: '/index.html' }}>
       <SandpackLayout>
-        <SandpackPreview showOpenInCodeSandbox={false} showRefreshButton viewport={{ width: '100%', height: '100%' }} />
+        <div style={{ width: '100%', height: '100%', minHeight: 300 }}>
+          <SandpackPreview showOpenInCodeSandbox={false} showRefreshButton />
+        </div>
       </SandpackLayout>
     </SandpackProvider>
   )
