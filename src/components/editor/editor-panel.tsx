@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useProjectStore } from '@/store/project-store'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface EditorPanelProps {
   selectedElement: {
@@ -22,6 +23,7 @@ export function EditorPanel({ selectedElement, onUpdate, onClose }: EditorPanelP
   const [linkValue, setLinkValue] = useState('')
   const [imageValue, setImageValue] = useState('')
   const pagePlan = useProjectStore((s) => s.pagePlan)
+  const updateToken = useProjectStore((s) => s.updateDesignToken)
 
   const parsedSelection = useMemo(() => {
     if (!selectedElement) return null
@@ -124,6 +126,89 @@ export function EditorPanel({ selectedElement, onUpdate, onClose }: EditorPanelP
                   onChange={(e) => setImageValue(e.target.value)}
                   placeholder="https://..."
                 />
+              </div>
+            )}
+            {parsedSelection && (
+              <div className="space-y-2 border-t pt-3">
+                <div className="text-xs font-medium text-muted-foreground">Design Tokens</div>
+                <div className="grid grid-cols-1 gap-2">
+                  <div>
+                    <Label className="text-xs">Card Style</Label>
+                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'cardStyle', v)}>
+                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="elevated">elevated</SelectItem>
+                        <SelectItem value="outline">outline</SelectItem>
+                        <SelectItem value="glass">glass</SelectItem>
+                        <SelectItem value="minimal">minimal</SelectItem>
+                        <SelectItem value="bold">bold</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Spacing</Label>
+                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'spacing', v)}>
+                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="compact">compact</SelectItem>
+                        <SelectItem value="comfortable">comfortable</SelectItem>
+                        <SelectItem value="spacious">spacious</SelectItem>
+                        <SelectItem value="extra-spacious">extra-spacious</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Emphasis</Label>
+                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'emphasis', v)}>
+                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="primary">primary</SelectItem>
+                        <SelectItem value="accent">accent</SelectItem>
+                        <SelectItem value="neutral">neutral</SelectItem>
+                        <SelectItem value="muted">muted</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Border Radius</Label>
+                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'borderRadius', v)}>
+                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">none</SelectItem>
+                        <SelectItem value="small">small</SelectItem>
+                        <SelectItem value="medium">medium</SelectItem>
+                        <SelectItem value="large">large</SelectItem>
+                        <SelectItem value="full">full</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Shadow Intensity</Label>
+                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'shadowIntensity', v)}>
+                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">none</SelectItem>
+                        <SelectItem value="soft">soft</SelectItem>
+                        <SelectItem value="medium">medium</SelectItem>
+                        <SelectItem value="strong">strong</SelectItem>
+                        <SelectItem value="dramatic">dramatic</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Animation</Label>
+                    <Select onValueChange={(v) => updateToken(parsedSelection.blockIndex, 'animation', v)}>
+                      <SelectTrigger className="h-8"><SelectValue placeholder="(omitir)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">none</SelectItem>
+                        <SelectItem value="subtle">subtle</SelectItem>
+                        <SelectItem value="smooth">smooth</SelectItem>
+                        <SelectItem value="bouncy">bouncy</SelectItem>
+                        <SelectItem value="dramatic">dramatic</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
             )}
             <Button type="submit" className="w-full">Atualizar</Button>

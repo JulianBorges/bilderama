@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { GeneratedFile, AIResponse } from '@/lib/ai';
 import { PagePlan } from '@/lib/schemas';
 import type { DiffOperation } from '@/lib/vfs';
+import { pagePlanSchema } from '@/lib/schemas'
 
 export type ChatMessage = {
   role: 'user' | 'assistant';
@@ -56,6 +57,7 @@ interface ProjectState {
   // Actions
   handleCodeGeneration: (response: AIResponse) => void;
   handleElementUpdate: (id: string, newContent: string) => void;
+  updateDesignToken: (blockIndex: number, tokenKey: 'cardStyle' | 'spacing' | 'emphasis' | 'borderRadius' | 'shadowIntensity' | 'animation', value: string | undefined) => void;
   setGeneratedFiles: (files: GeneratedFile[]) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setActiveView: (view: ActiveView) => void;
@@ -215,8 +217,38 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         return block;
       })
     };
-    
-    set({ pagePlan: newPagePlan });
+    try {
+      pagePlanSchema.parse(newPagePlan)
+      set({ pagePlan: newPagePlan })
+    } catch (e) {
+      console.warn('Validação Zod falhou ao atualizar propriedade:', e)
+    }
+  },
+
+  updateDesignToken: (blockIndex, tokenKey, value) => {
+    const { pagePlan } = get();
+    if (!pagePlan) return;
+    const newPagePlan: PagePlan = {
+      ...pagePlan,
+      blocks: pagePlan.blocks.map((block, index) => {
+        if (index !== blockIndex) return block
+        const nextTokens: Record<string, any> = { ...(block as any).designTokens || {} }
+        if (value === undefined || value === '') {
+          delete nextTokens[tokenKey]
+        } else {
+          nextTokens[tokenKey] = value
+        }
+        // remove objeto vazio
+        const cleaned = Object.keys(nextTokens).length > 0 ? nextTokens : undefined
+        return { ...block, designTokens: cleaned as any }
+      })
+    }
+    try {
+      pagePlanSchema.parse(newPagePlan)
+      set({ pagePlan: newPagePlan })
+    } catch (e) {
+      console.warn('Validação Zod falhou ao atualizar design token:', e)
+    }
   },
 
   applyVfsDiff: async (operations) => {
