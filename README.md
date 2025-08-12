@@ -166,11 +166,34 @@ Abaixo, uma análise prática das lacunas e do que precisa ser refatorado/adicio
 - Kits verticais (restaurantes, clínicas, imobiliárias, educação, etc.) com variações de blocos e copy PT‑BR nativa.
 - Regras de diversidade visual por nicho (cores, densidade, tipografia) orientadas pelo prompt de Designer.
 
-9) Assets e mídia
+9) Experiência de uso (onboarding + receitas + diffs)
+- Onboarding guiado por objetivos (ex.: “clínica com agendamento por WhatsApp”).
+- Biblioteca de “receitas” acionáveis via chat (mudanças comuns, boas práticas de UX e conversão).
+- Modo diffs com staging por arquivo/trecho e pré‑visualização segura.
+
+10) Assets e mídia
 - Otimização de imagens (formatos modernos, resize, lazy‑load, placeholders) e pipeline de upload/transformação.
 - Diretrizes para ícones/ilustrações consistentes por nicho.
 
-> Sprints sugeridos: (1) mapeamento+editor, (2) agente+explicações, (3) persistência+histórico, (4) build remoto+preview, (5) publicação, (6) billing+LGPD).
+> Sprints sugeridos: (1) mapeamento+editor, (2) agente+explicações+UX/receitas, (3) persistência+histórico, (4) build remoto+preview, (5) publicação, (6) billing+LGPD).
+
+---
+
+## ✅ Critérios de Aceite (MVP)
+
+- Editor por tipo funcionando sobre `data-bild-*`:
+  - Texto, imagem, link interno e enums de tokens com validação Zod.
+- Agente multi‑etapas operante:
+  - Gera `diffs` aplicáveis (VFS), executa `format`/`typecheck`/`tests` e retorna explicação e sugestões.
+- Persistência e histórico:
+  - Snapshots versionados via `/api/projects` com restauração a partir de versões.
+  - Publicação persistida localmente (FS) com URL pública `/p/[slug]`.
+- Preview executável:
+  - HTML determinístico como fallback; Sandpack ou build remoto efêmero planejado.
+- Publicação mínima viável:
+  - Artefatos persistidos e servidos, SEO básico (metas/sitemap/robots planejados).
+- Qualidade base:
+  - Suíte de testes verde, typecheck, lint/format; sanitização básica de conteúdo.
 
 ---
 
